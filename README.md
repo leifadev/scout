@@ -6,7 +6,7 @@ No bloated javascript ad websites anymore!
  
 ## Native Build Details
 ```cs
-Tested macOS version: 10.15.7 (19H2)
+Currently testing on macOS 10.15.7 (19H2)
 
 Python version: 3.8.5
 ``` 
