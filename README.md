@@ -18,8 +18,9 @@ Python version: 3.8.5
 | Windows   | ?                |
 | MacOS  | :white_check_mark: |
 | Linux   | ?                |
+
 *Since this is based only with python it is versatile for OS support*
- 
+
  ## To-do list
 - Inital release include barebones of functionality
 - Great file browser
