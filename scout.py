@@ -18,7 +18,7 @@ class App:
         print(self.changedDefaultDir)
         
         ## UI elements ##
-        # initiating elements first!
+
 
         # Attributes #
 
@@ -30,6 +30,8 @@ class App:
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+
+
 
         # Menu items
 
@@ -49,12 +51,14 @@ class App:
 
 
         helpmenu = Menu(menubar)
-        helpmenu.add_command(label="Settings", command=self.settings_button)
-        helpmenu.add_separator()
+        
         helpmenu.add_command(label="About", command=self.dummy)
         helpmenu.add_command(label="Help", command=self.helpButton_command)
+        
+        helpmenu.add_separator()
+        
+        helpmenu.add_command(label="Settings", command=self.settings_button)
         menubar.add_cascade(label="About", menu=helpmenu)
-
 
         root.config(menu=menubar)
         
@@ -120,7 +124,7 @@ class App:
     def downloadButton_command(self):
         query = self.urlfield.get() # gets entry input
         yt = YouTube(query)
-
+    
         yt.streams.first().download(self.path)
         
         
