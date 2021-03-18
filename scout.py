@@ -77,11 +77,10 @@ class App:
 
     def downloadButton_command(self):
         query = self.urlfield.get()
-        path = ""
-        yt.streams.first().download(spath)
-        print(yt.title)
-        
         yt = YouTube(query)
+        path = ""
+        yt.streams.first().download(path)
+                                        # print(yt.title)
         
         print(query)
 
@@ -104,6 +103,14 @@ class App:
 
     def helpButton_command(root):
         webbrowser.open("https://github.com/leifadev/scout")
+
+
+
+
+
+
+# https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/ # file browser
+# https://python-pytube.readthedocs.io/en/latest/api.html
 
 
 
