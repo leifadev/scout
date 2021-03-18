@@ -22,7 +22,7 @@ Python version: 3.8.5
 *Since this is based only with python it is versatile for OS support*
 
  ## To-do list
-~~- Release alpha version include barebones of functionality~~
+- ~~Release alpha version include barebones of functionality~~
 - Great file browser
 - Add support for more file types and or resolutions
 - Add thumbnail downloading  support
