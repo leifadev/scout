@@ -1,17 +1,22 @@
 import tkinter as tk
+from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
 from pytube import YouTube
 
+
+# python3 setup.py py2app -A
+# The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
+
 class App:
     def __init__(self, root):
-
         self.audioBool = False
         self.videoBool = False
-        
-        
+        self.changedDefaultDir = False
         self.path = ""
 
+        print(self.changedDefaultDir)
+        
         ## UI elements ##
         # initiating elements first!
 
@@ -25,10 +30,34 @@ class App:
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+
+        # Menu items
+
+        menubar = Menu(root)
+        filemenu = Menu(menubar)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
         
+        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
+        
+        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
+        
+        filemenu.add_separator()
+        
+        filemenu.add_command(label="Exit", command=root.quit)
+        menubar.add_cascade(label="File", menu=filemenu)
 
 
+        helpmenu = Menu(menubar)
+        helpmenu.add_command(label="Settings", command=self.settings_button)
+        helpmenu.add_separator()
+        helpmenu.add_command(label="About", command=self.dummy)
+        helpmenu.add_command(label="Help", command=self.helpButton_command)
+        menubar.add_cascade(label="About", menu=helpmenu)
 
+
+        root.config(menu=menubar)
+        
 
         # Elements #
 
@@ -94,13 +123,15 @@ class App:
 
         yt.streams.first().download(self.path)
         
-            
-
+        
 
     def browseButton_command(self):
-        self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
-        print(self.path)
+        if self.changedDefaultDir:
+            self.path = str(askdirectory(initialdir=self.path))
+        else:
+            self.path = str(askdirectory(initialdir='~/Desktop/'))
         
+        ## READ THIS OK: ADD IN SETTINGS PANEL CHANGE YOUR DEFAULT DIR OPTION
 
 
     def videoButton_command(self):
@@ -118,14 +149,50 @@ class App:
             self.audioBool = True
         else:
             self.audioBool = False
+            
+        self.settings_button()
 
 #        print(self.audioBool) # print boolean output
 
 
-    def helpButton_command(root):
+    def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
+        
+        
+    def settings_button(self):
+        sWin = Toplevel()
+        sWin.title("Settings")
+        width=550
+        height=400
+        screenwidth = sWin.winfo_screenwidth()
+        screenheight = sWin.winfo_screenheight()
+        sWin_alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        sWin.geometry(sWin_alignstr)
+        sWin.resizable(width=False, height=False)
+
+        defaultDirButton=tk.Button(sWin)
+        defaultDirButton["justify"] = "center"
+        defaultDirButton["text"] = "Choose"
+        defaultDirButton.place(x=280,y=168,width=120)
+        defaultDirButton["command"] = self.defaultDir_command
+
+        defaultDirTip = tk.Label(sWin)
+        defaultDirTip = Label(sWin, text="Set Default Directory")
+        defaultDirTip.place(x=140,y=170,width=140)
+
+        defaultDirTip = tk.Label(sWin)
+        defaultDirTip = Label(sWin, text="Settings")
+        defaultDirTip.place(x=200,y=60,width=140)
 
 
+
+    def defaultDir_command(self):
+        self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
+        self.changedDefaultDir = True
+
+        
+    def dummy(self):
+        pass
 
 
 
@@ -140,12 +207,3 @@ if __name__ == "__main__":
     app = App(root)
     root.mainloop()
 
-
-#        if self.audioBool:
-#            print("audio")
-#            if self.videoBool:
-#                print("both on")
-#        elif self.videoBool:
-#                print("video")
-#        else:
-#            print("nothing")
