@@ -9,7 +9,7 @@ Usage:
  
 from setuptools import setup
  
-APP = ['Sheath.py']
+APP = ['Scout.py']
  
 OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns',
            'plist': {
@@ -20,7 +20,6 @@ OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns',
  
 setup(
     app=APP,
-    data_files=DATA_FILES,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
 )

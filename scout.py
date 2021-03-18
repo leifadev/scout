@@ -9,6 +9,7 @@ class App:
         self.audioBool = False
         self.videoBool = False
         
+        
         self.path = ""
 
         ## UI elements ##
@@ -16,14 +17,18 @@ class App:
 
         # Attributes #
 
-        root.title("Sheath")
+        root.title("Scout")
         width=845
-        height=320
+        height=350
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
+        
+
+
+
 
         # Elements #
 
@@ -71,7 +76,7 @@ class App:
         helpButton=tk.Button(root)
         helpButton["justify"] = "center"
         helpButton["text"] = "Help"
-        helpButton.place(x=20,y=270,width=70)
+        helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
         ###### Hidden File format buttons ######
@@ -84,11 +89,12 @@ class App:
     ## Triggers and Scripts ##
 
     def downloadButton_command(self):
-        query = self.urlfield.get()
+        query = self.urlfield.get() # gets entry input
         yt = YouTube(query)
-        yt.streams.first().download(path)
-        print(query)
 
+        yt.streams.first().download(self.path)
+        
+            
 
 
     def browseButton_command(self):
@@ -102,16 +108,18 @@ class App:
             self.videoBool = True
         else:
             self.videoBool = False
-        print(self.videoBool) # print boolean output
+
+#        print(self.videoBool) # print boolean output
 
 
     def audioButton_command(self):
+    
         if self.audioBool == False:
             self.audioBool = True
         else:
             self.audioBool = False
 
-        print(self.audioBool) # print boolean output
+#        print(self.audioBool) # print boolean output
 
 
     def helpButton_command(root):
@@ -131,3 +139,13 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
     root.mainloop()
+
+
+#        if self.audioBool:
+#            print("audio")
+#            if self.videoBool:
+#                print("both on")
+#        elif self.videoBool:
+#                print("video")
+#        else:
+#            print("nothing")
