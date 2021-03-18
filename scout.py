@@ -3,6 +3,7 @@ from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
 from pytube import YouTube
+from pytube.exceptions import RegexMatchError
 
 
 # python3 setup.py py2app -A
@@ -15,7 +16,6 @@ class App:
         self.changedDefaultDir = False
         self.path = ""
 
-        print(self.changedDefaultDir)
         
         ## UI elements ##
 
@@ -122,10 +122,23 @@ class App:
     ## Triggers and Scripts ##
 
     def downloadButton_command(self):
-        query = self.urlfield.get() # gets entry input
-        yt = YouTube(query)
-    
-        yt.streams.first().download(self.path)
+        
+        if self.videoBool and self.audioBool:
+            query = self.urlfield.get() # gets entry input
+            yt = YouTube(query)
+            yt.streams.filters().first().download(self.path)
+            
+        elif self.audioBool:  # Audio only
+            query = self.urlfield.get() # gets entry input
+            yt = YouTube(query)
+            yt.streams.filters(only_audio=True).first().download(self.path)
+
+        elif self.audioBool == False and self.videoBool: # Video only
+            print("video only mmmmzaaddyyyy")
+            
+        else:
+            print("ERROR: Invalid selection, you need download some form of media!")
+
         
         
 
@@ -144,23 +157,19 @@ class App:
         else:
             self.videoBool = False
 
-#        print(self.videoBool) # print boolean output
 
 
     def audioButton_command(self):
-    
         if self.audioBool == False:
             self.audioBool = True
         else:
             self.audioBool = False
             
-        self.settings_button()
-
-#        print(self.audioBool) # print boolean output
-
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
+        
+        
         
         
     def settings_button(self):
