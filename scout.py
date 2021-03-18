@@ -7,6 +7,8 @@ class App:
     def __init__(self, root):
 
         self.audioBool = False
+        self.videoBool = False
+        
         self.path = ""
 
         ## UI elements ##
@@ -79,7 +81,6 @@ class App:
 
 
 
-
     ## Triggers and Scripts ##
 
     def downloadButton_command(self):
@@ -97,11 +98,11 @@ class App:
 
 
     def videoButton_command(self):
-        if self.audioBool == False:
-            self.audioBool = True
+        if self.videoBool == False:
+            self.videoBool = True
         else:
-            self.audioBool = False
-        print(self.audioBool) # print boolean output
+            self.videoBool = False
+        print(self.videoBool) # print boolean output
 
 
     def audioButton_command(self):
