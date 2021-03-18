@@ -23,7 +23,7 @@ Python version: 3.8.5
 
  ## To-do list
 - ~~Release alpha version include barebones of functionality~~
-- Great file browser
+- ~~Great file browser~~
 - Add support for more file types and or resolutions
 - Add thumbnail downloading  support
 - Add other streaming-site support
