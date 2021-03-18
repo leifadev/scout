@@ -1,12 +1,13 @@
 import tkinter as tk
 import webbrowser
+from tkinter.filedialog import askdirectory
 from pytube import YouTube
-
 
 class App:
     def __init__(self, root):
 
         self.audioBool = False
+        self.path = ""
 
         ## UI elements ##
         # initiating elements first!
@@ -24,29 +25,36 @@ class App:
 
         # Elements #
 
-        label = tk.Label(root)
-        label["justify"] = "left"
-        label["text"] = "Scout"
-        #        label.pack(padx=1,pady=2)
-        label.place(x=390,y=5,width=70,height=25)
+        #        label = tk.Label(root)
+        #        label["justify"] = "left"
+        #        label["text"] = "Scout"
+        #        #        label.pack(padx=1,pady=2)
+        #        label.place(x=390,y=5,width=70,height=25)
 
 
         self.urlfield = tk.Entry(root)
         self.urlfield["justify"] = "left"
         self.urlfield["text"] = ""
         self.urlfield.insert(0, '')   # add pre made message
-        self.urlfield.place(x=20,y=60,width=624)
+        self.urlfield.place(x=20,y=60,width=540)
 
         self.downloadButton=tk.Button(root)
         self.downloadButton["justify"] = "center"
         self.downloadButton["text"] = "Download"
-        self.downloadButton.place(x=660,y=60,width=170)
+        self.downloadButton.place(x=570,y=59,width=120)
         self.downloadButton["command"] = self.downloadButton_command
+
+
+        self.browseButton=tk.Button(root)
+        self.browseButton["text"] = "File Destination"
+        self.browseButton["command"] = self.browseButton_command
+        self.browseButton.place(x=690,y=59,width=140)
+
 
         self.videoButton=tk.Checkbutton(root)
         self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
-        self.videoButton.place(x=730,y=120,width=70,height=25)
+        self.videoButton.place(x=720,y=120,width=70,height=25)
         self.videoButton["offvalue"] = "0"
         self.videoButton["onvalue"] = "1"
         self.videoButton["command"] = self.videoButton_command
@@ -54,7 +62,7 @@ class App:
         self.audioButton=tk.Checkbutton(root)
         self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
-        self.audioButton.place(x=730,y=160,width=70,height=25)
+        self.audioButton.place(x=720,y=160,width=70,height=25)
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
 
@@ -72,17 +80,21 @@ class App:
 
 
 
-
     ## Triggers and Scripts ##
 
     def downloadButton_command(self):
         query = self.urlfield.get()
         yt = YouTube(query)
-        path = ""
         yt.streams.first().download(path)
-                                        # print(yt.title)
-        
         print(query)
+
+
+
+    def browseButton_command(self):
+        self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
+        print(self.path)
+        
+
 
     def videoButton_command(self):
         if self.audioBool == False:

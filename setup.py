@@ -11,7 +11,7 @@ from setuptools import setup
  
 APP = ['Sheath.py']
  
-OPTIONS = {'argv_emulation': True, 'iconfile':'scout_icon.icns',
+OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns',
            'plist': {
                'PyRuntimeLocations': [
                 '/Users/leif/opt/anaconda3/lib/libpython3.8.dylib'
