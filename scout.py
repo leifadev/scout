@@ -4,6 +4,9 @@ import webbrowser
 from tkinter.filedialog import askdirectory
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError
+import getpass
+from tkinter import messagebox
+
 
 
 # python3 setup.py py2app -A
@@ -14,14 +17,16 @@ class App:
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = False
-        self.path = ""
-
+        self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
+        
+        self.videoRes = False
+                
         
         ## UI elements ##
 
 
         # Attributes #
-
+        root.lift()
         root.title("Scout")
         width=845
         height=350
@@ -32,23 +37,26 @@ class App:
         root.resizable(width=False, height=False)
 
 
-
         # Menu items
 
         menubar = Menu(root)
         filemenu = Menu(menubar)
         filemenu = Menu(menubar, tearoff=0)
+        
         filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
         
         filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
         
         filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
         
+        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
+        
+      
         filemenu.add_separator()
         
         filemenu.add_command(label="Exit", command=root.quit)
+        
         menubar.add_cascade(label="File", menu=filemenu)
-
 
         helpmenu = Menu(menubar)
         
@@ -71,11 +79,12 @@ class App:
         #        #        label.pack(padx=1,pady=2)
         #        label.place(x=390,y=5,width=70,height=25)
 
+        root.lift()
 
         self.urlfield = tk.Entry(root)
         self.urlfield["justify"] = "left"
         self.urlfield["text"] = ""
-        self.urlfield.insert(0, '')   # add pre made message
+        self.urlfield.insert(0, 'https://www.youtube.com/watch?v=NYu1YWYNG9E')   # add pre made message
         self.urlfield.place(x=20,y=60,width=540)
 
         self.downloadButton=tk.Button(root)
@@ -96,7 +105,7 @@ class App:
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=720,y=120,width=70,height=25)
         self.videoButton["offvalue"] = "0"
-        self.videoButton["onvalue"] = "1"
+        self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
         self.audioButton=tk.Checkbutton(root)
@@ -122,24 +131,32 @@ class App:
     ## Triggers and Scripts ##
 
     def downloadButton_command(self):
-        
-        if self.videoBool and self.audioBool:
+        if self.videoBool and self.audioBool: # Video and Audio
             query = self.urlfield.get() # gets entry input
             yt = YouTube(query)
-            yt.streams.filters().first().download(self.path)
+            videoDown = yt.streams.filter().get_highest_resolution()
+            videoDown.download(self.path, filename_prefix="Scout_")
             
         elif self.audioBool:  # Audio only
-            query = self.urlfield.get() # gets entry input
+            query = self.urlfield.get()
             yt = YouTube(query)
-            yt.streams.filters(only_audio=True).first().download(self.path)
+            
+            audioDown = yt.streams.filter(only_audio=True).first()
+            audioDown.download(self.path, filename_prefix="Scout_")
+            # high_audioDown = yt.streams.get_audio_only()
 
         elif self.audioBool == False and self.videoBool: # Video only
-            print("video only mmmmzaaddyyyy")
+            messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+
+            query = self.urlfield.get()
+            yt = YouTube(query)
+                        
+            silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
+            silent_audioDown.download(self.path, filename_prefix="Scout_")
             
         else:
             print("ERROR: Invalid selection, you need download some form of media!")
 
-        
         
 
     def browseButton_command(self):
@@ -156,7 +173,6 @@ class App:
             self.videoBool = True
         else:
             self.videoBool = False
-
 
 
     def audioButton_command(self):
@@ -183,21 +199,21 @@ class App:
         sWin.geometry(sWin_alignstr)
         sWin.resizable(width=False, height=False)
 
+        defaultDirTip = tk.Label(sWin)
+        defaultDirTip = Label(sWin, text="Settings")
+        defaultDirTip.place(x=207,y=10,width=140)
+
         defaultDirButton=tk.Button(sWin)
-        defaultDirButton["justify"] = "center"
+        defaultDirButton["justify"] = "center"    #  <<< Default dir choose \/\/\/
         defaultDirButton["text"] = "Choose"
-        defaultDirButton.place(x=280,y=168,width=120)
+        defaultDirButton.place(x=287,y=48,width=120)
         defaultDirButton["command"] = self.defaultDir_command
 
         defaultDirTip = tk.Label(sWin)
         defaultDirTip = Label(sWin, text="Set Default Directory")
-        defaultDirTip.place(x=140,y=170,width=140)
-
-        defaultDirTip = tk.Label(sWin)
-        defaultDirTip = Label(sWin, text="Settings")
-        defaultDirTip.place(x=200,y=60,width=140)
-
-
+        defaultDirTip.place(x=147,y=50,width=140)
+        
+        
 
     def defaultDir_command(self):
         self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
@@ -206,8 +222,6 @@ class App:
         
     def dummy(self):
         pass
-
-
 
 
 # https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/ # file browser
