@@ -6,11 +6,14 @@ from pytube import YouTube
 from pytube.exceptions import RegexMatchError
 import getpass
 from tkinter import messagebox
-
-
+import yaml
+import os
+import tkinter.font as tkFont
 
 # python3 setup.py py2app -A
 # The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
+
+
 
 class App:
     def __init__(self, root):
@@ -20,10 +23,31 @@ class App:
         self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
         
         self.videoRes = False
-                
+                        
+        
+        # Database
+        self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
+        self.payload = {
+                'Options': {
+                'defaultDir': self.fileLoc,
+                'errorChoice': True
+                }
+            }
+
+
+        self.enablePrompts = self.payload['Options']['errorChoice']
+
+
+
+        if os.path.exists(self.fileLoc):
+            print("file exists")
+        else:
+            self.dump()
+            
+            
+#        print(tk.font.families())
         
         ## UI elements ##
-
 
         # Attributes #
         root.lift()
@@ -60,7 +84,7 @@ class App:
 
         helpmenu = Menu(menubar)
         
-        helpmenu.add_command(label="About", command=self.dummy)
+        helpmenu.add_command(label="About")
         helpmenu.add_command(label="Help", command=self.helpButton_command)
         
         helpmenu.add_separator()
@@ -84,7 +108,7 @@ class App:
         self.urlfield = tk.Entry(root)
         self.urlfield["justify"] = "left"
         self.urlfield["text"] = ""
-        self.urlfield.insert(0, 'https://www.youtube.com/watch?v=NYu1YWYNG9E')   # add pre made message
+        self.urlfield.insert(0, '')   # add pre made message
         self.urlfield.place(x=20,y=60,width=540)
 
         self.downloadButton=tk.Button(root)
@@ -104,7 +128,7 @@ class App:
         self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=720,y=120,width=70,height=25)
-        self.videoButton["offvalue"] = "0"
+        self.videoButton["offvalue"] = False
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
@@ -112,6 +136,7 @@ class App:
         self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
         self.audioButton.place(x=720,y=160,width=70,height=25)
+        self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
 
@@ -121,10 +146,25 @@ class App:
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
+#        w = OptionMenu(root, "one", "two", "three")
+#        w.place(x=100,y=300,width=30)
+
+        
+
+        ## LOG FEILD AND ERROR HANDLING ##
+
+        self.logfield = tk.Entry(root)
+        self.logfield["justify"] = "left"
+        self.logfield.insert(0, '')
+        self.logfield.place(x=20,y=100,width=540, height=180)
+        ft = tkFont.Font(family='Source Code Pro',size=10)  # Make setting to adjust log font size!
+        self.logfield["font"] = ft
+
+
+
+
+
         ###### Hidden File format buttons ######
-
-
-
 
 
 
@@ -146,7 +186,9 @@ class App:
             # high_audioDown = yt.streams.get_audio_only()
 
         elif self.audioBool == False and self.videoBool: # Video only
-            messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+            if self.enablePrompts:
+                messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+
 
             query = self.urlfield.get()
             yt = YouTube(query)
@@ -155,7 +197,7 @@ class App:
             silent_audioDown.download(self.path, filename_prefix="Scout_")
             
         else:
-            print("ERROR: Invalid selection, you need download some form of media!")
+            messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
 
         
 
@@ -165,7 +207,7 @@ class App:
         else:
             self.path = str(askdirectory(initialdir='~/Desktop/'))
         
-        ## READ THIS OK: ADD IN SETTINGS PANEL CHANGE YOUR DEFAULT DIR OPTION
+
 
 
     def videoButton_command(self):
@@ -180,7 +222,7 @@ class App:
             self.audioBool = True
         else:
             self.audioBool = False
-            
+        self.settings_button()
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
@@ -189,7 +231,7 @@ class App:
         
         
     def settings_button(self):
-        sWin = Toplevel()
+        sWin = Tk()
         sWin.title("Settings")
         width=550
         height=400
@@ -203,34 +245,62 @@ class App:
         defaultDirTip = Label(sWin, text="Settings")
         defaultDirTip.place(x=207,y=10,width=140)
 
-        defaultDirButton=tk.Button(sWin)
-        defaultDirButton["justify"] = "center"    #  <<< Default dir choose \/\/\/
-        defaultDirButton["text"] = "Choose"
-        defaultDirButton.place(x=287,y=48,width=120)
-        defaultDirButton["command"] = self.defaultDir_command
+        self.defaultDirButton=tk.Button(sWin)
+        self.defaultDirButton["justify"] = "center"    #  <<< Default dir choose \/\/\/
+        self.defaultDirButton["text"] = "Choose"
+        self.defaultDirButton.place(x=287,y=48,width=120)
+        self.defaultDirButton["command"] = self.defaultDir_command
 
-        defaultDirTip = tk.Label(sWin)
-        defaultDirTip = Label(sWin, text="Set Default Directory")
-        defaultDirTip.place(x=147,y=50,width=140)
+        self.defaultDirTip = tk.Label(sWin)
+        self.defaultDirTip = Label(sWin, text="Set Default Directory")
+        self.defaultDirTip.place(x=147,y=50,width=140)
+
+        self.warnMenu = tk.Button(sWin)
+        self.warnMenu["justify"] = "center"
+        self.warnMenu["text"] = "Toggle Off"
+        self.warnMenu.place(x=280,y=100,width=110)
+        self.warnMenu["command"] = self.errorToggle
         
+        self.defaultDirTip = tk.Label(sWin)
+        self.defaultDirTip = Label(sWin, text="Recieve Prompts")
+        self.defaultDirTip.place(x=165,y=103,width=110)
+
         
+
+
+    
 
     def defaultDir_command(self):
         self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
         self.changedDefaultDir = True
 
-        
-    def dummy(self):
-        pass
 
 
-# https://www.geeksforgeeks.org/file-explorer-in-python-using-tkinter/ # file browser
+    def errorToggle(self):
+        if self.enablePrompts == False:
+            self.enablePrompts = True
+        else:
+            self.enablePrompts = False
+                    
+        if self.enablePrompts:
+            self.warnMenu["text"] = "Toggle Off"
+        else:
+            self.warnMenu["text"] = "Toggle On"
+                    
+        self.payload['Options']['errorChoice'] = self.enablePrompts
+        self.dump()
+
+
+    def dump(self):
+        with open(self.fileLoc, 'w') as settingsFile:
+            dump = yaml.dump(self.payload, settingsFile)
+
+
 # https://python-pytube.readthedocs.io/en/latest/api.html
 
-
-
+  
+        
 if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
     root.mainloop()
-
