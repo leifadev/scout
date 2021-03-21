@@ -9,17 +9,18 @@ from tkinter import messagebox
 import yaml
 import os
 import tkinter.font as tkFont
+import time
+
 
 # python3 setup.py py2app -A
 # The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
-
 
 
 class App:
     def __init__(self, root):
         self.audioBool = False
         self.videoBool = False
-        self.changedDefaultDir = False
+        self.changedDefaultDir = bool
         self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
         
         self.videoRes = False
@@ -34,13 +35,11 @@ class App:
                 }
             }
 
-
         self.enablePrompts = self.payload['Options']['errorChoice']
 
 
-
-        if os.path.exists(self.fileLoc):
-            print("file exists")
+        if os.path.exists(self.fileLoc): # Check to dump on startup
+            pass
         else:
             self.dump()
             
@@ -145,71 +144,79 @@ class App:
         helpButton["text"] = "Help"
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
+        
 
-#        w = OptionMenu(root, "one", "two", "three")
-#        w.place(x=100,y=300,width=30)
+        logevents = []
+
 
         
 
         ## LOG FEILD AND ERROR HANDLING ##
 
-        self.logfield = tk.Entry(root)
-        self.logfield["justify"] = "left"
-        self.logfield.insert(0, '')
+        self.logfield = tk.Text(root)
         self.logfield.place(x=20,y=100,width=540, height=180)
-        ft = tkFont.Font(family='Source Code Pro',size=10)  # Make setting to adjust log font size!
+        ft = tkFont.Font(family='Source Code Pro', size=10)
         self.logfield["font"] = ft
+        self.logfield["highlightthickness"] = 0
+        self.logfield["highlightbackground"] = "#ffffff"
+        self.logfield.insert(INSERT, "Scout launched successfully!")
+        self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
 
 
 
 
-
-        ###### Hidden File format buttons ######
-
+########################################################################################################
 
 
     ## Triggers and Scripts ##
-
-    def downloadButton_command(self):
-        if self.videoBool and self.audioBool: # Video and Audio
+    try:
+        def downloadButton_command(self):
+            if self.urlfield.get() == "":
+                messagebox.showerror("Error", "Please enter a URL!")
             query = self.urlfield.get() # gets entry input
-            yt = YouTube(query)
-            videoDown = yt.streams.filter().get_highest_resolution()
-            videoDown.download(self.path, filename_prefix="Scout_")
-            
-        elif self.audioBool:  # Audio only
-            query = self.urlfield.get()
-            yt = YouTube(query)
-            
-            audioDown = yt.streams.filter(only_audio=True).first()
-            audioDown.download(self.path, filename_prefix="Scout_")
-            # high_audioDown = yt.streams.get_audio_only()
 
-        elif self.audioBool == False and self.videoBool: # Video only
-            if self.enablePrompts:
-                messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+            if self.videoBool and self.audioBool: # Video and Audio
+                yt = YouTube(query)
+                videoDown = yt.streams.filter().get_highest_resolution()
+                videoDown.download(self.path, filename_prefix="Scout_")
+                
+            elif self.audioBool:  # Audio only
+                query = self.urlfield.get()
+                yt = YouTube(query)
+                
+                audioDown = yt.streams.filter(only_audio=True).first()
+                audioDown.download(self.path, filename_prefix="Scout_")
+                # high_audioDown = yt.streams.get_audio_only()
+
+            elif self.audioBool == False and self.videoBool: # Video only
+                if self.enablePrompts:
+                    messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
 
 
-            query = self.urlfield.get()
-            yt = YouTube(query)
-                        
-            silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
-            silent_audioDown.download(self.path, filename_prefix="Scout_")
-            
-        else:
-            messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
+                query = self.urlfield.get()
+                yt = YouTube(query)
+                            
+                silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
+                silent_audioDown.download(self.path, filename_prefix="Scout_")
+                
+            else:
+                if self.enablePrompts:
+                    messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
 
+            self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
+
+    except:
+        print("Exception: Remove the try statement?")
+########################################################################################################
         
 
     def browseButton_command(self):
-        if self.changedDefaultDir:
-            self.path = str(askdirectory(initialdir=self.path))
+        if self.changedDefaultDir != False:
+            askdirectory(initialdir=self.path)
         else:
-            self.path = str(askdirectory(initialdir='~/Desktop/'))
+            print(self.changedDefaultDir)
+            askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
         
-
-
-
     def videoButton_command(self):
         if self.videoBool == False:
             self.videoBool = True
@@ -245,12 +252,12 @@ class App:
         defaultDirTip = Label(sWin, text="Settings")
         defaultDirTip.place(x=207,y=10,width=140)
 
-        self.defaultDirButton=tk.Button(sWin)
-        self.defaultDirButton["justify"] = "center"    #  <<< Default dir choose \/\/\/
-        self.defaultDirButton["text"] = "Choose"
+        self.defaultDirButton=tk.Button(sWin, text="Choose", state=tk.DISABLED) # Disabled default dir until further notice
+        self.defaultDirButton["justify"] = "center"
+#        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=48,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
-
+        
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
         self.defaultDirTip.place(x=147,y=50,width=140)
@@ -267,13 +274,10 @@ class App:
 
         
 
-
-    
-
     def defaultDir_command(self):
         self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
-        self.changedDefaultDir = True
-
+        if self.changedDefaultDir:
+            self.changedDefaultDir = True
 
 
     def errorToggle(self):
