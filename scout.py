@@ -1,14 +1,14 @@
-import Tkinter as tk
-from Tkinter import *
+import tkinter as tk
+from tkinter import *
 import webbrowser
-import FileDialog
+import tkinter.filedialog
 from pytube import YouTube     # pip3 install pytube3
 from pytube.exceptions import RegexMatchError
 import getpass
-from Tkinter import messagebox
+from tkinter import messagebox
 import yaml
 import os
-import Tkinter.font as tkFont
+import tkinter.font as tkFont
 import time
 
 
@@ -32,6 +32,7 @@ class App:
                 'Options': {
                 'defaultDir': self.fileLoc,
                 'errorChoice': True
+                'changedDefaultDir': False
                 }
             }
 

@@ -7,15 +7,15 @@ Usage:
     
 """
 
-import getpass
+#import getpass
 from setuptools import setup
  
 APP = ['Scout.py']
  
-OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns',
+OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns', 'includes':['pytube3', 'tkinter', 'pyyaml'],
            'plist': {
                'PyRuntimeLocations': [
-                '/usr/bin/python3'
+                '/usr/local/bin/python3'
                ]
            }}
  
