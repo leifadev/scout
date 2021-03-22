@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import *
 import webbrowser
-import tkinter.filedialog
+from tkinter.filedialog import askdirectory
 from pytube import YouTube     # pip3 install pytube3
 from pytube.exceptions import RegexMatchError
 import getpass
@@ -9,7 +9,6 @@ from tkinter import messagebox
 import yaml
 import os
 import tkinter.font as tkFont
-import time
 
 
 # python3 setup.py py2app -A
@@ -22,19 +21,19 @@ class App:
         self.videoBool = False
         self.changedDefaultDir = bool
         self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
-        
+
         self.videoRes = False
-                        
-        
+
+
         # Database
         self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
         self.payload = {
-                'Options': {
+            'Options': {
                 'defaultDir': self.fileLoc,
-                'errorChoice': True
+                'errorChoice': True,
                 'changedDefaultDir': False
-                }
             }
+        }
 
         self.enablePrompts = self.payload['Options']['errorChoice']
 
@@ -43,14 +42,15 @@ class App:
             pass
         else:
             self.dump()
-            
-            
-#        print(tk.font.families())
-        
+
+
+
+        #        print(tk.font.families())
+
         ## UI elements ##
 
         # Attributes #
-        root.lift()
+
         root.title("Scout")
         width=845
         height=350
@@ -66,34 +66,34 @@ class App:
         menubar = Menu(root)
         filemenu = Menu(menubar)
         filemenu = Menu(menubar, tearoff=0)
-        
+
         filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
-        
+
         filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
-        
+
         filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
-        
+
         filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
-        
-      
+
+
         filemenu.add_separator()
-        
+
         filemenu.add_command(label="Exit", command=root.quit)
-        
+
         menubar.add_cascade(label="File", menu=filemenu)
 
         helpmenu = Menu(menubar)
-        
+
         helpmenu.add_command(label="About")
         helpmenu.add_command(label="Help", command=self.helpButton_command)
-        
+
         helpmenu.add_separator()
-        
+
         helpmenu.add_command(label="Settings", command=self.settings_button)
         menubar.add_cascade(label="About", menu=helpmenu)
 
         root.config(menu=menubar)
-        
+
 
         # Elements #
 
@@ -145,12 +145,12 @@ class App:
         helpButton["text"] = "Help"
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
-        
+
 
         logevents = []
 
 
-        
+
 
         ## LOG FEILD AND ERROR HANDLING ##
 
@@ -159,18 +159,17 @@ class App:
         ft = tkFont.Font(family='Source Code Pro', size=10)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield["highlightbackground"] = "#ffffff"
         self.logfield.insert(INSERT, "Scout launched successfully!")
         self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
+        self.logfield["bg"] = "#F6F6F6"
 
 
-
-
-########################################################################################################
+    ########################################################################################################
 
 
     ## Triggers and Scripts ##
     try:
+    
         def downloadButton_command(self):
             if self.urlfield.get() == "":
                 messagebox.showerror("Error", "Please enter a URL!")
@@ -180,11 +179,11 @@ class App:
                 yt = YouTube(query)
                 videoDown = yt.streams.filter().get_highest_resolution()
                 videoDown.download(self.path, filename_prefix="Scout_")
-                
+
             elif self.audioBool:  # Audio only
                 query = self.urlfield.get()
                 yt = YouTube(query)
-                
+
                 audioDown = yt.streams.filter(only_audio=True).first()
                 audioDown.download(self.path, filename_prefix="Scout_")
                 # high_audioDown = yt.streams.get_audio_only()
@@ -196,10 +195,10 @@ class App:
 
                 query = self.urlfield.get()
                 yt = YouTube(query)
-                            
+
                 silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
                 silent_audioDown.download(self.path, filename_prefix="Scout_")
-                
+
             else:
                 if self.enablePrompts:
                     messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
@@ -207,9 +206,13 @@ class App:
             self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
 
     except:
+    
         print("Exception: Remove the try statement?")
-########################################################################################################
         
+        
+        
+    ########################################################################################################
+
 
     def browseButton_command(self):
         if self.changedDefaultDir != False:
@@ -217,7 +220,7 @@ class App:
         else:
             print(self.changedDefaultDir)
             askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
-        
+
     def videoButton_command(self):
         if self.videoBool == False:
             self.videoBool = True
@@ -234,10 +237,10 @@ class App:
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
-        
-        
-        
-        
+
+
+
+
     def settings_button(self):
         sWin = Tk()
         sWin.title("Settings")
@@ -255,10 +258,10 @@ class App:
 
         self.defaultDirButton=tk.Button(sWin, text="Choose", state=tk.DISABLED) # Disabled default dir until further notice
         self.defaultDirButton["justify"] = "center"
-#        self.defaultDirButton["text"] = "Choose"
+        #        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=48,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
-        
+
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
         self.defaultDirTip.place(x=147,y=50,width=140)
@@ -268,12 +271,12 @@ class App:
         self.warnMenu["text"] = "Toggle Off"
         self.warnMenu.place(x=280,y=100,width=110)
         self.warnMenu["command"] = self.errorToggle
-        
+
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Recieve Prompts")
         self.defaultDirTip.place(x=165,y=103,width=110)
 
-        
+
 
     def defaultDir_command(self):
         self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
@@ -286,12 +289,12 @@ class App:
             self.enablePrompts = True
         else:
             self.enablePrompts = False
-                    
+
         if self.enablePrompts:
             self.warnMenu["text"] = "Toggle Off"
         else:
             self.warnMenu["text"] = "Toggle On"
-                    
+
         self.payload['Options']['errorChoice'] = self.enablePrompts
         self.dump()
 
@@ -303,8 +306,8 @@ class App:
 
 # https://python-pytube.readthedocs.io/en/latest/api.html
 
-  
-        
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
