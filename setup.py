@@ -6,7 +6,8 @@ Usage:
     
     
 """
- 
+
+import getpass
 from setuptools import setup
  
 APP = ['Scout.py']
@@ -14,7 +15,7 @@ APP = ['Scout.py']
 OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns',
            'plist': {
                'PyRuntimeLocations': [
-                '/Users/leif/opt/anaconda3/lib/libpython3.8.dylib'
+                '/usr/bin/python3'
                ]
            }}
  
@@ -25,3 +26,4 @@ setup(
 )
 
 # python3 setup.py py2app -A
+# getpass.getuser()

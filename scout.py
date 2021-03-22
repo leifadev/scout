@@ -1,14 +1,14 @@
-import tkinter as tk
-from tkinter import *
+import Tkinter as tk
+from Tkinter import *
 import webbrowser
-from tkinter.filedialog import askdirectory
-from pytube import YouTube
+import FileDialog
+from pytube import YouTube     # pip3 install pytube3
 from pytube.exceptions import RegexMatchError
 import getpass
-from tkinter import messagebox
+from Tkinter import messagebox
 import yaml
 import os
-import tkinter.font as tkFont
+import Tkinter.font as tkFont
 import time
 
 
