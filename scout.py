@@ -3,12 +3,14 @@ from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
 from pytube import YouTube     # pip3 install pytube3
-from pytube.exceptions import RegexMatchError
+import pytube
 import getpass
 from tkinter import messagebox
 import yaml
 import os
 import tkinter.font as tkFont
+from pytube.exceptions import VideoUnavailable
+
 
 
 # python3 setup.py py2app -A
@@ -160,7 +162,7 @@ class App:
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!")
-        self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
+#        self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
         self.logfield["bg"] = "#F6F6F6"
 
 
@@ -169,7 +171,6 @@ class App:
 
     ## Triggers and Scripts ##
     try:
-    
         def downloadButton_command(self):
             if self.urlfield.get() == "":
                 messagebox.showerror("Error", "Please enter a URL!")
@@ -203,11 +204,19 @@ class App:
                 if self.enablePrompts:
                     messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
 
-            self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
+    except VideoPrivate:
+        print("COOL")
 
-    except:
-    
-        print("Exception: Remove the try statement?")
+
+#                self.logfield.insert(INSERT, f'\nTitle: {yt.title}')
+#                self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
+#                self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
+#                self.logfield.insert(INSERT, f'\nVideo Duration: {yt.length}')
+#                self.logfield.insert(INSERT, f'\nViews: {yt.views}')
+#                self.logfield.insert(INSERT, f'\nRating: {yt.rating}')
+#                self.logfield.insert(INSERT, f'\nThumbnail URL: {yt.thumbnail_url}')
+#
+#                self.logfield["state"] = "disabled" # Put this LAST to all logging statements!
         
         
         
@@ -233,7 +242,6 @@ class App:
             self.audioBool = True
         else:
             self.audioBool = False
-        self.settings_button()
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
