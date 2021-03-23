@@ -9,7 +9,7 @@ import yaml
 import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
-
+import time
 
 
 # python3 setup.py py2app -A
@@ -45,7 +45,6 @@ class App:
             self.dump()
 
 
-
         #        print(tk.font.families())
 
         ## UI elements ##
@@ -69,40 +68,31 @@ class App:
         filemenu = Menu(menubar, tearoff=0)
 
         filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
-
+        
         filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
-
+        
         filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
-
         filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
-
 
         filemenu.add_separator()
 
         filemenu.add_command(label="Exit", command=root.quit)
-
         menubar.add_cascade(label="File", menu=filemenu)
-
+        
         helpmenu = Menu(menubar)
-
         helpmenu.add_command(label="About")
         helpmenu.add_command(label="Help", command=self.helpButton_command)
-
+        
         helpmenu.add_separator()
 
         helpmenu.add_command(label="Settings", command=self.settings_button)
         menubar.add_cascade(label="About", menu=helpmenu)
 
         root.config(menu=menubar)
+        root.update()   # Updates window at startup to be interactive and lifted, DO NOT TOUCH
 
 
         # Elements #
-
-        #        label = tk.Label(root)
-        #        label["justify"] = "left"
-        #        label["text"] = "Scout"
-        #        #        label.pack(padx=1,pady=2)
-        #        label.place(x=390,y=5,width=70,height=25)
 
         root.lift()
 
@@ -148,10 +138,6 @@ class App:
         helpButton["command"] = self.helpButton_command
 
 
-        logevents = []
-
-
-
 
         ## LOG FEILD AND ERROR HANDLING ##
 
@@ -160,13 +146,13 @@ class App:
         ft = tkFont.Font(family='Source Code Pro', size=10)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(INSERT, "Scout launched successfully!")
+        self.logfield.insert(INSERT, "Scout launched successfully!\n")
         self.logfield["bg"] = "#F6F6F6"
         self.logfield["state"] = "disabled"
 
 
-    ########################################################################################################
 
+    ########################################################################################################
 
     ## Triggers and Scripts ##
     def downloadButton_command(self):
@@ -177,99 +163,115 @@ class App:
             yt = YouTube(query)
 
             if self.urlfield.get() == "":
-                self.logfield.insert(INSERT, f'\nERROR: URL field is empty and cannot be parsed')
+                self.logfield.insert(INSERT, f'ERROR: URL field is empty and cannot be parsed')
 
         except RegexMatchError:
-            self.logfield.insert(INSERT, f'\n\nERROR: Invalid link formatting\n')
+            pass
 
         if self.videoBool and self.audioBool: # Video and Audio
             try:
                 yt = YouTube(query)
                 videoDown = yt.streams.filter().get_highest_resolution()
                 videoDown.download(self.path, filename_prefix="Scout_")
+                comp = videoDown.on_complete(self.path)
+                print()
+                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"')
+
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\n\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
             except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'\n\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\n\nERROR: Invalid link formatting\n')
+                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\n\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\n\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\n\nERROR: This is a livestream, and not a downloadable video\n')
-            except (HTMLParseError, ExtractError):
-                self.logfield.insert(INSERT, f'\n\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\n\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.videoFetch(yt, query)
+            
 
         elif self.audioBool:  # Audio only
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-                
+    
                 audioDown = yt.streams.filter(only_audio=True).first()
                 audioDown.download(self.path, filename_prefix="Scout_")
+                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", format="audio/mp4"')
+
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
             except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
-            except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
+#            except RegexMatchError:
+#                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
-            except (HTMLParseError, ExtractError):
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-                
+                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.videoFetch(yt, query)
+
             
             # high_audioDown = yt.streams.get_audio_only()
 
         elif self.audioBool == False and self.videoBool: # Video only
             if self.enablePrompts:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+                self.logfield.insert(INSERT, f'INFO: As of now videos downloaded without audio are fixed to 360p\n\n')
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
 
                 silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
                 silent_audioDown.download(self.path, filename_prefix="Scout_")
+                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
             except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+                pass
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
-            except (HTMLParseError, ExtractError):
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.videoFetch(yt, query)
+
         else:
-            if self.enablePrompts:
+            if self.enablePrompts: # hasnt selected video nor audio
                 messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
+                self.logfield.insert(INSERT, f'ERROR: You can\'t download a video with video or audio\n')
+
         
+    def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
+        yt = YouTube(query)
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
-        self.logfield.insert(INSERT, '\nVideo Duration: ' + str(yt.length))
+        self.logfield.insert(INSERT, '\nVideo Duration (sec): ' + str(yt.length))
         self.logfield.insert(INSERT, '\nViews: ' + str(yt.views))
-        self.logfield.insert(INSERT, f'\nRating: {yt.rating}')
-        
-        
-        
-        self.logfield["state"] = "disabled"
+        self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
+        self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
+
+        self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
     ########################################################################################################
 
@@ -298,10 +300,10 @@ class App:
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
 
+#################################################################
 
 
-
-    def settings_button(self):
+    def settings_button(self): # Settings pane, offers custiomizable features!
         sWin = Tk()
         sWin.title("Settings")
         width=550
