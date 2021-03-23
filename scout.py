@@ -137,6 +137,12 @@ class App:
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
+        clearButton=tk.Button(root)
+        helpButton["justify"] = "center"
+        clearButton["text"] = "Clear"
+        clearButton.place(x=95,y=300,width=70)
+        clearButton["command"] = self.clearConsole_command
+
 
 
         ## LOG FEILD AND ERROR HANDLING ##
@@ -229,7 +235,7 @@ class App:
         elif self.audioBool == False and self.videoBool: # Video only
             if self.enablePrompts:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                self.logfield.insert(INSERT, f'INFO: As of now videos downloaded without audio are fixed to 360p\n\n')
+                self.logfield.insert(INSERT, f'INFO: As of now videos downloaded without audio are fixed to 360p\n')
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
@@ -257,7 +263,6 @@ class App:
 
         else:
             if self.enablePrompts: # hasnt selected video nor audio
-                messagebox.showerror("Error", "Invalid selection, you need download a form of media!")
                 self.logfield.insert(INSERT, f'ERROR: You can\'t download a video with video or audio\n')
 
         
@@ -299,7 +304,13 @@ class App:
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
-
+        
+    def clearConsole_command(self):
+        if self.enablePrompts:
+            messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
+            self.logfield.delete("1.0","end")
+        else:
+            self.logfield.delete("1.0","end")
 #################################################################
 
 
@@ -321,18 +332,19 @@ class App:
         self.defaultDirButton=tk.Button(sWin, text="Choose", state=tk.DISABLED) # Disabled default dir until further notice
         self.defaultDirButton["justify"] = "center"
         #        self.defaultDirButton["text"] = "Choose"
-        self.defaultDirButton.place(x=287,y=48,width=120)
+        self.defaultDirButton.place(x=287,y=50,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
 
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
         self.defaultDirTip.place(x=147,y=50,width=140)
 
-        self.warnMenu = tk.Button(sWin)
+        self.warnMenu = tk.Button(sWin, state=tk.DISABLED)
         self.warnMenu["justify"] = "center"
         self.warnMenu["text"] = "Toggle Off"
-        self.warnMenu.place(x=280,y=100,width=110)
+        self.warnMenu.place(x=280,y=102,width=110)
         self.warnMenu["command"] = self.errorToggle
+        
 
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Recieve Prompts")
@@ -362,8 +374,7 @@ class App:
 
 
     def dump(self):
-        with open(self.fileLoc, 'w') as settingsFile:
-            dump = yaml.dump(self.payload, settingsFile)
+        print("not working")
 
 
 # https://python-pytube.readthedocs.io/en/latest/api.html
