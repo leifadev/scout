@@ -12,7 +12,7 @@ from setuptools import setup
  
 APP = ['Scout.py']
  
-OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns', 'includes':['pytube3', 'tkinter', 'pyyaml', 'wheel'],
+OPTIONS = {'argv_emulation': True, 'iconfile':'scout_logo.icns', 'includes':['pytube3', 'tkinter', 'wheel', 'ruamel'],
            'plist': {
                'PyRuntimeLocations': [
                 '/usr/local/bin/python3'

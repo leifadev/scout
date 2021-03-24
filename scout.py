@@ -2,10 +2,10 @@ import tkinter as tk
 from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
-from pytube import YouTube     # pip3 install pytube3
+from pytube import YouTube  # pip3 install pytube3
 import getpass
 from tkinter import messagebox
-import yaml
+from ruamel import yaml
 import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
@@ -25,27 +25,37 @@ class App:
 
         self.videoRes = False
 
-
         # Database
-        self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
-        self.payload = {
-            'Options': {
-                'defaultDir': self.fileLoc,
-                'errorChoice': True,
-                'changedDefaultDir': False
+        self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
+        self.payload = [
+            {
+                'Options': {
+                    'defaultDir': "~/Desktop",
+                    'errorChoice': True,
+                    'changedDefaultDir': False
+                }
             }
-        }
+        ]
 
-        self.enablePrompts = self.payload['Options']['errorChoice']
+        self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
 
 
-        if os.path.exists(self.fileLoc): # Check to dump on startup
-            pass
+        # Generates initial yml file
+        if not os.path.exists(self.fileLoc + "Scout"):
+            path = os.path.join(self.fileLoc, "Scout")
+            os.makedirs(path)
         else:
-            self.dump()
+            print("Config folder exists!")
+            if not os.path.isfile(self.ymldir):
+                print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
+                os.chdir("/Users/leif/Library/Application Support/Scout")
+                f = open("settings.yml","w+")
+                f.close
+                yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
 
+                # ADD AUTIO GEN WITH IF NONE
+            
 
-        #        print(tk.font.families())
 
         ## UI elements ##
 
@@ -68,9 +78,9 @@ class App:
         filemenu = Menu(menubar, tearoff=0)
 
         filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
-        
+
         filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
-        
+
         filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
         filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
 
@@ -78,11 +88,11 @@ class App:
 
         filemenu.add_command(label="Exit", command=root.quit)
         menubar.add_cascade(label="File", menu=filemenu)
-        
+
         helpmenu = Menu(menubar)
         helpmenu.add_command(label="About")
         helpmenu.add_command(label="Help", command=self.helpButton_command)
-        
+
         helpmenu.add_separator()
 
         helpmenu.add_command(label="Settings", command=self.settings_button)
@@ -164,7 +174,7 @@ class App:
     def downloadButton_command(self):
         try:
             self.logfield["state"] = "normal"
-            
+
             query = self.urlfield.get() # gets entry input
             yt = YouTube(query)
 
@@ -200,13 +210,13 @@ class App:
             except VideoUnavailable:
                 self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
             self.videoFetch(yt, query)
-            
+
 
         elif self.audioBool:  # Audio only
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-    
+
                 audioDown = yt.streams.filter(only_audio=True).first()
                 audioDown.download(self.path, filename_prefix="Scout_")
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", format="audio/mp4"')
@@ -215,8 +225,8 @@ class App:
                 self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
             except VideoRegionBlocked:
                 self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
-#            except RegexMatchError:
-#                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
+            #            except RegexMatchError:
+            #                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
             except RecordingUnavailable:
                 self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
             except MembersOnly:
@@ -229,7 +239,7 @@ class App:
                 self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
             self.videoFetch(yt, query)
 
-            
+
             # high_audioDown = yt.streams.get_audio_only()
 
         elif self.audioBool == False and self.videoBool: # Video only
@@ -265,7 +275,7 @@ class App:
             if self.enablePrompts: # hasnt selected video nor audio
                 self.logfield.insert(INSERT, f'ERROR: You can\'t download a video with video or audio\n')
 
-        
+
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
@@ -282,10 +292,13 @@ class App:
 
 
     def browseButton_command(self):
-        if self.changedDefaultDir != False:
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.path = data[0]['Options']['defaultDir']
+            
+        if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:
-            print(self.changedDefaultDir)
             askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
 
 
@@ -304,14 +317,16 @@ class App:
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
-        
+
     def clearConsole_command(self):
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
         else:
             self.logfield.delete("1.0","end")
-#################################################################
+
+
+    #################################################################
 
 
     def settings_button(self): # Settings pane, offers custiomizable features!
@@ -329,7 +344,7 @@ class App:
         defaultDirTip = Label(sWin, text="Settings")
         defaultDirTip.place(x=207,y=10,width=140)
 
-        self.defaultDirButton=tk.Button(sWin, text="Choose", state=tk.DISABLED) # Disabled default dir until further notice
+        self.defaultDirButton=tk.Button(sWin, text="Choose") # Disabled default dir until further notice
         self.defaultDirButton["justify"] = "center"
         #        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=50,width=120)
@@ -339,12 +354,22 @@ class App:
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
         self.defaultDirTip.place(x=147,y=50,width=140)
 
-        self.warnMenu = tk.Button(sWin, state=tk.DISABLED)
+        self.warnMenu = tk.Button(sWin)
         self.warnMenu["justify"] = "center"
+
+
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader) # Changing button state depending on mode
+            if data[0]['Options']['errorChoice']:
+                self.warnMenu["text"] = "Toggle On"
+            else:
+                self.warnMenu["text"] = "Toggle Off"
+
+
         self.warnMenu["text"] = "Toggle Off"
         self.warnMenu.place(x=280,y=102,width=110)
         self.warnMenu["command"] = self.errorToggle
-        
+
 
         self.defaultDirTip = tk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Recieve Prompts")
@@ -353,32 +378,37 @@ class App:
 
 
     def defaultDir_command(self):
-        self.path = str(askdirectory())   # Uses tkinter filedialog for prompting a save dir
-        if self.changedDefaultDir:
-            self.changedDefaultDir = True
+        self.path = askdirectory()
+        print(self.path)
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+
+        with open(self.ymldir,"w+") as yml:
+            data[0]['Options']['changedDefaultDir'] = True
+            data[0]['Options']['defaultDir'] = self.path
+            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
 
 
     def errorToggle(self):
-        if self.enablePrompts == False:
-            self.enablePrompts = True
-        else:
-            self.enablePrompts = False
-
-        if self.enablePrompts:
+        if self.warnMenu["text"] == "Toggle On":
             self.warnMenu["text"] = "Toggle Off"
         else:
             self.warnMenu["text"] = "Toggle On"
-
-        self.payload['Options']['errorChoice'] = self.enablePrompts
         self.dump()
 
 
     def dump(self):
-        print("not working")
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+#            print(str(data))
 
+        with open(self.ymldir,"w+") as yml:
+            data[0]['Options']['errorChoice'] = not data[0]['Options']['errorChoice']
+            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            print(self.enablePrompts)
 
 # https://python-pytube.readthedocs.io/en/latest/api.html
-
 
 
 if __name__ == "__main__":
