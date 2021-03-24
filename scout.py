@@ -55,6 +55,9 @@ class App:
 
                 # ADD AUTIO GEN WITH IF NONE
             
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
 
 
         ## UI elements ##
