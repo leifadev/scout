@@ -8,7 +8,7 @@ No bloated javascript ad websites anymore!
 ```cs
 Currently testing on macOS 10.15.7 (19H2)
 
-Python version: 3.8.5
+Tested python version: 3.8.5 - 9.2
 ``` 
  
 ### Supported Versions
@@ -24,8 +24,11 @@ Python version: 3.8.5
  ## To-do list
 - ~~Release alpha version include barebones of functionality~~
 - ~~Great file browser~~
-- ~~Error handling/Console~~
+- ~~Error handling with Console~~
+- ~~Add customizable settings w/ storage file~~
+- Extensive testing on macOS, Windows, and Linux
 - Add support for more file types and or resolutions
+- Add extra video file console logging
 - Add thumbnail downloading  support
 - Add playlist support with video selection
 - Add segmented video download support
