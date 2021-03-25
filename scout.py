@@ -48,7 +48,7 @@ class App:
             print("Config folder exists!")
             if not os.path.isfile(self.ymldir):
                 print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-                os.chdir("/Users/leif/Library/Application Support/Scout")
+                os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
                 f = open("settings.yml","w+")
                 f.close
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
