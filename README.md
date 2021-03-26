@@ -15,7 +15,7 @@ Tested python version: 3.8.5 - 9.2
 
 | macOS Version | Supported          |
 | ------- | ------------------ |
-| Windows   | ?                |
+| Windows   | :white_check_mark: |
 | MacOS  | :white_check_mark: |
 | Linux   | ?                |
 
