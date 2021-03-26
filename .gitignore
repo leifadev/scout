@@ -582,3 +582,16 @@ dist/Scout.app/Contents/Resources/lib/python3.7/config
 setup.py
 dist/scout.app/Contents/Resources/Scout
 dist/scout.app/Contents/Resources/lib/python3.9/config
+*.pyz
+build/scout/xref-scout.html
+build/scout/warn-scout.txt
+build/scout/Tree-02.toc
+build/scout/Tree-01.toc
+build/scout/Tree-00.toc
+build/scout/PYZ-00.toc
+build/scout/PKG-00.toc
+build/scout/PKG-00.pkg
+build/scout/EXE-00.toc
+build/scout/BUNDLE-00.toc
+build/scout/base_library.zip
+build/scout/Analysis-00.toc
