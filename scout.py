@@ -9,7 +9,7 @@ from ruamel import yaml
 import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
-import time
+import wget
 
 
 # python3 setup.py py2app -A
@@ -54,7 +54,7 @@ class App:
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
 
                 # ADD AUTIO GEN WITH IF NONE
-            
+
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.enablePrompts = data[0]['Options']['errorChoice']
@@ -298,7 +298,7 @@ class App:
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.path = data[0]['Options']['defaultDir']
-            
+
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:

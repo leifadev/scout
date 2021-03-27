@@ -10,7 +10,7 @@ import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
 import time
-
+import wget
 
 # python3 setup.py py2app -A
 # The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
@@ -46,15 +46,17 @@ class App:
         if not os.path.exists(self.fileLoc + "Scout"):
             path = os.path.join(self.fileLoc, "Scout")
             os.makedirs(path, exist_ok=True)
-            print(self.ymldir)
-        else:
-            print("Config folder exists!")
-            if not os.path.isfile(self.ymldir):
-                print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-                os.chdir("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout")
-                f = open("settings.yml","w+")
-                yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
-                f.close()
+        if not os.path.isfile(self.ymldir):
+            print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
+            os.chdir("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout")
+            f = open("settings.yml","w+")
+            yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+            f.close()
+        if not os.path.isfile("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico"):
+            print("Downloading logo .ico!")
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.ico"
+            wget.download(url, "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico")
+            print("Download successful!")
 
 
         with open(self.ymldir,"r") as yml:
@@ -424,6 +426,6 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.iconbitmap("C:\\Users\\leifa\\Desktop\\scout-main\\scout-main\\scout_logo.ico")
+    # root.iconbitmap("C:\\Users\\leifa\\Desktop\\scout-main\\scout-main\\scout_logo.ico")
     app = App(root)
     root.mainloop()
