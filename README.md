@@ -24,7 +24,7 @@ Compiler: Pyinstaller
 | macOS Version | Supported   |
 | ------- | ------------------|
 | Windows 10 | :white_check_mark:|
-| Windows 8 | :white_check_mark:|
+| Windows 8 | ?|
 | MacOS 10.15-16 | :white_check_mark: |
 | Linux   | ?                |
 
