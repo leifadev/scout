@@ -19,10 +19,11 @@ Using packages:
  
 ### Supported Versions
 
-| macOS Version | Supported          |
-| ------- | ------------------ |
-| Windows   | :white_check_mark: |
-| MacOS  | :white_check_mark: |
+| macOS Version | Supported   |
+| ------- | ------------------|
+| Windows 10 | :white_check_mark:|
+| Windows 8 | :white_check_mark:|
+| MacOS 10.15-16 | :white_check_mark: |
 | Linux   | ?                |
 
 *Since this is based only with python it is versatile for OS support*
