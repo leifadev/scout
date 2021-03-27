@@ -15,6 +15,8 @@ Using packages:
 - pytube
 - pytube3
 - ruamel.yaml
+
+Compiler: Pyinstaller
 ``` 
  
 ### Supported Versions
