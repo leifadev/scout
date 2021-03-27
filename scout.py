@@ -12,8 +12,7 @@ from pytube.exceptions import *
 import wget
 
 
-# python3 setup.py py2app -A
-# The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
+# MACOS RELEASE
 
 
 class App:
@@ -44,16 +43,21 @@ class App:
         if not os.path.exists(self.fileLoc + "Scout"):
             path = os.path.join(self.fileLoc, "Scout")
             os.makedirs(path)
-        else:
-            print("Config folder exists!")
-            if not os.path.isfile(self.ymldir):
-                print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-                os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
-                f = open("settings.yml","w+")
-                f.close
-                yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+        if not os.path.isfile(self.ymldir):
+            print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
+            os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
+            f = open("settings.yml","w+")
+            f.close
+            yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+        if not os.path.isfile(self.fileLoc + "Scout"):
+            print("Downloading logo .icns!")
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_icon.icns"
+            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.icns")
+            print("Download successful!")
 
-                # ADD AUTIO GEN WITH IF NONE
+
+
+
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -65,6 +69,7 @@ class App:
         # Attributes #
 
         root.title("Scout")
+        root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.icns")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
@@ -416,6 +421,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.iconbitmap("/Users/leif/PycharmProjects/Scout/scout")
     app = App(root)
     root.mainloop()

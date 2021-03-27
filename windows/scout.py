@@ -12,11 +12,7 @@ from pytube.exceptions import *
 import time
 import wget
 
-# python3 setup.py py2app -A
-# The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
-
-# import sys
-# sys.modules[__name__].__dict__.clear()
+# MACOS RELEASE
 
 class App:
     def __init__(self, root):
@@ -69,6 +65,7 @@ class App:
         # Attributes #
 
         root.title("Scout")
+        root.iconbitmap("C:\\Users\\" + getpass.getuser() + "\\Desktop\\scout-main\\scout-main\\scout_logo.ico")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
@@ -426,6 +423,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    # root.iconbitmap("C:\\Users\\leifa\\Desktop\\scout-main\\scout-main\\scout_logo.ico")
     app = App(root)
     root.mainloop()
