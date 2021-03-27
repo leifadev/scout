@@ -50,7 +50,7 @@ If you encounter any tiny to fatal bugs or security vulnerbilites, you can do th
 
 1. Go to the [Issues page on this repo](https://github.com/leifadev/scout/issues).
 2. Fill out bug report template of what you have encountered
-3. Wait up to around 12 - 24 hours and you may be likely to get a response. Realistically, I won't think you'll be waiting weeks.
+3. Wait up to around 1 - 12 hours and you will likely to get a response. Realistically, I won't think you'll be waiting weeks on end obviously.
 
 ## Other
 I also make youtube videos! Check them out if you want:
