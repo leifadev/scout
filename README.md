@@ -6,7 +6,7 @@ No bloated javascript ad websites anymore!
  
 ## Native Build Details
 ```cs
-Currently testing on macOS 10.15.7 (19H2)
+Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
 
 Tested python version: 3.8.5 - 9.2
 ``` 
