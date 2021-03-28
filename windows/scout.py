@@ -65,7 +65,7 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\Desktop\\scout-main\\scout-main\\scout_logo.ico")
+        icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico")
         root.tk.call('wm', 'iconphoto', root._w, icon)
         width=845
         height=350
