@@ -48,10 +48,10 @@ class App:
             f = open("settings.yml","w+")
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
             f.close()
-        if not os.path.isfile("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico"):
-            print("Downloading logo .ico!")
-            url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.ico"
-            wget.download(url, "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico")
+        if not os.path.isfile("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png"):
+            print("Downloading logo .png!")
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
+            wget.download(url, "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
             print("Download successful!")
 
 
@@ -65,8 +65,8 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.ico")
-        root.tk.call('wm', 'iconphoto', root._w, icon)
+        icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
+        root.tk.call('wm', 'pngnphoto', root._w, pngn)
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
