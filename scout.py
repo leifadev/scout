@@ -423,5 +423,7 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
+    root.tk.call('wm', 'iconphoto', root._w, icon)
     app = App(root)
     root.mainloop()
