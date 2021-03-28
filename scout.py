@@ -67,6 +67,8 @@ class App:
         # Attributes #
 
         root.title("Scout")
+        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
+        root.tk.call('wm', 'iconphoto', root._w, icon)
         root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
         width=845
         height=350
@@ -423,7 +425,5 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
-    root.tk.call('wm', 'iconphoto', root._w, icon)
     app = App(root)
     root.mainloop()
