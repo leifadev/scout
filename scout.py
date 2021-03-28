@@ -50,9 +50,9 @@ class App:
             f.close
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
         if not os.path.isfile(self.fileLoc + "Scout"):
-            print("Downloading logo .gif!")
-            url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.gif"
-            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
+            print("Downloading logo .png!")
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
+            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
             print("Download successful!")
 
 
@@ -67,9 +67,9 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
+        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
         root.tk.call('wm', 'iconphoto', root._w, icon)
-        root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.gif")
+        # root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()

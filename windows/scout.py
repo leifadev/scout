@@ -66,7 +66,8 @@ class App:
 
         root.title("Scout")
         icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
-        root.tk.call('wm', 'pngnphoto', root._w, pngn)
+        root.tk.call('wm', 'iconphoto', root._w, icon)
+        # root.iconbitmap("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
