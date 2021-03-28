@@ -54,7 +54,7 @@ class App:
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
         if not os.path.isfile(self.fileLoc + "Scout"):
             print("Downloading logo .gif!")
-            url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.gif"
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/linux/scout_logo.gif"
             wget.download(url, "/home/" + getpass.getuser() + "/Documents/Scout/scout_logo.gif")
             print("Download successful!")
 
