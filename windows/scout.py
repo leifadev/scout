@@ -12,7 +12,6 @@ from pytube.exceptions import *
 import time
 import wget
 
-# MACOS RELEASE
 
 class App:
     def __init__(self, root):
