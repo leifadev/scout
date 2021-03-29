@@ -10,6 +10,7 @@ import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
 import wget
+import ssl
 
 # python3 setup.py py2app -A
 # The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
@@ -23,6 +24,8 @@ class App:
         self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
 
         self.videoRes = False
+
+        ssl._create_default_https_context = ssl._create_unverified_context
 
         # Database
         self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
