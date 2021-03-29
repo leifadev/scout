@@ -11,7 +11,6 @@ import tkinter.font as tkFont
 from pytube.exceptions import *
 import time
 
-
 # python3 setup.py py2app -A
 # The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
 
