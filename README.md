@@ -6,18 +6,28 @@ No bloated javascript ad websites anymore!
  
 ## Native Build Details
 ```cs
-Currently testing on macOS 10.15.7 (19H2)
+Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
 
-Tested python version: 3.8.5 - 9.2
+Tested python versions: 3.8.5 - 9.2
+
+Using packages:
+- tkinter
+- pytube
+- pytube3
+- ruamel.yaml
+- wget
+
+Compiler: Pyinstaller
 ``` 
  
 ### Supported Versions
 
-| macOS Version | Supported          |
-| ------- | ------------------ |
-| Windows   | :white_check_mark: |
-| MacOS  | :white_check_mark: |
-| Linux   | ?                |
+| macOS Version | Supported   |
+| ------- | ------------------|
+| Windows 10 | :white_check_mark:|
+| Windows 8 | ?                |
+| MacOS 10.15-16 | :white_check_mark: |
+| Linux   | :white_check_mark: |
 
 *Since this is based only with python it is versatile for OS support*
 
@@ -41,7 +51,9 @@ If you encounter any tiny to fatal bugs or security vulnerbilites, you can do th
 
 1. Go to the [Issues page on this repo](https://github.com/leifadev/scout/issues).
 2. Fill out bug report template of what you have encountered
-3. Wait up to around 12 - 24 hours and you may be likely to get a response. Realistically, I won't think you'll be waiting weeks.
+3. Wait up to around 1 - 12 hours and you will likely to get a response. Realistically, I won't think you'll be waiting weeks on end obviously.
+
+You can also contribute the the wiki as it is public for writing! 
 
 ## Other
 I also make youtube videos! Check them out if you want:

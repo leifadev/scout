@@ -9,10 +9,8 @@ from ruamel import yaml
 import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
+import time
 import wget
-
-# python3 setup.py py2app -A
-# The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
 
 
 class App:
@@ -20,41 +18,40 @@ class App:
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
-        self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
-
+        self.path = "C:\\Users\\" + getpass.getuser() + "\\Desktop" #user Desktop dir
         self.videoRes = False
 
         # Database
-        self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
+        self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
+
         self.payload = [
             {
                 'Options': {
-                    'defaultDir': "~/Desktop",
+                    'defaultDir': "C:\\Users\\" + getpass.getuser() + "\Desktop",
                     'errorChoice': True,
                     'changedDefaultDir': False
                 }
             }
         ]
 
-        self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
 
 
+        self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
         # Generates initial yml file
         if not os.path.exists(self.fileLoc + "Scout"):
             path = os.path.join(self.fileLoc, "Scout")
-            os.makedirs(path)
+            os.makedirs(path, exist_ok=True)
         if not os.path.isfile(self.ymldir):
             print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-            os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
+            os.chdir("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout")
             f = open("settings.yml","w+")
-            f.close
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
-        if not os.path.isfile(self.fileLoc + "Scout"):
+            f.close()
+        if not os.path.isfile("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png"):
             print("Downloading logo .png!")
             url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
-            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+            wget.download(url, "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
             print("Download successful!")
-
 
 
         with open(self.ymldir,"r") as yml:
@@ -67,9 +64,9 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+        icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
         root.tk.call('wm', 'iconphoto', root._w, icon)
-        # root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+        # root.iconbitmap("C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
@@ -85,12 +82,12 @@ class App:
         filemenu = Menu(menubar)
         filemenu = Menu(menubar, tearoff=0)
 
-        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
+        filemenu.add_command(label="Cut", accelerator="Control+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
 
-        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
+        filemenu.add_command(label="Copy", accelerator="Control+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
 
-        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
-        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
+        filemenu.add_command(label="Paste", accelerator="Control+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
+        filemenu.add_command(label="Select All", accelerator="Control+A", command=lambda: root.focus_get().select_range(0, 'end'))
 
         filemenu.add_separator()
 
@@ -217,7 +214,6 @@ class App:
                 self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
             except VideoUnavailable:
                 self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-            yt = YouTube(query)
             self.videoFetch(yt, query)
 
 
@@ -290,15 +286,14 @@ class App:
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
-        self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
-        self.logfield.insert(INSERT, f'\nViews: {yt.views}')
+        self.logfield.insert(INSERT, '\nVideo Duration (sec): ' + str(yt.length))
+        self.logfield.insert(INSERT, '\nViews: ' + str(yt.views))
         self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
         self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
 
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
     ########################################################################################################
-
 
     def browseButton_command(self):
         with open(self.ymldir,"r") as yml:
@@ -308,7 +303,7 @@ class App:
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:
-            askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
+            askdirectory(initialdir="C:\\Users\\" + getpass.getuser() + "\AppData\Roaming\Scout")
 
 
     def videoButton_command(self):
@@ -327,15 +322,19 @@ class App:
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
 
-
     def clearConsole_command(self):
         self.logfield["state"] = "normal"
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+
         if self.enablePrompts:
+            print("oooo")
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
         else:
             self.logfield.delete("1.0","end")
-        self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
+        self.logfield["state"] = "disabled"
 
 
     #################################################################

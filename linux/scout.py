@@ -9,6 +9,7 @@ from ruamel import yaml
 import os
 import tkinter.font as tkFont
 from pytube.exceptions import *
+import time
 import wget
 
 # python3 setup.py py2app -A
@@ -20,12 +21,12 @@ class App:
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
-        self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
+        self.path = '/home/' + getpass.getuser() + '/Desktop/' #macos dir
 
         self.videoRes = False
 
         # Database
-        self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
+        self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
         self.payload = [
             {
                 'Options': {
@@ -36,26 +37,30 @@ class App:
             }
         ]
 
-        self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
+        self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
 
 
         # Generates initial yml file
         if not os.path.exists(self.fileLoc + "Scout"):
             path = os.path.join(self.fileLoc, "Scout")
-            os.makedirs(path)
-        if not os.path.isfile(self.ymldir):
-            print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-            os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
-            f = open("settings.yml","w+")
-            f.close
-            yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+            os.makedirs(path, exist_ok=True)
+        if os.path.exists(self.fileLoc + "Scout"):
+            print("Config folder exists!")
+            if not os.path.isfile(self.ymldir):
+                print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
+                os.chdir("/home/" + getpass.getuser() + "/Documents/Scout")
+                f = open("settings.yml","w+")
+                f.close
+                yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
         if not os.path.isfile(self.fileLoc + "Scout"):
-            print("Downloading logo .png!")
-            url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
-            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+            print("Downloading logo .gif!")
+            url = "https://raw.githubusercontent.com/leifadev/scout/main/linux/scout_logo.gif"
+            wget.download(url, "/home/" + getpass.getuser() + "/Documents/Scout/scout_logo.gif")
             print("Download successful!")
 
 
+
+                # ADD AUTIO GEN WITH IF NONE
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -67,9 +72,8 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+        icon = PhotoImage(file="/home/" + getpass.getuser() + "/Documents/Scout/scout_logo.gif")
         root.tk.call('wm', 'iconphoto', root._w, icon)
-        # root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
@@ -85,12 +89,12 @@ class App:
         filemenu = Menu(menubar)
         filemenu = Menu(menubar, tearoff=0)
 
-        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
+        filemenu.add_command(label="Cut", accelerator="Control+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
 
-        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
+        filemenu.add_command(label="Copy", accelerator="Control+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
 
-        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
-        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
+        filemenu.add_command(label="Paste", accelerator="Control+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
+        filemenu.add_command(label="Select All", accelerator="Control+A", command=lambda: root.focus_get().select_range(0, 'end'))
 
         filemenu.add_separator()
 
@@ -178,6 +182,8 @@ class App:
 
     ########################################################################################################
 
+
+
     ## Triggers and Scripts ##
     def downloadButton_command(self):
         try:
@@ -217,7 +223,6 @@ class App:
                 self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
             except VideoUnavailable:
                 self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-            yt = YouTube(query)
             self.videoFetch(yt, query)
 
 
@@ -290,8 +295,8 @@ class App:
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
-        self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
-        self.logfield.insert(INSERT, f'\nViews: {yt.views}')
+        self.logfield.insert(INSERT, '\nVideo Duration (sec): ' + str(yt.length))
+        self.logfield.insert(INSERT, '\nViews: ' + str(yt.views))
         self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
         self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
 
@@ -308,7 +313,7 @@ class App:
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:
-            askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
+            askdirectory(initialdir='/home/' + getpass.getuser() + '/Desktop/')
 
 
     def videoButton_command(self):
@@ -327,7 +332,6 @@ class App:
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
 
-
     def clearConsole_command(self):
         self.logfield["state"] = "normal"
         if self.enablePrompts:
@@ -335,8 +339,7 @@ class App:
             self.logfield.delete("1.0","end")
         else:
             self.logfield.delete("1.0","end")
-        self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
-
+        self.logfield["state"] = "disabled" #
 
     #################################################################
 
