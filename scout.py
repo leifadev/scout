@@ -12,8 +12,6 @@ from pytube.exceptions import *
 import wget
 import ssl
 
-# python3 setup.py py2app -A
-# The whole app with its enity is in class App. Didn't deel the need to make more or something... lol
 
 
 class App:
@@ -22,7 +20,7 @@ class App:
         self.videoBool = False
         self.changedDefaultDir = bool
         self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
-
+        
         self.videoRes = False
 
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -178,118 +176,13 @@ class App:
         self.logfield["state"] = "disabled"
 
 
-
     ########################################################################################################
 
     ## Triggers and Scripts ##
-    def downloadButton_command(self):
-        try:
-            self.logfield["state"] = "normal"
-
-            query = self.urlfield.get() # gets entry input
-            yt = YouTube(query)
-
-            if self.urlfield.get() == "":
-                self.logfield.insert(INSERT, f'ERROR: URL field is empty and cannot be parsed')
-
-        except RegexMatchError:
-            pass
-
-        if self.videoBool and self.audioBool: # Video and Audio
-            try:
-                yt = YouTube(query)
-                videoDown = yt.streams.filter().get_highest_resolution()
-                videoDown.download(self.path, filename_prefix="Scout_")
-                comp = videoDown.on_complete(self.path)
-                print()
-                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"')
-
-            except VideoPrivate:
-                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
-            except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
-            except RegexMatchError:
-                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
-            except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
-            except MembersOnly:
-                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
-            except LiveStreamError:
-                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
-            except HTMLParseError:
-                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
-            except VideoUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-            yt = YouTube(query)
-            self.videoFetch(yt, query)
-
-
-        elif self.audioBool:  # Audio only
-            try:
-                yt = YouTube(query)
-                query = self.urlfield.get()
-
-                audioDown = yt.streams.filter(only_audio=True).first()
-                audioDown.download(self.path, filename_prefix="Scout_")
-                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", format="audio/mp4"')
-
-            except VideoPrivate:
-                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
-            except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
-            #            except RegexMatchError:
-            #                self.logfield.insert(INSERT, f'ERROR: Invalid link formatting\n')
-            except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
-            except MembersOnly:
-                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
-            except LiveStreamError:
-                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
-            except HTMLParseError:
-                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
-            except VideoUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-            self.videoFetch(yt, query)
-
-
-            # high_audioDown = yt.streams.get_audio_only()
-
-        elif self.audioBool == False and self.videoBool: # Video only
-            if self.enablePrompts:
-                messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                self.logfield.insert(INSERT, f'INFO: As of now videos downloaded without audio are fixed to 360p\n')
-            try:
-                yt = YouTube(query)
-                query = self.urlfield.get()
-
-                silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
-                silent_audioDown.download(self.path, filename_prefix="Scout_")
-                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
-            except VideoPrivate:
-                self.logfield.insert(INSERT, f'ERROR: This video is privated, you can\'t download it\n')
-            except VideoRegionBlocked:
-                self.logfield.insert(INSERT, f'ERROR: This video is block in your region\n')
-            except RegexMatchError:
-                pass
-            except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This recording is unavalilable\n')
-            except MembersOnly:
-                self.logfield.insert(INSERT, f'ERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
-            except LiveStreamError:
-                self.logfield.insert(INSERT, f'ERROR: This is a livestream, and not a downloadable video\n')
-            except HTMLParseError:
-                self.logfield.insert(INSERT, f'ERROR: HTML parsing or extraction has failed')
-            except VideoUnavailable:
-                self.logfield.insert(INSERT, f'ERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
-            self.videoFetch(yt, query)
-
-        else:
-            if self.enablePrompts: # hasnt selected video nor audio
-                self.logfield.insert(INSERT, f'ERROR: You can\'t download a video with video or audio\n')
-
-
+    
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
+        query = self.urlfield.get()
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
@@ -297,8 +190,132 @@ class App:
         self.logfield.insert(INSERT, f'\nViews: {yt.views}')
         self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
         self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
-
+        
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
+    
+    
+    def downloadButton_command(self):
+        try:
+            self.logfield["state"] = "normal"
+
+            query = self.urlfield.get() # gets entry input
+            yt = YouTube(query)
+
+        except RegexMatchError:
+            self.logfield["state"] = "disabled"
+
+
+        if self.videoBool and self.audioBool: # Video and Audio
+            self.logfield["state"] = "normal"
+            try:
+                yt = YouTube(query)
+                videoDown = yt.streams.filter().get_highest_resolution()
+                videoDown.download(self.path, filename_prefix="Scout_")
+                comp = videoDown.on_complete(self.path)
+                
+                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
+                self.videoFetch(yt, query)
+
+            except VideoPrivate:
+                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+            except RegexMatchError:
+                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+            except VideoRegionBlocked:
+                self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+            except RecordingUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+            except MembersOnly:
+                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+            except LiveStreamError:
+                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+            except VideoUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.logfield["state"] = "disabled"
+            
+
+
+        elif self.audioBool:  # Audio only
+            self.logfield["state"] = "normal"
+            
+            try:
+                yt = YouTube(query)
+                query = self.urlfield.get()
+                audioDown = yt.streams.filter(only_audio=True).first()
+                audioDown.download(self.path, filename_prefix="Scout_")
+                
+                self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
+                self.videoFetch(yt, query)
+
+            except VideoPrivate:
+                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+            except VideoRegionBlocked:
+                self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+            except RegexMatchError:
+                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+            except RecordingUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+            except MembersOnly:
+                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+            except LiveStreamError:
+                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+            except VideoUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.logfield["state"] = "disable"
+
+
+            # high_audioDown = yt.streams.get_audio_only()
+
+
+        elif self.audioBool == False and self.videoBool: # Video only
+            self.logfield["state"] = "normal"
+            if self.enablePrompts:
+                messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+                self.logfield.insert(INSERT, f'\nINFO: As of now videos downloaded without audio are fixed to 360p\n')
+            try:
+                yt = YouTube(query)
+                query = self.urlfield.get()
+                silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
+                silent_audioDown.download(self.path, filename_prefix="Scout_")
+                
+                self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
+                self.videoFetch(yt, query)
+
+            except VideoPrivate:
+                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+            except VideoRegionBlocked:
+                self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+            except RegexMatchError:
+                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+            except RecordingUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+            except MembersOnly:
+                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+            except LiveStreamError:
+                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+            except HTMLParseError:
+                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+            except VideoUnavailable:
+                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+            self.logfield["state"] = "disabled"
+
+        else:
+            self.logfield["state"] = "normal"
+
+            query = self.urlfield.get() # gets entry input
+
+            if self.urlfield.get() == "":
+                self.logfield.insert(INSERT, f'\nERROR: URL field is empty and cannot be parsed')
+            
+            elif self.enablePrompts: # hasnt selected video nor audio
+                self.logfield.insert(INSERT, f'\nERROR: You can\'t download a video with video or audio\n')
+           
+            self.logfield["state"] = "disabled"
+    
+
 
     ########################################################################################################
 
