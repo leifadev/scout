@@ -11,18 +11,27 @@ import tkinter.font as tkFont
 from pytube.exceptions import *
 import time
 import wget
-import sys
+
+import os_spec
 
 
-#Create os-independent interface for paths and os-specific functions
-os = sys.platform()
-if platform == "linux" or platform == "linux2":
-    # linux
-    from linux import functions, paths
-elif platform == "darwin":
-    # OS X
-    print("Not Supported")
-    sys.exit()
-elif platform == "win32":
-    # Windows
-    from windows import functions, paths
+class App:
+    def __init__(self):
+        self.audioBool = False
+        self.videoBool = False
+        self.changedDefaultDir = bool
+        self.path = os_spec.paths.desktop
+        self.videoRes = False
+
+        #Database
+        self.fileLoc = os_spec.paths.fileLoc
+
+        self.payload = [
+            {
+                'Options': {
+                    'defaultDir': os_spec.paths.desktop,
+                    'errorChoice': True,
+                    'changedDefaultDir': False
+                }
+            }
+        ]
