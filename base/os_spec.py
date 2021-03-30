@@ -1,7 +1,7 @@
 import sys
 
 #Create os-independent interface for paths and os-specific functions
-os = sys.platform()
+platform = sys.platform()
 if platform == "linux" or platform == "linux2":
     # linux
     from linux import *
