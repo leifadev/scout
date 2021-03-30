@@ -446,8 +446,10 @@ class App:
 
 # https://python-pytube.readthedocs.io/en/latest/api.html
 
-
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
     app = App(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
