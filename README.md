@@ -36,7 +36,7 @@ Compiler: Pyinstaller
 - ~~Great file browser~~
 - ~~Error handling with Console~~
 - ~~Add customizable settings w/ storage file~~
-- Extensive testing on macOS, Windows, and Linux
+- ~~Extensive testing on macOS, Windows, and Linux~~
 - Add support for more file types and or resolutions
 - Add extra video file console logging
 - Add thumbnail downloading  support
