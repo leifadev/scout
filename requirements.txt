@@ -1,0 +1,11 @@
+altgraph==0.17
+certifi==2020.12.5
+macholib==1.14
+pyinstaller==4.2
+pyinstaller-hooks-contrib==2021.1
+pytube==10.6.0
+PyYAML==5.4.1
+ruamel.yaml==0.16.13
+ruamel.yaml.clib==0.2.2
+typing-extensions==3.7.4.3
+wget==3.2
