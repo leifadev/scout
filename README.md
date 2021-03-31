@@ -16,6 +16,9 @@ Using packages:
 - pytube3
 - ruamel.yaml
 - wget
+- certifi
+- altgraph
+- more... # (requirements.txt)
 
 Compiler: Pyinstaller
 ``` 
