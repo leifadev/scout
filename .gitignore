@@ -1,4 +1,4 @@
-
+.DS_Store
 .eggs/
 setup.py
 dist/scout.app/Contents/Resources/Scout
