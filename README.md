@@ -10,7 +10,7 @@ Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
 
 Tested python versions: 3.7 - 9.2
 
-Using packages:
+Using main packages:
 - tkinter
 - pytube
 - pytube3
