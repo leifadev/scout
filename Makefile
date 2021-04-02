@@ -1,23 +1,20 @@
 PYTHON = python3
 PROJECT_DIR = /
 PROJECT_MAIN = scout.py
+VERSION = v1.2
 
+# file may need fixes!
 
 .DEFAULT_GOAL = help
 
-.PHONY: help setup clean test build upload standalone install run
+.PHONY: help setup clean build
 
 help:
 	@echo "---------------HELP-----------------"
 	@echo "make help - display this message"
 	@echo "make setup - setup the project for development"
-	@echo "make clean - clean the project"
-	@echo "make test - run tests on the project"
+	@echo "make clean - clean up files"
 	@echo "make build - build the project"
-	@echo "make upload - upload the project to PyPI"
-	@echo "make standalone - build standalone application"
-	@echo "make install - install the project to local python installation"
-	@echo "make run - run the project"
 	@echo "------------------------------------"
 
 setup: clean
@@ -35,23 +32,6 @@ clean:
 	rm --force --recursive *.build/
 	rm --force --recursive *.dist/
 
-test:
-	${PYTHON} -m nose2 -v
-
-
 build: clean
-	@echo "Building project"
-	${PYTHON} -m nuitka ${PROJECT_MAIN}
-
-
-standalone: clean
 	@echo "Building standalone application"
-	${PYTHON} -m  nuitka --standalone ${PROJECT_MAIN}
-
-install: clean
-	@echo "Installing project"
-	${PYTHON} -m pip3 install .
-
-run: clean
-	@echo "Running project"
-	${PYTHON} ${PROJECT_MAIN}
+	$pyinstaller --onefile --windowed --icon=scout_logo.png  ${PROJECT_MAIN}
