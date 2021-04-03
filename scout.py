@@ -11,6 +11,7 @@ import tkinter.font as tkFont
 from pytube.exceptions import *
 import wget
 import ssl
+from sys import platform as _platform
 
 
 
@@ -19,25 +20,44 @@ class App:
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
-        self.path = '/Users/' + getpass.getuser() + '/Desktop/' #macos dir
-        
         self.videoRes = False
-
         ssl._create_default_https_context = ssl._create_unverified_context
+
+        
+        # check OS
+        if _platform == "linux" or _platform == "linux2":
+        self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
+        icon = PhotoImage(file="/home/" + getpass.getuser() + "/Documents/Scout/scout_logo.gif")
+        dirDefaultSetting = "~/Desktop"
+        self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
+
+
+        elif _platform == "darwin":
+            self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
+            dirDefaultSetting = "~/Desktop"
+            self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
+            icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
+            
+            
+        elif _platform == "win64" or "win32":
+            self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
+            dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
+            self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
+            icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
+
+
 
         # Database
         self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
         self.payload = [
             {
                 'Options': {
-                    'defaultDir': "~/Desktop",
+                    'defaultDir': dirDefaultSetting,
                     'errorChoice': True,
                     'changedDefaultDir': False
                 }
             }
         ]
-
-        self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
 
 
         # Generates initial yml file
@@ -46,15 +66,18 @@ class App:
             os.makedirs(path)
         if not os.path.isfile(self.ymldir):
             print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
-            os.chdir("/Users/" + getpass.getuser() + "/Library/Application Support/Scout")
+            os.chdir(self.fileLoc + "Scout")
             f = open("settings.yml","w+")
             f.close
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
         if not os.path.isfile(self.fileLoc + "Scout"):
             print("Downloading logo .png!")
             url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
-            wget.download(url, "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
-            print("Download successful!")
+            if _platform == "win64" or "win32":
+                wget.download(url, self.fileLoc + "Scout\\scout_logo.png")
+                print("Download successful!")
+            else:
+                wget.download(url, self.fileLoc + "Scout/scout_logo.png")
 
 
 
@@ -68,7 +91,6 @@ class App:
         # Attributes #
 
         root.title("Scout")
-        icon = PhotoImage(file="/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
         root.tk.call('wm', 'iconphoto', root._w, icon)
         # root.iconbitmap("/Users/" + getpass.getuser() + "/Library/Application Support/Scout/scout_logo.png")
         width=845
