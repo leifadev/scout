@@ -35,3 +35,4 @@ windows/dist/scout.exe
 dist/
 .DS_Store
 .DS_Store
+*.pyc
