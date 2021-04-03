@@ -24,7 +24,7 @@ class App:
         ssl._create_default_https_context = ssl._create_unverified_context
 
         self.version = "v1.3"
-        
+
         # check OS
         if _platform == "linux" or _platform == "linux2":
             self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
@@ -36,7 +36,7 @@ class App:
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
             dirDefaultSetting = "~/Desktop"
             self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
-            
+
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
             dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
@@ -68,19 +68,19 @@ class App:
             f = open("settings.yml","w+")
             f.close
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
-        
-        
+
+
         # Organizing and downloading app icon #
-        
+
         print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
-        
+
         if _platform == "linux" or _platform == "linux2":
             print("unix gen")
             if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout/scout_logo.png")
             icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
-        
+
         elif _platform == "darwin":
             if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout/scout_logo.png")
@@ -89,7 +89,7 @@ class App:
 
         elif _platform == "win64" or "win32":
             print("win gen")
-            if not os.path.file(self.fileLoc + "Scout\\scout_logo.png"):
+            if not os.path.isfile(self.fileLoc + "Scout\\scout_logo.png"):      #### here
                 wget.download(url, self.fileLoc + "Scout\\scout_logo.png")
             icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
 
@@ -200,7 +200,7 @@ class App:
 
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
-        self.versionText.place(x=780,y=320,width=70,height=25)
+        self.versionText.place(x=780,y=300,width=70,height=25)
         self.versionText["font"] = tkFont.Font(family='Source Code Pro', size=9)
 
 
@@ -219,7 +219,7 @@ class App:
     ########################################################################################################
 
     ## Triggers and Scripts ##
-    
+
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
         query = self.urlfield.get()
@@ -230,10 +230,10 @@ class App:
         self.logfield.insert(INSERT, f'\nViews: {yt.views}')
         self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
         self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
-        
+
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
-    
-    
+
+
     def downloadButton_command(self):
         try:
             self.logfield["state"] = "normal"
@@ -252,7 +252,7 @@ class App:
                 videoDown = yt.streams.filter().get_highest_resolution()
                 videoDown.download(self.path, filename_prefix="Scout_")
                 comp = videoDown.on_complete(self.path)
-                
+
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
                 self.videoFetch(yt, query)
 
@@ -273,18 +273,18 @@ class App:
             except VideoUnavailable:
                 self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
             self.logfield["state"] = "disabled"
-            
+
 
 
         elif self.audioBool:  # Audio only
             self.logfield["state"] = "normal"
-            
+
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 audioDown = yt.streams.filter(only_audio=True).first()
                 audioDown.download(self.path, filename_prefix="Scout_")
-                
+
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
                 self.videoFetch(yt, query)
 
@@ -320,7 +320,7 @@ class App:
                 query = self.urlfield.get()
                 silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
                 silent_audioDown.download(self.path, filename_prefix="Scout_")
-                
+
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
                 self.videoFetch(yt, query)
 
@@ -349,12 +349,12 @@ class App:
 
             if self.urlfield.get() == "":
                 self.logfield.insert(INSERT, f'\nERROR: URL field is empty and cannot be parsed')
-            
+
             elif self.enablePrompts: # hasnt selected video nor audio
                 self.logfield.insert(INSERT, f'\nERROR: You can\'t download a video with video or audio\n')
-           
+
             self.logfield["state"] = "disabled"
-    
+
 
 
     ########################################################################################################
@@ -393,8 +393,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
+            self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
         else:
             self.logfield.delete("1.0","end")
+            self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 

@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['scout.py'],
-             pathex=['/Users/leif/PycharmProjects/Scout/scout'],
+             pathex=['C:\\Users\\leifa\\Documents\\GitHub\\scout'],
              binaries=[],
              datas=[],
              hiddenimports=[],
