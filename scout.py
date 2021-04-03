@@ -23,6 +23,7 @@ class App:
         self.videoRes = False
         ssl._create_default_https_context = ssl._create_unverified_context
 
+        self.version = "v1.3"
         
         # check OS
         if _platform == "linux" or _platform == "linux2":
@@ -71,7 +72,7 @@ class App:
         
         # Organizing and downloading app icon #
         
-        print("Downloading logo .png!")
+        print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
         
         if _platform == "linux" or _platform == "linux2":
@@ -197,6 +198,10 @@ class App:
         clearButton.place(x=95,y=300,width=70)
         clearButton["command"] = self.clearConsole_command
 
+        self.versionText = tk.Label(root)
+        self.versionText = Label(root, text=self.version)
+        self.versionText.place(x=780,y=320,width=70,height=25)
+        self.versionText["font"] = tkFont.Font(family='Source Code Pro', size=9)
 
 
         ## LOG FEILD AND ERROR HANDLING ##
@@ -206,7 +211,7 @@ class App:
         ft = tkFont.Font(family='Source Code Pro', size=10)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(INSERT, "Scout launched successfully!\n")
+        self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
         self.logfield["bg"] = "#F6F6F6"
         self.logfield["state"] = "disabled"
 
