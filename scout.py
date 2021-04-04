@@ -30,21 +30,18 @@ class App:
             self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
             dirDefaultSetting = "~/Desktop"
             self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
-            icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
 
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
             dirDefaultSetting = "~/Desktop"
             self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
-            icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
 
 
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
             dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
-            icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
 
 
 
@@ -58,6 +55,7 @@ class App:
                 }
             }
         ]
+
 
 
         # Generates initial yml file and folder, detects missing files as well
@@ -77,28 +75,36 @@ class App:
         # Organizing and downloading app icon #
 
         print("Attemping logo downloading...")
-        url = "https://raw.githubusercontent.com/leifadev/scout/main/windows/scout_logo.png"
+        url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
 
         if _platform == "linux" or _platform == "linux2":
             print("unix gen")
             if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout/scout_logo.png")
+            icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
+
+
 
         elif _platform == "darwin":
             if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout/scout_logo.png")
+            icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
+
 
 
         elif _platform == "win64" or "win32":
             print("win gen")
-            if not os.path.isfile(self.fileLoc + "Scout\\scout_logo.png"):      #### here
+            if not os.path.isfile(self.fileLoc + "Scout\\scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout\\scout_logo.png")
+            icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
 
 
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.enablePrompts = data[0]['Options']['errorChoice']
+    
+
 
 
         ## UI elements ##
@@ -107,7 +113,6 @@ class App:
 
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, icon)
-        # root.iconbitmap(self.fileLoc + "Scout/scout_logo.png")
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
