@@ -3,6 +3,9 @@
 A simple but powerful python-based youtube video/audio downloader.
 No bloated javascript ad websites anymore!
 
+# ANNOUNCEMENT 
+ **New builds for the upcoming features will come! Stay tune and star the repo! (less bugs two)**\n
+ *Made  April 13, Tuesday, 2021*
  
 ## Native Build Details
 ```cs
