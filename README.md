@@ -18,9 +18,8 @@ Using main packages:
 - ruamel.yaml
 - wget
 
-Compiler: Pyinstaller
-``` 
- 
+Compiler: Pyinstaller | "pyinstaller --onefile (--windowed) --icon=scout_logo.png --osx-bundle-identifier=com.leifadev.scout"```
+
 ### Supported Versions
 
 | OS Platform | Supported   |
