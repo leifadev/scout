@@ -15,6 +15,7 @@ Using main packages:
 - wget
 
 Compiler: Pyinstaller | "pyinstaller --onefile (--windowed) --icon=scout_logo.png --osx-bundle-identifier=com.leifadev.scout"```
+```
 
 ### Supported Versions
 
