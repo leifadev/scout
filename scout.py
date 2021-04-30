@@ -27,6 +27,7 @@ class App:
         ssl._create_default_https_context = ssl._create_unverified_context
         self.path = ""
         self.darkMode = False
+        self.maxModeUse = 0
 
         self.version = "v1.4"
     
@@ -115,11 +116,6 @@ class App:
             icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
 
 
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-            self.enablePrompts = data[0]['Options']['errorChoice']
-    
-
 
         ## UI elements ##
 
@@ -148,35 +144,15 @@ class App:
                     print("No theme! Light mode then...")
 
 
-        # Dark mode toggle button #
+        ## area where clicks are detected ##
         
-        # left click listener, handles toggling dark mode boolean
-        def leftclick(event):
-            print("Click event successful!")
-            if self.darkMode == False:
-                self.darkMode = True
-            else:
-                self.darkMode = False
-
-            with open(self.ymldir,"r") as yml:
-                data = yaml.load(yml, Loader=yaml.Loader)
-                
-            with open(self.ymldir,"w+") as yml:
-                data[0]['Options']['darkMode'] = self.darkMode
-                write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-                self.darkMode = data[0]['Options']['darkMode']
-                print(self.darkMode)
-            print("\nCurrently updating settings.yml...")
-
-
-        # area where clicks are detected
-        frame = Frame(root, width=100, height=30)
-        frame.bind("<Button-1>", leftclick)
-        frame.place(x=170,y=300,width=35)
-        if self.darkMode:
-            frame["bg"] = '#464646'
-        else:
-            frame['bg'] = "#ececec"
+#        frame = Frame(root, width=100, height=30)
+#        frame.bind("<Button-1>", leftclick)
+#        frame.place(x=170,y=300,width=35)
+#        if self.darkMode:
+#            frame["bg"] = '#464646'
+#        else:
+#            frame['bg'] = "#ececec"
 
 
 #        canvas = Canvas(frame, width=845, height=350)
@@ -185,12 +161,12 @@ class App:
 #        test = PhotoImage(file="test.png")
 #        canvas.create_image(350,50,image=test)
 
+        ##                                 ##
+        
         
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
-
-
 
 
         # Menu items #
@@ -212,7 +188,7 @@ class App:
         menubar.add_cascade(label="File", menu=filemenu)
 
         helpmenu = Menu(menubar)
-        helpmenu.add_command(label="About")
+        helpmenu.add_command(label="About", command=self.about_button)
         helpmenu.add_command(label="Help", command=self.helpButton_command)
 
         helpmenu.add_separator()
@@ -276,16 +252,29 @@ class App:
         clearButton.place(x=95,y=300,width=70)
         clearButton["command"] = self.clearConsole_command
 
+        self.modeButton=ttk.Button(root)
+        self.modeButton.place(x=170,y=300,width=100)
+        self.modeButton["command"] = self.switchMode
+
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
-        self.versionText.place(x=780,y=300,width=70,height=25)
-        self.versionText["font"] = tkFont.Font(family='Source Code Pro', size=9)
+        self.versionText.place(x=780,y=300,width=40,height=25)
+        self.versionText["font"] = tkFont.Font(family='Source Code Pro', size=12)
         if self.darkMode:
-            self.versionText["bg"] = "#464646"
+            self.versionText["bg"] = "#464646" # dark theme gray
+            self.versionText["fg"] = "#ececec" # light theme gray
         else:
             self.versionText['bg'] = "#ececec"
+            self.versionText["fg"] = "#464646"
 
-
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.darkMode = data[0]['Options']['darkMode']
+            if self.darkMode:
+                self.modeButton["text"] = "Light Mode"
+            else:
+                self.modeButton["text"] = "Dark Mode"
 
 
         ## LOG FEILD AND ERROR HANDLING ##
@@ -299,11 +288,10 @@ class App:
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
-            print("e")
         else:
             self.logfield["bg"] = "#f6f6f6" # if you want change this into 1 line for a bg dont keep it there for future adjustments
-
-
+            
+            
     ######################################################################################
 
     ## Triggers and Scripts ##
@@ -450,6 +438,43 @@ class App:
 
     # Button and toggle functions/commands/calls for main window
 
+    def switchMode(self): # launches and toggles light and dark mode value
+        print("Click event successful!")
+        if self.darkMode == False:
+            self.darkMode = True
+            self.modeButton["text"] = "Light Mode"
+        else:
+            self.darkMode = False
+            self.modeButton["text"] = "Dark Mode"
+
+
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            
+        with open(self.ymldir,"w+") as yml:
+            data[0]['Options']['darkMode'] = self.darkMode
+            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+            self.darkMode = data[0]['Options']['darkMode']
+            print(self.darkMode)
+        print("\nCurrently updating settings.yml...")
+        
+        self.maxModeUse += 1
+        if self.maxModeUse == 1:
+            self.modeButton["state"] = "disabled"
+            self.maxWarn = Label(root, text=self.version)
+            if self.darkMode:
+                self.maxWarn["fg"] = "#464646" # light theme gray
+                self.maxWarn["bg"] = "#ececec"
+                print("hh")
+            else:
+                self.maxWarn["fg"] = "#ececec"
+                self.maxWarn["bg"] = "#464646"
+                print("ii")
+            self.maxWarn.place(x=275,y=302,width=130)
+            self.maxWarn["text"] = "Restart to apply!"
+            self.maxWarn["font"] = tkFont.Font(family='Source Code Pro', size=12)
+
+
     def browseButton_command(self):
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -498,19 +523,53 @@ class App:
 
     ## Settings pane ##
 
-    def settings_button(self): # Settings pane, offers custiomizable features!
-
-        sWin = ThemedTk(themebg=True)
-
+    def getTheme(self, name):
         with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.darkMode = data[0]['Options']['darkMode']
             if self.darkMode:
-                sWin.set_theme("equilux")
+                name.set_theme("equilux")
             else:
                 print("No theme! Light mode then...")
-                sWin["bg"] = "#ececec"
+                name["bg"] = "#ececec"
+
+    def about_button(self):
+        
+        abt = ThemedTk(themebg=True)
+        self.getTheme(abt)
+        
+        abt.title("About")
+        width=300
+        height=300
+        screenwidth = abt.winfo_screenwidth()
+        screenheight = abt.winfo_screenheight()
+        abt_alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        abt.geometry(abt_alignstr)
+        abt.resizable(width=False, height=False)
+        
+        abtTitle = ttk.Label(abt)
+        abtTitle = Label(abt, text="About")
+        abtTitle.place(x=105,y=10,width=140)
+        if self.darkMode:
+            defaultDirTip["bg"] = "#464646"
+        else:
+            defaultDirTip['bg'] = "#ececec"
+            
+        abtMsg = ""
+        abtTitle = ttk.Label(abt)
+        abtTitle = Label(abt, text=abtMsg, anchor)
+        abtTitle.place(x=105,y=10,width=140)
+        if self.darkMode:
+            defaultDirTip["bg"] = "#464646"
+        else:
+            defaultDirTip['bg'] = "#ececec"
+            
+
+    def settings_button(self): # Settings pane, offers custiomizable features!
+
+        sWin = ThemedTk(themebg=True)
                         
+        self.getTheme(sWin)
         sWin.title("Settings")
         width=550
         height=400
@@ -520,35 +579,30 @@ class App:
         sWin.geometry(sWin_alignstr)
         sWin.resizable(width=False, height=False)
 
-        defaultDirTip = ttk.Label(sWin)
-        defaultDirTip = Label(sWin, text="Settings")
-        defaultDirTip.place(x=207,y=10,width=140)
+        settingsTitle = ttk.Label(sWin)
+        settingsTitle = Label(sWin, text="Settings")
+        settingsTitle.place(x=207,y=10,width=140)
         if self.darkMode:
-            defaultDirTip["bg"] = "#464646"
+            settingsTitle["bg"] = "#464646"
         else:
-            defaultDirTip['bg'] = "#ececec"
+            settingsTitle['bg'] = "#ececec"
 
         self.defaultDirButton=ttk.Button(sWin, text="Choose") # Disabled default dir until further notice
         #        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=50,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
 
-        self.versionText = tk.Label(root)
-        self.versionText = Label(root, text=self.version)
-        self.versionText.place(x=780,y=300,width=70,height=25)
-        if self.darkMode:
-            self.versionText["bg"] = "#464646"
-        else:
-            self.versionText['bg'] = "#ececec"
 
         self.defaultDirTip = ttk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
-        self.defaultDirTip.place(x=147,y=50,width=140)
+        self.defaultDirTip.place(x=147,y=52,width=140)
         if self.darkMode:
-            self.defaultDirTip["bg"] = "#464646"
+            self.defaultDirTip["bg"] = "#464646" # dark theme gray
+            self.defaultDirTip["fg"] = "#999999" # light theme gray
         else:
-            self.defaultDirTip['bg'] = "#ececec"
-
+            self.defaultDirTip['bg'] = "#999999"
+            self.defaultDirTip["fg"] = "#464646"
+            
 
         self.warnMenu = ttk.Button(sWin)
         self.warnMenu["text"] = "Toggle Off"
@@ -557,11 +611,13 @@ class App:
 
         self.warnTip = ttk.Label(sWin)
         self.warnTip = Label(sWin, text="Recieve Prompts")
-        self.warnTip.place(x=165,y=103,width=110)
+        self.warnTip.place(x=165,y=108,width=110)
         if self.darkMode:
-            self.warnTip["bg"] = "#464646"
+            self.warnTip["bg"] = "#464646" # dark theme gray
+            self.warnTip["fg"] = "#999999" # light theme gray
         else:
             self.warnTip['bg'] = "#ececec"
+            self.warnTip["fg"] = "#999999"
 
         self.prefixMenu = ttk.Button(sWin)
         self.prefixMenu["text"] = "Toggle Off"
@@ -570,13 +626,15 @@ class App:
 
         self.prefixTip = ttk.Label(sWin)
         self.prefixTip = Label(sWin, text="File Prefix")
-        self.prefixTip.place(x=165,y=153,width=110)
+        self.prefixTip.place(x=165,y=157,width=110)
         if self.darkMode:
-            self.prefixTip["bg"] = "#464646"
+            self.prefixTip["bg"] = "#464646" # dark theme gray
+            self.prefixTip["fg"] = "#999999" # light theme gray
         else:
-            self.prefixTip['bg'] = "#ececec"
+            self.prefixTip['bg'] = "#999999"
+            self.prefixTip["fg"] = "#464646"
 
-        
+
 #        with open(self.ymldir,"r") as yml:
 #            data = yaml.load(yml, Loader=yaml.Loader) # Changing button state depending on mode
 #            if data[0]['Options']['errorChoice']:
@@ -639,22 +697,6 @@ class App:
             self.enablePrompts = data[0]['Options']['errorChoice']
             print(self.enablePrompts)
         print("\nCurrently updating settings.yml...")
-
-
-#    def about_button(self): # Settings pane, offers custiomizable features!
-#        sWin = Tk()
-#        sWin.title("Settings")
-#        width=550
-#        height=400
-#        screenwidth = sWin.winfo_screenwidth()
-#        screenheight = sWin.winfo_screenheight()
-#        sWin_alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
-#        sWin.geometry(sWin_alignstr)
-#        sWin.resizable(width=False, height=False)
-#
-#        defaultDirTip = tk.Label(sWin)
-#        defaultDirTip = Label(sWin, text="Settings")
-#        defaultDirTip.place(x=207,y=10,width=140)
 
 
 
