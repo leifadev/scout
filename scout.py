@@ -12,7 +12,9 @@ from pytube.exceptions import *
 import wget
 import ssl
 from sys import platform as _platform
-
+from tkinter import ttk
+from ttkthemes import ThemedTk,THEMES
+from PIL import Image, ImageTk
 
 
 class App:
@@ -21,37 +23,52 @@ class App:
         self.videoBool = False
         self.changedDefaultDir = bool
         self.videoRes = False
+        self.filePrefix = ""
         ssl._create_default_https_context = ssl._create_unverified_context
+        self.path = ""
+        self.darkMode = False
 
-        self.version = "v1.3"
+        self.version = "v1.4"
+    
 
         # check OS
         if _platform == "linux" or _platform == "linux2":
             self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
-            dirDefaultSetting = "~/Desktop"
+            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
             self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
-
+            if self.path ==  "":
+                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+            else:
+                print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
-            dirDefaultSetting = "~/Desktop"
+            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
             self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
-
+            if self.path ==  "":
+                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+            else:
+                print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
 
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
             dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
+            if self.path ==  "":
+                self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
+            else:
+                print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
 
 
-
-        # Database (pre-made yml structure for intial generation)
+        # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
             {
                 'Options': {
                     'defaultDir': dirDefaultSetting,
                     'errorChoice': True,
-                    'changedDefaultDir': False
+                    'changedDefaultDir': False,
+                    'hasFilePrefix': self.filePrefix,
+                    'darkMode': self.darkMode
                 }
             }
         ]
@@ -64,7 +81,7 @@ class App:
             os.makedirs(path, exist_ok=True)
             print("Folder generated...")
         if not os.path.isfile(self.ymldir):
-            print("Creating settings.yml,\nThis is not a restored version of a previously deleted one!")
+            print("Creating the settings.yml,\nThis is NOT a restored version of a previously deleted one!")
             os.chdir(self.fileLoc + "scout")
             print(os.getcwd())
             f = open("settings.yml","w+")
@@ -72,7 +89,7 @@ class App:
             yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
 
 
-        # Organizing and downloading app icon #
+        # Organizing and downloading app icon for each OS #
 
         print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
@@ -91,13 +108,11 @@ class App:
             icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
 
 
-
         elif _platform == "win64" or "win32":
             print("win gen")
             if not os.path.isfile(self.fileLoc + "Scout\\scout_logo.png"):
                 wget.download(url, self.fileLoc + "Scout\\scout_logo.png")
             icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
-
 
 
         with open(self.ymldir,"r") as yml:
@@ -106,23 +121,79 @@ class App:
     
 
 
-
         ## UI elements ##
 
         # Attributes #
 
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, icon)
+        
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
+        style = ttk.Style()
+
+
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.darkMode = data[0]['Options']['darkMode']
+            if self.darkMode:
+                root.set_theme("equilux")
+            else:
+                if _platform == "darwin":
+                    root['bg'] = "#ececec"
+                    print("No theme! Light mode then...")
+                else:
+                    print("No theme! Light mode then...")
+
+
+        # Dark mode toggle button #
+        
+        # left click listener, handles toggling dark mode boolean
+        def leftclick(event):
+            print("Click event successful!")
+            if self.darkMode == False:
+                self.darkMode = True
+            else:
+                self.darkMode = False
+
+            with open(self.ymldir,"r") as yml:
+                data = yaml.load(yml, Loader=yaml.Loader)
+                
+            with open(self.ymldir,"w+") as yml:
+                data[0]['Options']['darkMode'] = self.darkMode
+                write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+                self.darkMode = data[0]['Options']['darkMode']
+                print(self.darkMode)
+            print("\nCurrently updating settings.yml...")
+
+
+        # area where clicks are detected
+        frame = Frame(root, width=100, height=30)
+        frame.bind("<Button-1>", leftclick)
+        frame.place(x=170,y=300,width=35)
+        if self.darkMode:
+            frame["bg"] = '#464646'
+        else:
+            frame['bg'] = "#ececec"
+
+
+#        canvas = Canvas(frame, width=845, height=350)
+#        canvas.pack()
+#
+#        test = PhotoImage(file="test.png")
+#        canvas.create_image(350,50,image=test)
+
+        
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
 
 
-        # Menu items
+
+
+        # Menu items #
 
         menubar = Menu(root)
         filemenu = Menu(menubar)
@@ -155,51 +226,52 @@ class App:
 
         # Elements #
 
-        root.lift()
+        root.lift() # lift window to the top
 
-        self.urlfield = tk.Entry(root)
+        self.urlfield = ttk.Entry(root)
         self.urlfield["justify"] = "left"
         self.urlfield["text"] = ""
         self.urlfield.insert(0, '')   # add pre made message
         self.urlfield.place(x=20,y=60,width=540)
 
-        self.downloadButton=tk.Button(root)
-        self.downloadButton["justify"] = "center"
+
+        self.downloadButton=ttk.Button(root)
+#        self.downloadButton["justify"] = "center"
         self.downloadButton["text"] = "Download"
         self.downloadButton.place(x=570,y=59,width=120)
         self.downloadButton["command"] = self.downloadButton_command
 
 
-        self.browseButton=tk.Button(root)
+        self.browseButton=ttk.Button(root)
         self.browseButton["text"] = "File Destination"
         self.browseButton["command"] = self.browseButton_command
         self.browseButton.place(x=690,y=59,width=140)
 
 
-        self.videoButton=tk.Checkbutton(root)
-        self.videoButton["justify"] = "center"
+        self.videoButton=ttk.Checkbutton(root)
+#        self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
-        self.videoButton.place(x=720,y=120,width=70,height=25)
+        self.videoButton.place(x=720,y=120,width=70,height=30)
         self.videoButton["offvalue"] = False
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
-        self.audioButton=tk.Checkbutton(root)
-        self.audioButton["justify"] = "center"
+        self.audioButton=ttk.Checkbutton(root)
+#        self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
-        self.audioButton.place(x=720,y=160,width=70,height=25)
+        self.audioButton.place(x=720,y=160,width=70,height=30)
         self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
 
-        helpButton=tk.Button(root)
-        helpButton["justify"] = "center"
+        helpButton=ttk.Button(root)
+#        helpButton["justify"] = "center"
         helpButton["text"] = "Help"
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
-        clearButton=tk.Button(root)
-        helpButton["justify"] = "center"
+        clearButton=ttk.Button(root)
+#        helpButton["justify"] = "center"
         clearButton["text"] = "Clear"
         clearButton.place(x=95,y=300,width=70)
         clearButton["command"] = self.clearConsole_command
@@ -208,6 +280,12 @@ class App:
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=780,y=300,width=70,height=25)
         self.versionText["font"] = tkFont.Font(family='Source Code Pro', size=9)
+        if self.darkMode:
+            self.versionText["bg"] = "#464646"
+        else:
+            self.versionText['bg'] = "#ececec"
+
+
 
 
         ## LOG FEILD AND ERROR HANDLING ##
@@ -218,11 +296,15 @@ class App:
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
-        self.logfield["bg"] = "#F6F6F6"
         self.logfield["state"] = "disabled"
+        if self.darkMode:
+            self.logfield["bg"] = "#e5e5e5"
+            print("e")
+        else:
+            self.logfield["bg"] = "#f6f6f6" # if you want change this into 1 line for a bg dont keep it there for future adjustments
 
 
-    ########################################################################################################
+    ######################################################################################
 
     ## Triggers and Scripts ##
 
@@ -230,6 +312,7 @@ class App:
         yt = YouTube(query)
         query = self.urlfield.get()
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
+        self.logfield.insert(INSERT, f'\nVideo Author: {yt.title}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
         self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
@@ -256,7 +339,7 @@ class App:
             try:
                 yt = YouTube(query)
                 videoDown = yt.streams.filter().get_highest_resolution()
-                videoDown.download(self.path, filename_prefix="Scout_")
+                videoDown.download(self.path, filename_prefix=self.filePrefix)
                 comp = videoDown.on_complete(self.path)
 
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
@@ -289,7 +372,7 @@ class App:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 audioDown = yt.streams.filter(only_audio=True).first()
-                audioDown.download(self.path, filename_prefix="Scout_")
+                audioDown.download(self.path, filename_prefix=self.filePrefix)
 
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
                 self.videoFetch(yt, query)
@@ -325,7 +408,7 @@ class App:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
-                silent_audioDown.download(self.path, filename_prefix="Scout_")
+                silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
 
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
                 self.videoFetch(yt, query)
@@ -365,6 +448,7 @@ class App:
 
     ########################################################################################################
 
+    # Button and toggle functions/commands/calls for main window
 
     def browseButton_command(self):
         with open(self.ymldir,"r") as yml:
@@ -372,6 +456,7 @@ class App:
             self.path = data[0]['Options']['defaultDir']
 
         if self.changedDefaultDir:
+            print(self.path)
             askdirectory(initialdir=self.path)
         else:
             askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
@@ -382,6 +467,7 @@ class App:
             self.videoBool = True
         else:
             self.videoBool = False
+        print("Video status: " + str(self.videoBool))
 
 
     def audioButton_command(self):
@@ -389,9 +475,11 @@ class App:
             self.audioBool = True
         else:
             self.audioBool = False
+        print("Audio status: " + str(self.audioBool))
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
+        print("This is opening the github page to for Scout. All versions of scout, a public wiki, and an issues page\nare there to help!")
 
 
     def clearConsole_command(self):
@@ -408,9 +496,21 @@ class App:
 
     #################################################################
 
+    ## Settings pane ##
 
     def settings_button(self): # Settings pane, offers custiomizable features!
-        sWin = Tk()
+
+        sWin = ThemedTk(themebg=True)
+
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.darkMode = data[0]['Options']['darkMode']
+            if self.darkMode:
+                sWin.set_theme("equilux")
+            else:
+                print("No theme! Light mode then...")
+                sWin["bg"] = "#ececec"
+                        
         sWin.title("Settings")
         width=550
         height=400
@@ -420,41 +520,69 @@ class App:
         sWin.geometry(sWin_alignstr)
         sWin.resizable(width=False, height=False)
 
-        defaultDirTip = tk.Label(sWin)
+        defaultDirTip = ttk.Label(sWin)
         defaultDirTip = Label(sWin, text="Settings")
         defaultDirTip.place(x=207,y=10,width=140)
+        if self.darkMode:
+            defaultDirTip["bg"] = "#464646"
+        else:
+            defaultDirTip['bg'] = "#ececec"
 
-        self.defaultDirButton=tk.Button(sWin, text="Choose") # Disabled default dir until further notice
-        self.defaultDirButton["justify"] = "center"
+        self.defaultDirButton=ttk.Button(sWin, text="Choose") # Disabled default dir until further notice
         #        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=50,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
 
-        self.defaultDirTip = tk.Label(sWin)
+        self.versionText = tk.Label(root)
+        self.versionText = Label(root, text=self.version)
+        self.versionText.place(x=780,y=300,width=70,height=25)
+        if self.darkMode:
+            self.versionText["bg"] = "#464646"
+        else:
+            self.versionText['bg'] = "#ececec"
+
+        self.defaultDirTip = ttk.Label(sWin)
         self.defaultDirTip = Label(sWin, text="Set Default Directory")
         self.defaultDirTip.place(x=147,y=50,width=140)
-
-        self.warnMenu = tk.Button(sWin)
-        self.warnMenu["justify"] = "center"
-
-
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader) # Changing button state depending on mode
-            if data[0]['Options']['errorChoice']:
-                self.warnMenu["text"] = "Toggle On"
-            else:
-                self.warnMenu["text"] = "Toggle Off"
+        if self.darkMode:
+            self.defaultDirTip["bg"] = "#464646"
+        else:
+            self.defaultDirTip['bg'] = "#ececec"
 
 
+        self.warnMenu = ttk.Button(sWin)
         self.warnMenu["text"] = "Toggle Off"
-        self.warnMenu.place(x=280,y=102,width=110)
-        self.warnMenu["command"] = self.errorToggle
+        self.warnMenu.place(x=292,y=102,width=110)
+        self.warnMenu["command"] = self.errorToggle     #  toggle button for prompts lolz
 
+        self.warnTip = ttk.Label(sWin)
+        self.warnTip = Label(sWin, text="Recieve Prompts")
+        self.warnTip.place(x=165,y=103,width=110)
+        if self.darkMode:
+            self.warnTip["bg"] = "#464646"
+        else:
+            self.warnTip['bg'] = "#ececec"
 
-        self.defaultDirTip = tk.Label(sWin)
-        self.defaultDirTip = Label(sWin, text="Recieve Prompts")
-        self.defaultDirTip.place(x=165,y=103,width=110)
+        self.prefixMenu = ttk.Button(sWin)
+        self.prefixMenu["text"] = "Toggle Off"
+        self.prefixMenu.place(x=292,y=152,width=110)
+        self.prefixMenu["command"] = self.togglePrefix   # SECOND
 
+        self.prefixTip = ttk.Label(sWin)
+        self.prefixTip = Label(sWin, text="File Prefix")
+        self.prefixTip.place(x=165,y=153,width=110)
+        if self.darkMode:
+            self.prefixTip["bg"] = "#464646"
+        else:
+            self.prefixTip['bg'] = "#ececec"
+
+        
+#        with open(self.ymldir,"r") as yml:
+#            data = yaml.load(yml, Loader=yaml.Loader) # Changing button state depending on mode
+#            if data[0]['Options']['errorChoice']:
+#                self.warnMenu["text"] = "Toggle On"
+#            else:
+#                self.warnMenu["text"] = "Toggle Off"
 
 
     def defaultDir_command(self):
@@ -469,12 +597,35 @@ class App:
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
 
 
+    def togglePrefix(self):
+        if self.filePrefix == "Scout_":
+            self.filePrefix = ""
+            self.prefixMenu["text"] = "Toggle Off"
+            print("Prefix off!")
+        else:
+            self.filePrefix = "Scout_"
+            self.prefixMenu["text"] = "Toggle On"
+            print("Prefix on!")
+            
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            
+        with open(self.ymldir,"w+") as yml:
+            data[0]['Options']['hasFilePrefix'] = self.filePrefix
+            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+            self.filePrefix = data[0]['Options']['hasFilePrefix']
+            print(self.filePrefix)
+        print("\nCurrently updating settings.yml...")
+
+
+
     def errorToggle(self):
         if self.warnMenu["text"] == "Toggle On":
             self.warnMenu["text"] = "Toggle Off"
         else:
             self.warnMenu["text"] = "Toggle On"
         self.dump()
+
 
 
     def dump(self):
@@ -487,11 +638,32 @@ class App:
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
             self.enablePrompts = data[0]['Options']['errorChoice']
             print(self.enablePrompts)
+        print("\nCurrently updating settings.yml...")
+
+
+#    def about_button(self): # Settings pane, offers custiomizable features!
+#        sWin = Tk()
+#        sWin.title("Settings")
+#        width=550
+#        height=400
+#        screenwidth = sWin.winfo_screenwidth()
+#        screenheight = sWin.winfo_screenheight()
+#        sWin_alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+#        sWin.geometry(sWin_alignstr)
+#        sWin.resizable(width=False, height=False)
+#
+#        defaultDirTip = tk.Label(sWin)
+#        defaultDirTip = Label(sWin, text="Settings")
+#        defaultDirTip.place(x=207,y=10,width=140)
+
+
+
+
 
 # https://python-pytube.readthedocs.io/en/latest/api.html
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ThemedTk(themebg=True)
     app = App(root)
     root.mainloop()
