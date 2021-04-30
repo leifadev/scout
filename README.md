@@ -2,7 +2,6 @@
 
 A simple but powerful python-based youtube video/audio downloader.
 No bloated javascript ad websites anymore!
-
  
 ## Native Build Details
 ```cs
@@ -11,24 +10,18 @@ Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
 Tested python versions: 3.7 - 9.2
 
 Using main packages:
-- tkinter
 - pytube
-- pytube3
 - ruamel.yaml
 - wget
-- certifi
-- altgraph
-- more... # (requirements.txt)
 
-Compiler: Pyinstaller
-``` 
- 
+Compiler: Pyinstaller | "pyinstaller --onefile (--windowed) --icon=scout_logo.png --osx-bundle-identifier=com.leifadev.scout"
+```
 ### Supported Versions
 
 | OS Platform | Supported   |
 | ------- | ------------------|
 | Windows 10 | :white_check_mark:|
-| Windows 8 | ?                |
+| Legacy Windows | ?                |
 | MacOS 10.15-16 | :white_check_mark: |
 | Linux   | :white_check_mark: |
 
