@@ -139,9 +139,9 @@ class App:
             else:
                 if _platform == "darwin":
                     root['bg'] = "#ececec"
-                    print("No theme! Light mode then...")
+                    print("MacOS: No theme! Light mode then...")
                 else:
-                    print("No theme! Light mode then...")
+                    print("Other: No theme! Light mode then...")
 
 
         ## area where clicks are detected ##
@@ -465,11 +465,9 @@ class App:
             if self.darkMode:
                 self.maxWarn["fg"] = "#464646" # light theme gray
                 self.maxWarn["bg"] = "#ececec"
-                print("hh")
             else:
                 self.maxWarn["fg"] = "#ececec"
                 self.maxWarn["bg"] = "#464646"
-                print("ii")
             self.maxWarn.place(x=275,y=302,width=130)
             self.maxWarn["text"] = "Restart to apply!"
             self.maxWarn["font"] = tkFont.Font(family='Source Code Pro', size=12)
@@ -547,23 +545,38 @@ class App:
         abt.geometry(abt_alignstr)
         abt.resizable(width=False, height=False)
         
-        abtTitle = ttk.Label(abt)
-        abtTitle = Label(abt, text="About")
-        abtTitle.place(x=105,y=10,width=140)
+        self.abtTitle = ttk.Label(abt)
+        self.abtTitle = Label(abt, text="About")
+        self.abtTitle.place(x=45,y=10,width=210)
         if self.darkMode:
-            defaultDirTip["bg"] = "#464646"
+            self.abtTitle["bg"] = "#464646" # dark theme gray
+            self.abtTitle["fg"] = "#999999" # light theme gray
         else:
-            defaultDirTip['bg'] = "#ececec"
+            self.abtTitle['bg'] = "#ececec"
+            self.abtTitle["fg"] = "black"
             
-        abtMsg = ""
-        abtTitle = ttk.Label(abt)
-        abtTitle = Label(abt, text=abtMsg, anchor)
-        abtTitle.place(x=105,y=10,width=140)
+        abtMsg = "Author: leifadev\nLicense: GPL/GNU v3\nVersion: " + self.version + "\n\nLanguage: Python 3\nCompilier: Pyinstaller\nFramework: Tkinter"
+        self.msg = ttk.Label(abt)
+        self.msg = Label(abt, text=abtMsg, anchor=CENTER, wraplength=160, justify=CENTER)
+        self.msg.place(x=50,y=40,width=200)
         if self.darkMode:
-            defaultDirTip["bg"] = "#464646"
+            self.msg["bg"] = "#464646" # dark theme gray
+            self.msg["fg"] = "#999999" # light theme gray
         else:
-            defaultDirTip['bg'] = "#ececec"
-            
+            self.msg['bg'] = "#ececec"
+            self.msg["fg"] = "black"
+
+
+        self.abtLink = "Contribute to the wiki!"
+        self.abtLink = ttk.Label(abt)
+        self.abtLink = Label(abt, font= ('Helvetica 13 underline'), text="Contribute to the wiki!", anchor=CENTER, wraplength=160, justify=CENTER)
+        self.abtLink.place(x=50,y=170,width=200)
+        self.abtLink["fg"] = "#2f81ed"
+        self.abtLink.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/leifadev/scout/wiki"))
+        if self.darkMode:
+            self.abtLink["bg"] = "#464646" # dark theme gray
+        else:
+            self.abtLink['bg'] = "#ececec"
 
     def settings_button(self): # Settings pane, offers custiomizable features!
 
@@ -579,16 +592,18 @@ class App:
         sWin.geometry(sWin_alignstr)
         sWin.resizable(width=False, height=False)
 
-        settingsTitle = ttk.Label(sWin)
-        settingsTitle = Label(sWin, text="Settings")
-        settingsTitle.place(x=207,y=10,width=140)
+        self.settingsTitle = ttk.Label(sWin)
+        self.settingsTitle = Label(sWin, text="Settings")
+        self.settingsTitle.place(x=207,y=10,width=140)
         if self.darkMode:
-            settingsTitle["bg"] = "#464646"
+            self.settingsTitle["bg"] = "#464646" # dark theme gray
+            self.settingsTitle["fg"] = "#999999" # light theme gray
         else:
-            settingsTitle['bg'] = "#ececec"
+            self.settingsTitle['bg'] = "#ececec"
+            self.settingsTitle["fg"] = "black"
 
         self.defaultDirButton=ttk.Button(sWin, text="Choose") # Disabled default dir until further notice
-        #        self.defaultDirButton["text"] = "Choose"
+#        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=50,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
 
@@ -600,8 +615,8 @@ class App:
             self.defaultDirTip["bg"] = "#464646" # dark theme gray
             self.defaultDirTip["fg"] = "#999999" # light theme gray
         else:
-            self.defaultDirTip['bg'] = "#999999"
-            self.defaultDirTip["fg"] = "#464646"
+            self.defaultDirTip['bg'] = "#ececec"
+            self.defaultDirTip["fg"] = "black"
             
 
         self.warnMenu = ttk.Button(sWin)
@@ -617,7 +632,7 @@ class App:
             self.warnTip["fg"] = "#999999" # light theme gray
         else:
             self.warnTip['bg'] = "#ececec"
-            self.warnTip["fg"] = "#999999"
+            self.warnTip["fg"] = "black"
 
         self.prefixMenu = ttk.Button(sWin)
         self.prefixMenu["text"] = "Toggle Off"
@@ -631,8 +646,8 @@ class App:
             self.prefixTip["bg"] = "#464646" # dark theme gray
             self.prefixTip["fg"] = "#999999" # light theme gray
         else:
-            self.prefixTip['bg'] = "#999999"
-            self.prefixTip["fg"] = "#464646"
+            self.prefixTip['bg'] = "#ececec"
+            self.prefixTip["fg"] = "black"
 
 
 #        with open(self.ymldir,"r") as yml:
