@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['scout.py'],
-             pathex=['/Users/leif/Documents/GitHub/scout'],
+             pathex=['C:\\Users\\leifa\\Documents\\GitHub\\scout'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -23,15 +23,11 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='scout',
+          name='Scout',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False , icon='scout_logo.png')
-app = BUNDLE(exe,
-             name='scout.app',
-             icon='scout_logo.png',
-             bundle_identifier='com.leifadev.scout')
+          console=False , icon='scout_logo.ico')
