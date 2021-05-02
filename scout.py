@@ -15,6 +15,7 @@ from sys import platform as _platform
 from tkinter import ttk
 from ttkthemes import ThemedTk,THEMES
 from PIL import Image, ImageTk
+import filecmp
 
 
 class App:
@@ -30,7 +31,7 @@ class App:
         self.maxModeUse = 0
 
         self.version = "v1.4"
-    
+
 
         # check OS
         if _platform == "linux" or _platform == "linux2":
@@ -75,19 +76,62 @@ class App:
         ]
 
 
-
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc + "Scout"):
             path = os.path.join(self.fileLoc, "Scout")
             os.makedirs(path, exist_ok=True)
             print("Folder generated...")
-        if not os.path.isfile(self.ymldir):
-            print("Creating the settings.yml,\nThis is NOT a restored version of a previously deleted one!")
+        if not os.path.isfile(self.ymldir) or os.path.getsize(self.ymldir) == 0:
+                print("Creating the settings.yml,\nThis is NOT a restored version of a previously deleted one!")
+                os.chdir(self.fileLoc + "scout")
+                print(os.getcwd())
+                f = open("settings.yml","w+")
+                f.close
+                yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+                print("if statement passes")
+        # makes a copy of the newest yml/settings structure
+        try:
             os.chdir(self.fileLoc + "scout")
-            print(os.getcwd())
-            f = open("settings.yml","w+")
-            f.close
-            yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
+            cache = open("cache.yml", "w+")
+            cache.close
+            yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
+            print("Cache updated!")
+        except:
+            print("Could not make cache file, if you switched to new version new features may not work.")
+
+        # updating yml if is outdated with options (based on amount of keys)
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            with open(self.fileLoc + "Scout\\cache.yml") as cache:
+                cacheData = yaml.load(cache, Loader=yaml.Loader)
+                settingsList = []
+                cacheList = []
+                for x in data[0]['Options']:
+                    settingsList.append(x)
+                for y in cacheData[0]['Options']:
+                    cacheList.append(y)
+                print(f'Settings: {settingsList}\nCache: {cacheList}')
+                if settingsList == cacheList:
+                    print("Your settings.yml is up to date!")
+                else:
+                    with open(self.ymldir, "w+") as yml:
+                        data = yaml.load(yml, Loader=yaml.Loader)
+                        os.chdir(self.fileLoc + "scout")
+                        cache = open("cache.yml", "w+")
+                        cache.close
+                        yaml.dump(self.payload, yml, Dumper=yaml.RoundTripDumper)
+                        print("Cache updated!")
+
+
+        # if filecmp.cmp('settings.yml', 'cache.yml'):
+        #     print("Successfully updated settings cache!")
+        # else:
+        #     print("Updating settings.yml, for now as of v1.4 your settings will reset every new new version.")
+        #     os.chdir(self.fileLoc + "scout")
+        #     print(os.getcwd())
+        #     f = open("settings.yml","w+")
+        #     f.close
+        #     yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
 
 
         # Organizing and downloading app icon for each OS #
@@ -123,7 +167,7 @@ class App:
 
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, icon)
-        
+
         width=845
         height=350
         screenwidth = root.winfo_screenwidth()
@@ -145,7 +189,7 @@ class App:
 
 
         ## area where clicks are detected ##
-        
+
 #        frame = Frame(root, width=100, height=30)
 #        frame.bind("<Button-1>", leftclick)
 #        frame.place(x=170,y=300,width=35)
@@ -162,8 +206,8 @@ class App:
 #        canvas.create_image(350,50,image=test)
 
         ##                                 ##
-        
-        
+
+
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
@@ -290,8 +334,8 @@ class App:
             self.logfield["bg"] = "#e5e5e5"
         else:
             self.logfield["bg"] = "#f6f6f6" # if you want change this into 1 line for a bg dont keep it there for future adjustments
-            
-            
+
+
     ######################################################################################
 
     ## Triggers and Scripts ##
@@ -450,14 +494,14 @@ class App:
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            
+
         with open(self.ymldir,"w+") as yml:
             data[0]['Options']['darkMode'] = self.darkMode
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
             self.darkMode = data[0]['Options']['darkMode']
             print(self.darkMode)
         print("\nCurrently updating settings.yml...")
-        
+
         self.maxModeUse += 1
         if self.maxModeUse == 1:
             self.modeButton["state"] = "disabled"
@@ -532,10 +576,10 @@ class App:
                 name["bg"] = "#ececec"
 
     def about_button(self):
-        
+
         abt = ThemedTk(themebg=True)
         self.getTheme(abt)
-        
+
         abt.title("About")
         width=300
         height=300
@@ -544,7 +588,7 @@ class App:
         abt_alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         abt.geometry(abt_alignstr)
         abt.resizable(width=False, height=False)
-        
+
         self.abtTitle = ttk.Label(abt)
         self.abtTitle = Label(abt, text="About")
         self.abtTitle.place(x=45,y=10,width=210)
@@ -554,7 +598,7 @@ class App:
         else:
             self.abtTitle['bg'] = "#ececec"
             self.abtTitle["fg"] = "black"
-            
+
         abtMsg = "Author: leifadev\nLicense: GPL/GNU v3\nVersion: " + self.version + "\n\nLanguage: Python 3\nCompilier: Pyinstaller\nFramework: Tkinter"
         self.msg = ttk.Label(abt)
         self.msg = Label(abt, text=abtMsg, anchor=CENTER, wraplength=160, justify=CENTER)
@@ -581,7 +625,7 @@ class App:
     def settings_button(self): # Settings pane, offers custiomizable features!
 
         sWin = ThemedTk(themebg=True)
-                        
+
         self.getTheme(sWin)
         sWin.title("Settings")
         width=550
@@ -617,7 +661,7 @@ class App:
         else:
             self.defaultDirTip['bg'] = "#ececec"
             self.defaultDirTip["fg"] = "black"
-            
+
 
         self.warnMenu = ttk.Button(sWin)
         self.warnMenu["text"] = "Toggle Off"
@@ -679,10 +723,10 @@ class App:
             self.filePrefix = "Scout_"
             self.prefixMenu["text"] = "Toggle On"
             print("Prefix on!")
-            
+
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            
+
         with open(self.ymldir,"w+") as yml:
             data[0]['Options']['hasFilePrefix'] = self.filePrefix
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
