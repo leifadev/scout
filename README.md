@@ -13,6 +13,7 @@ Using main packages:
 - pytube
 - ruamel.yaml
 - wget
+- ttkthemes
 
 Compiler: Pyinstaller | pyinstaller --onefile (--windowed) --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
