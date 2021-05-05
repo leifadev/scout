@@ -45,6 +45,7 @@ class App:
             self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
             dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
             self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
+            self.cachedir = "/home/" + getpass.getuser() + "/Documents/Scout/cache.yml"
             if self.path ==  "":
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
@@ -53,6 +54,7 @@ class App:
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
             dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
+            self.cachedir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/cache.yml"
             self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
             if self.path ==  "":
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
@@ -63,6 +65,7 @@ class App:
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
             dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
+            self.cachedir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\cache.yml"
             if self.path ==  "":
                 self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             else:
@@ -109,7 +112,7 @@ class App:
         # updating yml if is outdated with options (based on amount of keys)
         with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            with open(self.fileLoc + "Scout\\cache.yml") as cache:
+            with open(self.cachedir) as cache:
                 cacheData = yaml.load(cache, Loader=yaml.Loader)
                 settingsList = []
                 cacheList = []
@@ -612,8 +615,8 @@ class App:
 
         self.abtLink = "Contribute to the wiki!"
         self.abtLink = ttk.Label(abt)
-        self.abtLink = Label(abt, font= ('Courier 9 underline'), text="Contribute to the wiki!", anchor=CENTER, wraplength=160, justify=CENTER)
-        self.abtLink.place(x=50,y=160,width=200)
+        self.abtLink = Label(abt, font= ('Courier 12 underline'), text="Contribute to the wiki!", anchor=CENTER, wraplength=160, justify=CENTER)
+        self.abtLink.place(x=50,y=170,width=200)
         self.abtLink["fg"] = "#2f81ed"
         self.abtLink.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/leifadev/scout/wiki"))
         if self.darkMode:
