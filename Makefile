@@ -34,4 +34,4 @@ clean:
 
 build: clean
 	@echo "Building standalone application"
-	$pyinstaller --onefile --windowed --icon=scout_logo.png  ${PROJECT_MAIN}
+	$pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
