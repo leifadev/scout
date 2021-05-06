@@ -42,7 +42,7 @@ class App:
 
         # check OS
         if _platform == "linux" or _platform == "linux2":
-            self.fileLoc = "/home/" + getpass.getuser() + "/Documents/"
+            self.fileLoc = "/home/" + getpass.getuser() + "/Documents/Scout/"
             dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
             self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
             self.cachedir = "/home/" + getpass.getuser() + "/Documents/Scout/cache.yml"
@@ -52,7 +52,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
 
         elif _platform == "darwin":
-            self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/"
+            self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
             dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
             self.cachedir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/cache.yml"
             self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
@@ -62,7 +62,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
 
         elif _platform == "win64" or "win32":
-            self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\"
+            self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
             dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
             self.cachedir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\cache.yml"
@@ -87,27 +87,27 @@ class App:
 
 
         # Generates initial yml file and folder, detects missing files as well
-        if not os.path.isfile(self.fileLoc + "Scout"):
-            path = os.path.join(self.fileLoc, "Scout")
+        if not os.path.isfile(self.fileLoc):
+            path = os.path.join(self.fileLoc)
+            print(os.getcwd())
             os.makedirs(path, exist_ok=True)
             print("Folder generated...")
         if not os.path.isfile(self.ymldir) or os.path.getsize(self.ymldir) == 0:
                 print("Creating the settings.yml,\nThis is NOT a restored version of a previously deleted one!")
-                os.chdir(self.fileLoc + "scout")
+                os.chdir(self.fileLoc)
                 print(os.getcwd())
                 f = open("settings.yml","w+")
                 f.close
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
                 print("if statement passes")
         # makes a copy of the newest yml/settings structure
-        try:
-            os.chdir(self.fileLoc + "scout")
-            cache = open("cache.yml", "w+")
-            cache.close
-            yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
-            print("Cache updated!")
-        except:
-            print("Could not make cache file, if you switched to new version new features may not work.")
+
+        os.chdir(self.fileLoc)
+        cache = open("cache.yml", "w+")
+        cache.close
+        yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
+        print("Cache updated!")
+
 
         # updating yml if is outdated with options (based on amount of keys)
         with open(self.ymldir, "r") as yml:
@@ -127,7 +127,7 @@ class App:
                 else:
                     with open(self.ymldir, "w+") as yml:
                         data = yaml.load(yml, Loader=yaml.Loader)
-                        os.chdir(self.fileLoc + "scout")
+                        os.chdir(self.fileLoc)
                         cache = open("cache.yml", "w+")
                         cache.close
                         yaml.dump(self.payload, yml, Dumper=yaml.RoundTripDumper)
@@ -140,26 +140,11 @@ class App:
         print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
 
-        if _platform == "linux" or _platform == "linux2":
-            print(f"\n\n## Scout has detected you are on Linux! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
-            if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
-                wget.download(url, self.fileLoc + "Scout/scout_logo.png")
-            self.icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
+        print(f"\n\n## Scout has detected you are on Linux! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
+        if not os.path.isfile(self.fileLoc + "scout_logo.png"):
+            wget.download(url, self.fileLoc + "scout_logo.png")
+        self.icon = PhotoImage(file=self.fileLoc + "scout_logo.png")
 
-
-
-        elif _platform == "darwin":
-            print(f"\n\n## Scout has detected you are on macOS! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
-            if not os.path.isfile(self.fileLoc + "Scout/scout_logo.png"):
-                wget.download(url, self.fileLoc + "Scout/scout_logo.png")
-            self.icon = PhotoImage(file=self.fileLoc + "Scout/scout_logo.png")
-
-
-        elif _platform == "win64" or "win32":
-            print(f"\n\n## Scout has detected you are on windows! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
-            if not os.path.isfile(self.fileLoc + "Scout\\scout_logo.png"):
-                wget.download(url, self.fileLoc + "Scout\\scout_logo.png")
-            self.icon = PhotoImage(file="C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\scout_logo.png")
 
 
 
@@ -579,7 +564,7 @@ class App:
     # About button UI and scripting
     def about_button(self):
         abt = ThemedTk(themebg=True)
-        abt.iconbitmap(f"C:\\Users\\leifa\\Documents\\GitHub\\scout\\scout_logo.ico")
+        abt.iconbitmap = PhotoImage(file=self.fileLoc + "scout_logo.png")
         self.getTheme(abt)
 
         abt.title("About")
@@ -628,7 +613,7 @@ class App:
     def settings_button(self): # Settings pane, offers custiomizable features!
 
         sWin = ThemedTk(themebg=True)
-        sWin.iconbitmap(f"C:\\Users\\leifa\\Documents\\GitHub\\scout\\scout_logo.ico")
+        sWin.iconbitmap = PhotoImage(file=self.fileLoc + "scout_logo.png")
 
         self.getTheme(sWin)
         sWin.title("Settings")
