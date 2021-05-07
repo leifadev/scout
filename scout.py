@@ -684,7 +684,7 @@ class App:
 
         self.resetDefaultDir = ttk.Button(sWin)
         self.resetDefaultDir["text"] = "Reset Default Directory"
-        self.resetDefaultDir.place(x=210,y=201,width=160)
+        self.resetDefaultDir.place(x=210,y=201,width=170)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
         self.resetDefaultDir["state"] = "enabled"
 
