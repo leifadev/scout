@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
-from pytube import YouTube  # pip3 install pytube3
+from pytube import YouTube  # pip3 install pytube, pytube3 has little error handling yikesssssssss
 import getpass
 from tkinter import messagebox
 from ruamel import yaml
@@ -32,6 +32,7 @@ class App:
         self.darkMode = False
         self.maxModeUse = 0
         self.version = "v1.4"
+        self.logFont = "No value!"
 
 
         ####################################################
@@ -50,6 +51,8 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Courier' # font that fits the OS UI
+            # self.sysFont =
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
@@ -60,6 +63,7 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Source Code Pro'
 
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
@@ -70,6 +74,7 @@ class App:
                 self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Courier'
 
 
         # Pre-made Database (pre-made yml structure for intial generation)
@@ -292,7 +297,7 @@ class App:
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
-        self.versionText["font"] = tkFont.Font(family='Courier', size=9)
+        self.versionText["font"] = tkFont.Font(family=self.logFont, size=9)
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
             self.versionText["fg"] = "#ececec" # light theme gray
@@ -315,7 +320,7 @@ class App:
 
         self.logfield = tk.Text(root)
         self.logfield.place(x=20,y=100,width=540, height=180)
-        ft = tkFont.Font(family='Courier', size=8)
+        ft = tkFont.Font(family=self.logFont, size=8)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
@@ -499,9 +504,9 @@ class App:
             else:
                 self.maxWarn["fg"] = "#ececec"
                 self.maxWarn["bg"] = "#464646"
-            self.maxWarn.place(x=280,y=308,width=140)
-            self.maxWarn["text"] = "Restart to apply!" # y is 308/linux
-            self.maxWarn["font"] = tkFont.Font(family='Courier', size=10)
+            self.maxWarn.place(x=280,y=302,width=140)
+            self.maxWarn["text"] = "Restart to apply!"
+            self.maxWarn["font"] = tkFont.Font(family=self.logFont, size=10)
 
 
     def browseButton_command(self):
@@ -684,7 +689,7 @@ class App:
 
         self.resetDefaultDir = ttk.Button(sWin)
         self.resetDefaultDir["text"] = "Reset Default Directory"
-        self.resetDefaultDir.place(x=210,y=201,width=160)
+        self.resetDefaultDir.place(x=210,y=201,width=170)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
         self.resetDefaultDir["state"] = "enabled"
 
