@@ -499,8 +499,8 @@ class App:
             else:
                 self.maxWarn["fg"] = "#ececec"
                 self.maxWarn["bg"] = "#464646"
-            self.maxWarn.place(x=280,y=302,width=140)
-            self.maxWarn["text"] = "Restart to apply!"
+            self.maxWarn.place(x=280,y=308,width=140)
+            self.maxWarn["text"] = "Restart to apply!" # y is 308/linux
             self.maxWarn["font"] = tkFont.Font(family='Courier', size=10)
 
 

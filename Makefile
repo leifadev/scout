@@ -34,4 +34,8 @@ clean:
 
 build: clean
 	@echo "Building standalone application"
-	$pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
+	@echo "Installing pyinstaller, you may have to install it your self because it is required."
+	@echo "Installed on \"pip\""
+	@echo "Installed on \"pip3\""
+	$pip3 install pyinstaller
+	$python3 -m PyInstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" ${PROJECT_MAIN}
