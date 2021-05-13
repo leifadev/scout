@@ -32,7 +32,7 @@ class App:
         self.darkMode = False
         self.maxModeUse = 0
         self.version = "v1.4"
-        self.logFont = "No value!"
+
 
 
         ####################################################
@@ -51,8 +51,13 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Courier' # font that fits the OS UI
-            # self.sysFont =
+            self.UIAttributes = {
+                "Font": "Source Code Pro",
+                "charSize": 10,
+                "restartTextPos": 308,
+                "logFont": "Courier",
+                "logSize": 8
+            }
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
@@ -63,7 +68,14 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Source Code Pro'
+
+            self.UIAttributes = {
+                "Font": "Source Code Pro",
+                "charSize": 10,
+                "restartTextPos": 302,
+                "logFont": "Source Code Pro",
+                "logSize": 8
+            }
 
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
@@ -74,8 +86,19 @@ class App:
                 self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Courier'
 
+            self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
+                "Font": "Courier",
+                "charSize": 8,
+                "restartTextPos": 302,
+                "logFont": "Courier",
+                "logSize": 8
+            }
+
+
+
+
+#302mac 308linux
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -161,6 +184,7 @@ class App:
 
         ## Attributes ##
 
+
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, self.icon)
 
@@ -169,7 +193,6 @@ class App:
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         style = ttk.Style()
-
 
         with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -180,8 +203,10 @@ class App:
                 if _platform == "darwin":
                     root['bg'] = "#ececec"
                     print("Launching in light mode!")
-                else:
+                elif _platform == "linux" or _platform == "linux2":
+                    root['bg'] = "#ececec"
                     print("Launching in light mode!")
+
 
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
@@ -205,7 +230,6 @@ class App:
 #        test = PhotoImage(file="test.png")
 #        canvas.create_image(350,50,image=test)
 
-        ##                                 ##
 
         # Menu items #
 
@@ -262,7 +286,7 @@ class App:
         self.browseButton.place(x=690,y=59,width=140)
 
 
-        self.videoButton=ttk.Checkbutton(root)
+        self.videoButton=tk.Checkbutton(root)
 #        self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=720,y=120,width=70,height=30)
@@ -270,7 +294,7 @@ class App:
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
-        self.audioButton=ttk.Checkbutton(root)
+        self.audioButton=tk.Checkbutton(root)
 #        self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
         self.audioButton.place(x=720,y=160,width=70,height=30)
@@ -297,13 +321,19 @@ class App:
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
-        self.versionText["font"] = tkFont.Font(family=self.logFont, size=9)
+        self.versionText["font"] = tkFont.Font(family='Courier', size=12)
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
             self.versionText["fg"] = "#ececec" # light theme gray
         else:
             self.versionText['bg'] = "#ececec"
             self.versionText["fg"] = "#464646"
+
+            #background color for Checkbuttons
+            self.audioButton["bg"] = "#ececec"
+            self.videoButton["bg"] = "#ececec"
+
+
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -320,7 +350,7 @@ class App:
 
         self.logfield = tk.Text(root)
         self.logfield.place(x=20,y=100,width=540, height=180)
-        ft = tkFont.Font(family=self.logFont, size=8)
+        ft = tkFont.Font(family="Courier", size=10)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
@@ -506,7 +536,7 @@ class App:
                 self.maxWarn["bg"] = "#464646"
             self.maxWarn.place(x=280,y=302,width=140)
             self.maxWarn["text"] = "Restart to apply!"
-            self.maxWarn["font"] = tkFont.Font(family=self.logFont, size=10)
+            self.maxWarn["font"] = tkFont.Font(family="Source Code Pro", size=12)
 
 
     def browseButton_command(self):
