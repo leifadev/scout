@@ -32,6 +32,7 @@ class App:
         self.darkMode = False
         self.maxModeUse = 0
         self.version = "v1.4"
+        self.logFont = "No value!"
 
 
 
@@ -68,6 +69,7 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Source Code Pro'
 
             self.UIAttributes = {
                 "Font": "Source Code Pro",
@@ -86,6 +88,7 @@ class App:
                 self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Courier'
 
             self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",

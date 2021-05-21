@@ -1,11 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 block_cipher = None
 
 
-a = Analysis(['/Users/leif/Documents/GitHub/scout/scout.py'],
-             pathex=['/Users/leif/Documents/GitHub/scout'],
+a = Analysis(['scout.py'],
+             pathex=['/Users/leif/PycharmProjects/Scout/scout'],
              binaries=[],
              datas=[],
              hiddenimports=[],
