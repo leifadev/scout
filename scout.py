@@ -53,12 +53,9 @@ class App:
                 self.path = "/Users/" + getpass.getuser() + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-<<<<<<< HEAD
             self.logFont = 'Courier' # font that fits the OS UI
             self.logSize = "12"
             self.restartMsgY = None
-
-=======
             self.UIAttributes = {
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -66,7 +63,6 @@ class App:
                 "logFont": "Courier",
                 "logSize": 8
             }
->>>>>>> 278166dd502032a57e51a303689958ff1c3f7f57
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
@@ -80,8 +76,6 @@ class App:
             self.logFont = 'Source Code Pro'
             self.logSize = "12"
             self.restartMsgY = None
-
-
             self.UIAttributes = {
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -100,11 +94,8 @@ class App:
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Courier'
-<<<<<<< HEAD
             self.logSize = "9"
             self.restartMsgY = None
-=======
-
             self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -117,7 +108,6 @@ class App:
 
 
 #302mac 308linux
->>>>>>> 278166dd502032a57e51a303689958ff1c3f7f57
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [

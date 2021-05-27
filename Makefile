@@ -36,20 +36,15 @@ clean:
 	rm -rf *.build/
 	rm -rf *.dist/
 	@echo "\nFreezing your project! Updated requirements.txt\n"
-	pip3 freeze >> requirements.txt 
-	pip freeze >> requirements.txt 	
+	pip3 freeze >> requirements.txt
+	pip freeze >> requirements.txt
 	@echo "\n--------------------------"
 
 
 build:
-	@echo "Building standalone application"
-<<<<<<< HEAD
+	@echo "Building standalone application, pip is required!"
+	pip3 install pyinstaller && pip install pyinstaller
+	pip3 freeze >> requirements.txt
+	pip freeze >> requirements.txt
 	$ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
 	@echo "Done building! :)"
-=======
-	@echo "Installing pyinstaller, you may have to install it your self because it is required."
-	@echo "Installed on \"pip\""
-	@echo "Installed on \"pip3\""
-	$pip3 install pyinstaller
-	$python3 -m PyInstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" ${PROJECT_MAIN}
->>>>>>> 278166dd502032a57e51a303689958ff1c3f7f57

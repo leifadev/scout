@@ -1,11 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 block_cipher = None
 
 
 a = Analysis(['scout.py'],
-             pathex=['/home/leifers/Desktop/scout'],
+             pathex=['/Users/leif/PycharmProjects/Scout/scout'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -31,4 +30,8 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True , icon='scout_logo.png')
+          console=False , icon='scout_logo.png')
+app = BUNDLE(exe,
+             name='Scout.app',
+             icon='scout_logo.png',
+             bundle_identifier='com.leifadev.scout')
