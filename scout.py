@@ -1,21 +1,22 @@
-import tkinter as tk
+import tkinter as tk # main gui framework
 from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
-from pytube import YouTube  # pip3 install pytube, pytube3 has little error handling yikesssssssss
+from pytube import YouTube
 import getpass
 from tkinter import messagebox
 from ruamel import yaml
 import os
 import tkinter.font as tkFont
-from pytube.exceptions import *
+from pytube.exceptions import * # all excpetions I use for error handling in log field
 import wget
 import ssl
 from sys import platform as _platform
 from tkinter import ttk
-from ttkthemes import ThemedTk,THEMES
+from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
 import filecmp
+import subprocess # used for ffmpeg (file formatting)
 
 
 class App:
@@ -52,8 +53,10 @@ class App:
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Courier' # font that fits the OS UI
-            # self.sysFont =
-            
+            self.logSize = "12"
+            self.restartMsgY = None
+
+
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
             dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
@@ -64,6 +67,9 @@ class App:
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Source Code Pro'
+            self.logSize = "12"
+            self.restartMsgY = None
+
 
         elif _platform == "win64" or "win32":
             self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
@@ -75,7 +81,8 @@ class App:
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Courier'
-
+            self.logSize = "9"
+            self.restartMsgY = None
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -367,8 +374,10 @@ class App:
             self.logfield["state"] = "normal"
             try:
                 yt = YouTube(query)
+                print("Okie dokie!")
                 videoDown = yt.streams.filter().get_highest_resolution()
                 videoDown.download(self.path, filename_prefix=self.filePrefix)
+
                 comp = videoDown.on_complete(self.path)
 
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
@@ -396,12 +405,12 @@ class App:
 
         elif self.audioBool:  # Audio only
             self.logfield["state"] = "normal"
-
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 audioDown = yt.streams.filter(only_audio=True).first()
                 audioDown.download(self.path, filename_prefix=self.filePrefix)
+
                 # ^^^ high_audioDown = yt.streams.get_audio_only() is an alternative options to be tested in v1.5, update for custiomizable audio/video quaility/formats
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
                 self.videoFetch(yt, query)
@@ -772,6 +781,11 @@ class App:
 
 # Docs for pytube
 # https://python-pytube.readthedocs.io/en/latest/api.html
+
+# ffmpeg simple guide
+# https://opensource.com/article/17/6/ffmpeg-convert-media-file-formats
+# https://docs.python.org/3/library/subprocess.html || subprocess docs
+
 
 # Declaring root and looping it :D
 if __name__ == "__main__":
