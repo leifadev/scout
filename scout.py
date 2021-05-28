@@ -34,7 +34,7 @@ class App:
         self.maxModeUse = 0
         self.version = "v1.4"
         self.logFont = "No value!"
-
+        self.getUser = getpass.getuser()
 
 
         ####################################################
@@ -44,13 +44,13 @@ class App:
         ####################################################
 
         # check OS
-        if _platform == "linux" or _platform == "linux2":
-            self.fileLoc = "/home/" + getpass.getuser() + "/Documents/Scout/"
-            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
-            self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
-            self.cachedir = "/home/" + getpass.getuser() + "/Documents/Scout/cache.yml"
+        if _platform in ("linux", "linux2"):
+            self.fileLoc = "/home/" + self.getUser + "/Documents/Scout/"
+            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
+            self.ymldir = "/home/" + self.getUser + "/Documents/Scout/settings.yml"
+            self.cachedir = "/home/" + self.getUser + "/Documents/Scout/cache.yml"
             if self.path ==  "":
-                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+                self.path = "/home/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Courier' # font that fits the OS UI
@@ -65,12 +65,12 @@ class App:
             }
 
         elif _platform == "darwin":
-            self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
-            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
-            self.cachedir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/cache.yml"
-            self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
+            self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
+            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
+            self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
+            self.ymldir = "/Users/" + self.getUser + "/Library/Application Support/Scout/settings.yml"
             if self.path ==  "":
-                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+                self.path = "/Users/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Source Code Pro'
@@ -84,13 +84,13 @@ class App:
                 "logSize": 8
             }
 
-        elif _platform == "win64" or "win32":
-            self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
-            dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
-            self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
-            self.cachedir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\cache.yml"
+        elif _platform in ("win64", "win32"):
+            self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
+            dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
+            self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
+            self.cachedir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\cache.yml"
             if self.path ==  "":
-                self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
+                self.path = "C:\\Users\\" + self.getUser + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.logFont = 'Courier'
@@ -177,7 +177,6 @@ class App:
         print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
 
-        print(f"\n\n## Scout has detected you are on Linux! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
             wget.download(url, self.fileLoc + "scout_logo.png")
         self.icon = PhotoImage(file=self.fileLoc + "scout_logo.png")
@@ -380,7 +379,7 @@ class App:
         yt = YouTube(query)
         query = self.urlfield.get()
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
-        self.logfield.insert(INSERT, f'\nVideo Author: {yt.title}')
+        self.logfield.insert(INSERT, f'\nVideo Title: {yt.title}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
         self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
@@ -390,8 +389,19 @@ class App:
 
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log after done inserting
 
+
     # Download buttons scripting, includes all features said abive
     def downloadButton_command(self):
+
+        error_dict = {
+        'VideoPrivate': "\nERROR: This video is privated, you can't download it\n",
+        'RegexMatchError': "\nERROR: Invalid link formatting\n",
+        'VideoRegionBlocked': '\nERROR: This video is block in your region\n',
+        'RecordingUnavailable': "\nERROR: This recording is unavalilable\n",
+        'MembersOnly': "\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n",
+        'LiveStreamError': "\nERROR: This is a livestream, and not a downloadable video\n",
+        'HTMLParseError': "\nERROR: HTML parsing or extraction has failed",
+        'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
         try:
             self.logfield["state"] = "normal"
 
@@ -407,31 +417,28 @@ class App:
             try:
                 yt = YouTube(query)
                 print("Okie dokie!")
-                videoDown = yt.streams.filter().get_highest_resolution()
+                videoDown = yt.streams.filter(progressive=True).get_by_resolution("720p")
                 videoDown.download(self.path, filename_prefix=self.filePrefix)
-
-                comp = videoDown.on_complete(self.path)
+                print(yt.streams.filter(progressive=True).all())
 
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
                 self.videoFetch(yt, query)
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
-            # except VideoRegionBlocked:
-            #     self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
 
 
@@ -441,28 +448,27 @@ class App:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 audioDown = yt.streams.filter(only_audio=True).first()
-                audioDown.download(self.path, filename_prefix=self.filePrefix)
+                # high_audioDown = yt.streams.get_audio_only(subtype='mpeg')
+                high_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                # print(yt.streams.filter(only_audio=True).all())
 
-                # ^^^ high_audioDown = yt.streams.get_audio_only() is an alternative options to be tested in v1.5, update for custiomizable audio/video quaility/formats
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
                 self.videoFetch(yt, query)
 
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
-            # except VideoRegionBlocked:
-            #     self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disable"
 
         elif self.audioBool == False and self.videoBool: # Video only
@@ -473,28 +479,30 @@ class App:
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-                silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
+                silent_audioDown = yt.streams.filter(res="1080p").first()
                 silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                print(yt.streams.filter(fps=60, res="1080p"))
+
 
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
                 self.videoFetch(yt, query)
 
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
+            except RegexMatchError:
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             # except VideoRegionBlocked:
             #     self.logfield.insert(INSERT, f'\nERROR: This video is blocked in your region\n')
-            except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
         else:
             self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -558,7 +566,7 @@ class App:
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:
-            askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
+            askdirectory(initialdir='/Users/' + self.getUser + '/Desktop/')
 
 
     def videoButton_command(self):

@@ -4,7 +4,7 @@ PROJECT_DIR = /
 PROJECT_MAIN = scout.py
 VERSION = v1.2
 
-# file may need fixes!
+# leifadev, scout.app
 
 .DEFAULT_GOAL = help
 
