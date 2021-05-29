@@ -40,7 +40,7 @@ Compiler: Pyinstaller | pyinstaller --onefile (--windowed) --icon=scout_logo.png
 - Add thumbnail downloading  support
 - Add playlist support with video selection
 - Add segmented video download support
- 
+  
 # Help
  
 ### Reporting a Vulnerabilitys and Bugs

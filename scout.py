@@ -1,21 +1,22 @@
-import tkinter as tk
+import tkinter as tk # main gui framework
 from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
-from pytube import YouTube  # pip3 install pytube3
+from pytube import YouTube
 import getpass
 from tkinter import messagebox
 from ruamel import yaml
 import os
 import tkinter.font as tkFont
-from pytube.exceptions import *
+from pytube.exceptions import * # all excpetions I use for error handling in log field
 import wget
 import ssl
 from sys import platform as _platform
 from tkinter import ttk
-from ttkthemes import ThemedTk,THEMES
+from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
 import filecmp
+import subprocess # used for ffmpeg (file formatting)
 
 
 class App:
@@ -32,6 +33,8 @@ class App:
         self.darkMode = False
         self.maxModeUse = 0
         self.version = "v1.4"
+        self.logFont = "No value!"
+        self.getUser = getpass.getuser()
 
 
         ####################################################
@@ -41,36 +44,70 @@ class App:
         ####################################################
 
         # check OS
-        if _platform == "linux" or _platform == "linux2":
-            self.fileLoc = "/home/" + getpass.getuser() + "/Documents/Scout/"
-            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
-            self.ymldir = "/home/" + getpass.getuser() + "/Documents/Scout/settings.yml"
-            self.cachedir = "/home/" + getpass.getuser() + "/Documents/Scout/cache.yml"
+        if _platform in ("linux", "linux2"):
+            self.fileLoc = "/home/" + self.getUser + "/Documents/Scout/"
+            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
+            self.ymldir = "/home/" + self.getUser + "/Documents/Scout/settings.yml"
+            self.cachedir = "/home/" + self.getUser + "/Documents/Scout/cache.yml"
             if self.path ==  "":
-                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+                self.path = "/home/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Courier' # font that fits the OS UI
+            self.logSize = "12"
+            self.restartMsgY = None
+            self.UIAttributes = {
+                "Font": "Source Code Pro",
+                "charSize": 10,
+                "restartTextPos": 308,
+                "logFont": "Courier",
+                "logSize": 8
+            }
 
         elif _platform == "darwin":
-            self.fileLoc = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/"
-            dirDefaultSetting = "/Users/" + getpass.getuser() + "/Desktop"
-            self.cachedir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/cache.yml"
-            self.ymldir = "/Users/" + getpass.getuser() + "/Library/Application Support/Scout/settings.yml"
+            self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
+            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
+            self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
+            self.ymldir = "/Users/" + self.getUser + "/Library/Application Support/Scout/settings.yml"
             if self.path ==  "":
-                self.path = "/Users/" + getpass.getuser() + "/Desktop"
+                self.path = "/Users/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Source Code Pro'
+            self.logSize = "12"
+            self.restartMsgY = None
+            self.UIAttributes = {
+                "Font": "Source Code Pro",
+                "charSize": 10,
+                "restartTextPos": 302,
+                "logFont": "Source Code Pro",
+                "logSize": 8
+            }
 
-        elif _platform == "win64" or "win32":
-            self.fileLoc = "C:\\Users\\" + getpass.getuser() + "\\Appdata\\Roaming\\Scout\\"
-            dirDefaultSetting = "C:\\Users\\" + getpass.getuser() + "\Desktop"
-            self.ymldir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\settings.yml"
-            self.cachedir = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Roaming\\Scout\\cache.yml"
+        elif _platform in ("win64", "win32"):
+            self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
+            dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
+            self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
+            self.cachedir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\cache.yml"
             if self.path ==  "":
-                self.path = "C:\\Users\\" + getpass.getuser() + "\Desktop"
+                self.path = "C:\\Users\\" + self.getUser + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
+            self.logFont = 'Courier'
+            self.logSize = "9"
+            self.restartMsgY = None
+            self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
+                "Font": "Courier",
+                "charSize": 8,
+                "restartTextPos": 302,
+                "logFont": "Courier",
+                "logSize": 8
+            }
 
+
+
+
+#302mac 308linux
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -140,7 +177,6 @@ class App:
         print("Attemping logo downloading...")
         url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
 
-        print(f"\n\n## Scout has detected you are on Linux! ##\nIf this is wrong, the app will break. Report this here:\nhttps://github.com/leifadev/scout/issues\n\n")
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
             wget.download(url, self.fileLoc + "scout_logo.png")
         self.icon = PhotoImage(file=self.fileLoc + "scout_logo.png")
@@ -156,6 +192,7 @@ class App:
 
         ## Attributes ##
 
+
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, self.icon)
 
@@ -164,7 +201,6 @@ class App:
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         style = ttk.Style()
-
 
         with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -175,8 +211,10 @@ class App:
                 if _platform == "darwin":
                     root['bg'] = "#ececec"
                     print("Launching in light mode!")
-                else:
+                elif _platform == "linux" or _platform == "linux2":
+                    root['bg'] = "#ececec"
                     print("Launching in light mode!")
+
 
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
@@ -200,7 +238,6 @@ class App:
 #        test = PhotoImage(file="test.png")
 #        canvas.create_image(350,50,image=test)
 
-        ##                                 ##
 
         # Menu items #
 
@@ -257,7 +294,7 @@ class App:
         self.browseButton.place(x=690,y=59,width=140)
 
 
-        self.videoButton=ttk.Checkbutton(root)
+        self.videoButton=tk.Checkbutton(root)
 #        self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=720,y=120,width=70,height=30)
@@ -265,7 +302,7 @@ class App:
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
-        self.audioButton=ttk.Checkbutton(root)
+        self.audioButton=tk.Checkbutton(root)
 #        self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
         self.audioButton.place(x=720,y=160,width=70,height=30)
@@ -292,13 +329,19 @@ class App:
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
-        self.versionText["font"] = tkFont.Font(family='Courier', size=9)
+        self.versionText["font"] = tkFont.Font(family='Courier', size=12)
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
             self.versionText["fg"] = "#ececec" # light theme gray
         else:
             self.versionText['bg'] = "#ececec"
             self.versionText["fg"] = "#464646"
+
+            #background color for Checkbuttons
+            self.audioButton["bg"] = "#ececec"
+            self.videoButton["bg"] = "#ececec"
+
+
 
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
@@ -315,7 +358,7 @@ class App:
 
         self.logfield = tk.Text(root)
         self.logfield.place(x=20,y=100,width=540, height=180)
-        ft = tkFont.Font(family='Courier', size=8)
+        ft = tkFont.Font(family="Courier", size=10)
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
@@ -336,7 +379,7 @@ class App:
         yt = YouTube(query)
         query = self.urlfield.get()
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
-        self.logfield.insert(INSERT, f'\nVideo Author: {yt.title}')
+        self.logfield.insert(INSERT, f'\nVideo Title: {yt.title}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
         self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
         self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
@@ -346,8 +389,19 @@ class App:
 
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log after done inserting
 
+
     # Download buttons scripting, includes all features said abive
     def downloadButton_command(self):
+
+        error_dict = {
+        'VideoPrivate': "\nERROR: This video is privated, you can't download it\n",
+        'RegexMatchError': "\nERROR: Invalid link formatting\n",
+        'VideoRegionBlocked': '\nERROR: This video is block in your region\n',
+        'RecordingUnavailable': "\nERROR: This recording is unavalilable\n",
+        'MembersOnly': "\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n",
+        'LiveStreamError': "\nERROR: This is a livestream, and not a downloadable video\n",
+        'HTMLParseError': "\nERROR: HTML parsing or extraction has failed",
+        'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
         try:
             self.logfield["state"] = "normal"
 
@@ -362,61 +416,59 @@ class App:
             self.logfield["state"] = "normal"
             try:
                 yt = YouTube(query)
-                videoDown = yt.streams.filter().get_highest_resolution()
+                print("Okie dokie!")
+                videoDown = yt.streams.filter(progressive=True).get_by_resolution("720p")
                 videoDown.download(self.path, filename_prefix=self.filePrefix)
-                comp = videoDown.on_complete(self.path)
+                print(yt.streams.filter(progressive=True).all())
 
                 self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
                 self.videoFetch(yt, query)
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
-            # except VideoRegionBlocked:
-            #     self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
 
 
         elif self.audioBool:  # Audio only
             self.logfield["state"] = "normal"
-
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 audioDown = yt.streams.filter(only_audio=True).first()
-                audioDown.download(self.path, filename_prefix=self.filePrefix)
-                # ^^^ high_audioDown = yt.streams.get_audio_only() is an alternative options to be tested in v1.5, update for custiomizable audio/video quaility/formats
+                # high_audioDown = yt.streams.get_audio_only(subtype='mpeg')
+                high_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                # print(yt.streams.filter(only_audio=True).all())
+
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
                 self.videoFetch(yt, query)
 
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
-            # except VideoRegionBlocked:
-            #     self.logfield.insert(INSERT, f'\nERROR: This video is block in your region\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disable"
 
         elif self.audioBool == False and self.videoBool: # Video only
@@ -427,28 +479,30 @@ class App:
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-                silent_audioDown = yt.streams.filter(only_video=True).get_by_itag(itag=134)
+                silent_audioDown = yt.streams.filter(res="1080p").first()
                 silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                print(yt.streams.filter(fps=60, res="1080p"))
+
 
                 self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
                 self.videoFetch(yt, query)
 
             except VideoPrivate:
-                self.logfield.insert(INSERT, f'\nERROR: This video is privated, you can\'t download it\n')
+                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
+            except RegexMatchError:
+                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
             # except VideoRegionBlocked:
             #     self.logfield.insert(INSERT, f'\nERROR: This video is blocked in your region\n')
-            except RegexMatchError:
-                self.logfield.insert(INSERT, f'\nERROR: Invalid link formatting\n')
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This recording is unavalilable\n')
+                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, f'\nERROR: This video is for channel members only.\nRefer here for more info: https://support.google.com/youtube/answer/7544492\n')
+                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, f'\nERROR: This is a livestream, and not a downloadable video\n')
+                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, f'\nERROR: HTML parsing or extraction has failed')
+                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                self.logfield.insert(INSERT, f'\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n')
+                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
         else:
             self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -501,7 +555,7 @@ class App:
                 self.maxWarn["bg"] = "#464646"
             self.maxWarn.place(x=280,y=302,width=140)
             self.maxWarn["text"] = "Restart to apply!"
-            self.maxWarn["font"] = tkFont.Font(family='Courier', size=10)
+            self.maxWarn["font"] = tkFont.Font(family="Source Code Pro", size=12)
 
 
     def browseButton_command(self):
@@ -512,7 +566,7 @@ class App:
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path)
         else:
-            askdirectory(initialdir='/Users/' + getpass.getuser() + '/Desktop/')
+            askdirectory(initialdir='/Users/' + self.getUser + '/Desktop/')
 
 
     def videoButton_command(self):
@@ -684,7 +738,7 @@ class App:
 
         self.resetDefaultDir = ttk.Button(sWin)
         self.resetDefaultDir["text"] = "Reset Default Directory"
-        self.resetDefaultDir.place(x=210,y=201,width=160)
+        self.resetDefaultDir.place(x=210,y=201,width=170)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
         self.resetDefaultDir["state"] = "enabled"
 
@@ -767,6 +821,11 @@ class App:
 
 # Docs for pytube
 # https://python-pytube.readthedocs.io/en/latest/api.html
+
+# ffmpeg simple guide
+# https://opensource.com/article/17/6/ffmpeg-convert-media-file-formats
+# https://docs.python.org/3/library/subprocess.html || subprocess docs
+
 
 # Declaring root and looping it :D
 if __name__ == "__main__":
