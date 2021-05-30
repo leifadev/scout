@@ -9,11 +9,12 @@ Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
 
 Tested python versions: 3.7 - 9.2
 
-Using main packages:
+Using main packages/frameworks/libraries:
 - pytube
 - ruamel.yaml
 - wget
 - ttkthemes
+- ffmpeg
 
 Compiler: Pyinstaller | pyinstaller --onefile (--windowed) --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
