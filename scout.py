@@ -17,12 +17,13 @@ from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
 import filecmp
 import subprocess # used for ffmpeg (file formatting)
+import shutil # used for detecting ffmpeg installation, could be use for more after this comment is made
 
 
 class App:
     def __init__(self, root):
 
-        # Iniatiating variables, some temporary , some stored in settings.yml
+        # Iniatiating variables, some temporary, some stored in settings.yml
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
@@ -35,6 +36,11 @@ class App:
         self.version = "v1.4"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
+        self.videoq = "" # vid quality example: 720p
+        self.audioq = "" # audio quality example: 128kbps
+        self.videof = "" # vid format example: mp4
+        self.audiof = "" # audio format example: wav
+        # DEVS DONT INCLUDE "."s ^^^BEFORE EXTENSIONS^^^
 
 
         ####################################################
@@ -56,7 +62,7 @@ class App:
             self.logFont = 'Courier' # font that fits the OS UI
             self.logSize = "12"
             self.restartMsgY = None
-            self.UIAttributes = {
+            self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
                 "restartTextPos": 308,
@@ -76,7 +82,7 @@ class App:
             self.logFont = 'Source Code Pro'
             self.logSize = "12"
             self.restartMsgY = None
-            self.UIAttributes = {
+            self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
                 "restartTextPos": 302,
@@ -106,8 +112,12 @@ class App:
 
 
 
+        ####################################################
+        ### Updating and Restoring YML settings initally ###
+        ####################################################
 
-#302mac 308linux
+        # Summary of this block: This generates the YML from scratch if its outdated or doesnt exist, and ignores otherwise.
+        # Uses sample yml "cache.yml" to compare it being the newest yml to a potentially old one. (Not ennough or different settings).
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -121,7 +131,6 @@ class App:
                 }
             }
         ]
-
 
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc):
@@ -138,7 +147,6 @@ class App:
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
                 print("if statement passes")
         # makes a copy of the newest yml/settings structure
-
         os.chdir(self.fileLoc)
         cache = open("cache.yml", "w+")
         cache.close
@@ -190,8 +198,8 @@ class App:
         #                                                  #
         ####################################################
 
-        ## Attributes ##
 
+        ## Attributes ##
 
         root.title("Scout")
         root.tk.call('wm', 'iconphoto', root._w, self.icon)
@@ -295,7 +303,6 @@ class App:
 
 
         self.videoButton=tk.Checkbutton(root)
-#        self.videoButton["justify"] = "center"
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=720,y=120,width=70,height=30)
         self.videoButton["offvalue"] = False
@@ -303,21 +310,18 @@ class App:
         self.videoButton["command"] = self.videoButton_command
 
         self.audioButton=tk.Checkbutton(root)
-#        self.audioButton["justify"] = "center"
         self.audioButton["text"] = "Audio"
-        self.audioButton.place(x=720,y=160,width=70,height=30)
+        self.audioButton.place(x=720,y=170,width=70,height=30)
         self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
 
         helpButton=ttk.Button(root)
-#        helpButton["justify"] = "center"
         helpButton["text"] = "Help"
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
         clearButton=ttk.Button(root)
-#        helpButton["justify"] = "center"
         clearButton["text"] = "Clear"
         clearButton.place(x=95,y=300,width=70)
         clearButton["command"] = self.clearConsole_command
@@ -342,7 +346,7 @@ class App:
             self.videoButton["bg"] = "#ececec"
 
 
-
+        # Loading dark mode value from settings.yml for inital launch
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.enablePrompts = data[0]['Options']['errorChoice']
@@ -371,9 +375,26 @@ class App:
 
     ######################################################################################
 
-
     ## Triggers and Scripts ##
     # These coinside with the log field element itself
+
+    # FFmpeg warning: For formatting one must install ffmpeg for video formatting
+
+        self.ffmpeg = bool
+        
+        if shutil.which('ffmpeg') == None:
+            # messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+            self.logfield["state"] = "normal"
+            self.logfield.insert(INSERT, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n | MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n | Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n | Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
+            self.ffmpeg = False
+            self.logfield["state"] = "disabled"
+            print("You don't have FFmpeg installed! You can't use custom file types.")
+        else:
+            self.ffmpeg = True
+            print("You have FFmpeg installed! You can use custom file types.")
+
+    ######################################################################################
+
 
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
@@ -390,10 +411,33 @@ class App:
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log after done inserting
 
 
-    # Download buttons scripting, includes all features said abive
-    def downloadButton_command(self):
+    ## Quality choices
+    # Video: 144p 240p 360p 720p 1080p
+    # Audio: 24, 64, 96, 128, 192kbps
 
-        error_dict = {
+    # self.videoq = "720p"
+    # self.audioq = "128kbps"
+
+    ## Format choices
+    # Video: mp4, mov
+    # Audio: mp3, wav, ogg
+
+    # self.videof = "mp4"
+    # self.audiof = "mp3"
+
+    # ffmpeg -hide_banner -loglevel error -y -i xbox.mp3 xboxx.wav
+
+    # Download buttons scripting, includes all features said abive
+
+    def downloadButton_command(self):
+        self.videoq = ""
+        self.audioq = ""
+        self.videof = ""
+        self.audiof = ""
+        self.vfps = 30
+        self.mime_type = ""
+
+        error_dict = { # All errors stored in this dictionary to be called later for more clear code
         'VideoPrivate': "\nERROR: This video is privated, you can't download it\n",
         'RegexMatchError': "\nERROR: Invalid link formatting\n",
         'VideoRegionBlocked': '\nERROR: This video is block in your region\n',
@@ -402,6 +446,7 @@ class App:
         'LiveStreamError': "\nERROR: This is a livestream, and not a downloadable video\n",
         'HTMLParseError': "\nERROR: HTML parsing or extraction has failed",
         'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
+
         try:
             self.logfield["state"] = "normal"
 
@@ -417,11 +462,13 @@ class App:
             try:
                 yt = YouTube(query)
                 print("Okie dokie!")
-                videoDown = yt.streams.filter(progressive=True).get_by_resolution("720p")
-                videoDown.download(self.path, filename_prefix=self.filePrefix)
-                print(yt.streams.filter(progressive=True).all())
-
-                self.logfield.insert(INSERT, f'INFO: vcodec="avc1.64001e", res="highest", fps="best", format="video/mp4"\n')
+                videoDown = yt.streams.filter(mime_type="video/" + self.videof, fps=self.vfps, res=self.videoq, abr=self.audioq, progressive=True).first()
+                try:
+                    videoDown.download(self.path, filename_prefix=self.filePrefix)
+                    print(yt.streams.filter(res="720p", progressive=True).all())
+                except:
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
+                self.logfield.insert(INSERT, f'{videoDown}')
                 self.videoFetch(yt, query)
 
             # Try statments using pytube errors repeats for each selection mode of video
@@ -447,14 +494,17 @@ class App:
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-                audioDown = yt.streams.filter(only_audio=True).first()
-                # high_audioDown = yt.streams.get_audio_only(subtype='mpeg')
-                high_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                try:
+                    audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
+                    high_audioDown.download(self.path, filename_prefix=self.filePrefix)
                 # print(yt.streams.filter(only_audio=True).all())
+                except:
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
 
-                self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.64001e", format="audio/mp4"\n')
+                self.logfield.insert(INSERT, f'{audioDown}')
                 self.videoFetch(yt, query)
 
+            # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
                 self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
@@ -479,20 +529,20 @@ class App:
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
-                silent_audioDown = yt.streams.filter(res="1080p").first()
-                silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
-                print(yt.streams.filter(fps=60, res="1080p"))
+                try:
+                    silent_audioDown = yt.streams.filter(mime_type="video/" + self.videof, fps=self.vfps, res=self.videoq)
+                    silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                except:
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
 
-
-                self.logfield.insert(INSERT, f'\nINFO: vcodec="avc1.4d401e", res_LOW="360p", fps="24fps", format="video/mp4"')
+                self.logfield.insert(INSERT, f'{silent_audioDown}')
                 self.videoFetch(yt, query)
 
+            # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
                 self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
             except RegexMatchError:
                 self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
-            # except VideoRegionBlocked:
-            #     self.logfield.insert(INSERT, f'\nERROR: This video is blocked in your region\n')
             except RecordingUnavailable:
                 self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
@@ -517,6 +567,8 @@ class App:
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
+    def formatFile(self, audiof, videof):
+        print("Test")
 
 
     ########################################################################################################
@@ -740,7 +792,7 @@ class App:
         self.resetDefaultDir["text"] = "Reset Default Directory"
         self.resetDefaultDir.place(x=210,y=201,width=170)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
-        self.resetDefaultDir["state"] = "enabled"
+        self.resetDefaultDir["state"] = "normal"
 
         self.resetDirTip = ttk.Label(sWin)
         self.resetDirTip = Label(sWin, text="")
@@ -818,6 +870,7 @@ class App:
             self.enablePrompts = data[0]['Options']['errorChoice']
             print(self.enablePrompts)
         print("\nCurrently updating settings.yml...")
+
 
 # Docs for pytube
 # https://python-pytube.readthedocs.io/en/latest/api.html
