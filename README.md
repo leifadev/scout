@@ -1,6 +1,6 @@
 # Scout
 
-A simple but powerful python-based youtube video/audio downloader.
+A simple but powerful python-based cross-platform youtube video/audio downloader.
 No bloated javascript ad websites anymore!
  
 ## Native Build Details
