@@ -1,5 +1,5 @@
 - Options:
-    defaultDir: /Users/leif/Desktop
+    defaultDir: /Users/example/example
     errorChoice: true
     changedDefaultDir: false
     hasFilePrefix: ''

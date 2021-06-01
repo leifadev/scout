@@ -17,7 +17,8 @@ from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
 import filecmp
 import subprocess # used for ffmpeg (file formatting)
-import shutil # used for detecting ffmpeg installation, could be use for more after this comment is made
+import shutil # mainly used for detecting ffmpeg installation
+import datetime
 
 
 class App:
@@ -51,10 +52,10 @@ class App:
 
         # check OS
         if _platform in ("linux", "linux2"):
-            self.fileLoc = "/home/" + self.getUser + "/Documents/Scout/"
-            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
-            self.ymldir = "/home/" + self.getUser + "/Documents/Scout/settings.yml"
-            self.cachedir = "/home/" + self.getUser + "/Documents/Scout/cache.yml"
+            self.fileLoc = "~/.config/Scout/"
+            dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
+            self.ymldir = "~/.config/Scout/settings.yml"
+            self.cachedir = "~/.config/Scout/cache.yml"
             if self.path ==  "":
                 self.path = "/home/" + self.getUser + "/Desktop"
             else:
@@ -304,14 +305,14 @@ class App:
 
         self.videoButton=tk.Checkbutton(root)
         self.videoButton["text"] = "Video"
-        self.videoButton.place(x=730,y=120,width=70,height=30)
+        self.videoButton.place(x=730,y=130,width=70,height=30)
         self.videoButton["offvalue"] = False
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
         self.audioButton=tk.Checkbutton(root)
         self.audioButton["text"] = "Audio"
-        self.audioButton.place(x=730,y=170,width=70,height=30)
+        self.audioButton.place(x=730,y=190,width=70,height=30)
         self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
@@ -349,6 +350,17 @@ class App:
         self.audioformat["state"] = "normal"
 
 
+        self.clickedvq = StringVar()
+        self.clickedvq.set("Quality")
+        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "Quality", "1080p", "720p", "480p", "240p", "144p")
+        self.videoquality["state"] = "normal"
+
+        self.clickedaq = StringVar()
+        self.clickedaq.set("Quality")
+        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbps", "128kbps", "70kbps", "40kbps")
+        self.audioquality["state"] = "normal"
+
+
         # Block of code to switch bgs and fgs manually for darkMode using only tk not ttk
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
@@ -362,7 +374,6 @@ class App:
 
             # self.videoformat["bg"] = "#464646"
             # self.audioformat["bg"] = "#464646"
-
         else:
             self.versionText['bg'] = "#ececec"
             self.versionText["fg"] = "#464646"
@@ -595,9 +606,6 @@ class App:
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
-    def formatFile(self, audiof, videof):
-        print("Test")
-
 
     ########################################################################################################
 
@@ -648,31 +656,37 @@ class App:
         else:
             askdirectory(initialdir='/Users/' + self.getUser + '/Desktop/')
 
-
+    # This includes changes boolean status for video/audio inclusion as well as handling the UI elements for them
     def videoButton_command(self):
         if self.videoBool == False:
             self.videoBool = True
-            self.videoformat.place(x=650, y=121, width=70, height=30)
+            self.videoformat.place(x=650, y=130, width=75, height=30)
+            self.videoquality.place(x=638, y=160, width=87, height=30)
             if self.audioBool:
                 self.audioformat.place_forget()
+                self.audioquality.place_forget()
         else:
             self.videoBool = False
             self.videoformat.place_forget()
+            self.videoquality.place_forget()
             if self.audioBool:
-                self.audioformat.place(x=650, y=171, width=70, height=30)
+                self.audioformat.place(x=655, y=190, width=70, height=30)
+                self.audioquality.place(x=635, y=220, width=90, height=30)
         print("Video status: " + str(self.videoBool))
 
 
+    # This includes changes boolean status for video/audio inclusion as well as handling the UI elements for them
     def audioButton_command(self):
         if self.audioBool == False:
             self.audioBool = True
-            if self.videoBool:
-                pass
-            else:
-                self.audioformat.place(x=650, y=171, width=70, height=30)
+            if self.videoBool == False:
+                self.audioformat.place(x=655, y=190, width=70, height=30)
+                self.audioquality.place(x=635, y=220, width=90, height=30)
         else:
             self.audioBool = False
             self.audioformat.place_forget()
+            self.audioquality.place_forget()
+
         print("Audio status: " + str(self.audioBool))
 
 
