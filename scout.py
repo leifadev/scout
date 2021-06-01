@@ -304,14 +304,14 @@ class App:
 
         self.videoButton=tk.Checkbutton(root)
         self.videoButton["text"] = "Video"
-        self.videoButton.place(x=720,y=120,width=70,height=30)
+        self.videoButton.place(x=730,y=120,width=70,height=30)
         self.videoButton["offvalue"] = False
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
         self.audioButton=tk.Checkbutton(root)
         self.audioButton["text"] = "Audio"
-        self.audioButton.place(x=720,y=170,width=70,height=30)
+        self.audioButton.place(x=730,y=170,width=70,height=30)
         self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
@@ -334,9 +334,35 @@ class App:
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
         self.versionText["font"] = tkFont.Font(family='Courier', size=12)
+
+
+        self.clickedvf = StringVar()
+        self.clickedvf.set("mp4")
+        self.videoformat = ttk.OptionMenu(root, self.clickedvf, "mp4", "mp4", "mov", "webm")
+        # self.videoformat.place(x=650, y=121, width=70, height=30)
+        self.videoformat["state"] = "normal"
+
+        self.clickedaf = StringVar()
+        self.clickedaf.set("mp4")
+        self.audioformat = ttk.OptionMenu(root, self.clickedaf, "mp3", "mp3", "wav", "ogg")
+        # self.audioformat.place(x=650, y=171, width=70, height=30)
+        self.audioformat["state"] = "normal"
+
+
+        # Block of code to switch bgs and fgs manually for darkMode using only tk not ttk
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
             self.versionText["fg"] = "#ececec" # light theme gray
+
+            self.audioButton["bg"] = "#464646"
+            self.videoButton["bg"] = "#464646"
+
+            self.audioButton["fg"] = "#ececec"
+            self.videoButton["fg"] = "#ececec"
+
+            # self.videoformat["bg"] = "#464646"
+            # self.audioformat["bg"] = "#464646"
+
         else:
             self.versionText['bg'] = "#ececec"
             self.versionText["fg"] = "#464646"
@@ -345,16 +371,8 @@ class App:
             self.audioButton["bg"] = "#ececec"
             self.videoButton["bg"] = "#ececec"
 
-
-        # Loading dark mode value from settings.yml for inital launch
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-            self.enablePrompts = data[0]['Options']['errorChoice']
-            self.darkMode = data[0]['Options']['darkMode']
-            if self.darkMode:
-                self.modeButton["text"] = "Light Mode"
-            else:
-                self.modeButton["text"] = "Dark Mode"
+            # self.videoformat["bg"] = "#ececec"
+            # self.audioformat["bg"] = "#ececec"
 
 
         # Logfield #
@@ -372,6 +390,16 @@ class App:
         else:
             self.logfield["bg"] = "#f6f6f6" # if you want change this into 1 line for a bg dont keep it there for future adjustments
 
+        # Loading dark mode value from settings.yml for inital launch
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.darkMode = data[0]['Options']['darkMode']
+            if self.darkMode:
+                self.modeButton["text"] = "Light Mode"
+            else:
+                self.modeButton["text"] = "Dark Mode"
+
 
     ######################################################################################
 
@@ -381,7 +409,7 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
 
         self.ffmpeg = bool
-        
+
         if shutil.which('ffmpeg') == None:
             # messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
             self.logfield["state"] = "normal"
@@ -624,17 +652,29 @@ class App:
     def videoButton_command(self):
         if self.videoBool == False:
             self.videoBool = True
+            self.videoformat.place(x=650, y=121, width=70, height=30)
+            if self.audioBool:
+                self.audioformat.place_forget()
         else:
             self.videoBool = False
+            self.videoformat.place_forget()
+            if self.audioBool:
+                self.audioformat.place(x=650, y=171, width=70, height=30)
         print("Video status: " + str(self.videoBool))
 
 
     def audioButton_command(self):
         if self.audioBool == False:
             self.audioBool = True
+            if self.videoBool:
+                pass
+            else:
+                self.audioformat.place(x=650, y=171, width=70, height=30)
         else:
             self.audioBool = False
+            self.audioformat.place_forget()
         print("Audio status: " + str(self.audioBool))
+
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
