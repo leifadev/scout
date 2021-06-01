@@ -85,10 +85,10 @@ class App:
             self.restartMsgY = None
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
-                "charSize": 10,
+                "charSize": 12,
                 "restartTextPos": 302,
                 "logFont": "Source Code Pro",
-                "logSize": 8
+                "logSize": 10
             }
 
         elif _platform in ("win64", "win32"):
@@ -334,7 +334,7 @@ class App:
         self.versionText = tk.Label(root)
         self.versionText = Label(root, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
-        self.versionText["font"] = tkFont.Font(family='Courier', size=12)
+        self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"))
 
 
         self.clickedvf = StringVar()
@@ -391,7 +391,7 @@ class App:
 
         self.logfield = tk.Text(root)
         self.logfield.place(x=20,y=100,width=540, height=180)
-        ft = tkFont.Font(family="Courier", size=10)
+        ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
         self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
@@ -643,7 +643,7 @@ class App:
                 self.maxWarn["bg"] = "#464646"
             self.maxWarn.place(x=280,y=302,width=140)
             self.maxWarn["text"] = "Restart to apply!"
-            self.maxWarn["font"] = tkFont.Font(family="Source Code Pro", size=12)
+            self.maxWarn["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"))
 
 
     def browseButton_command(self):
@@ -760,7 +760,8 @@ class App:
 
         self.abtLink = "Contribute to the wiki!"
         self.abtLink = ttk.Label(abt)
-        self.abtLink = Label(abt, font= ('Courier 12 underline'), text="Contribute to the wiki!", anchor=CENTER, wraplength=160, justify=CENTER)
+        lol = f'{self.UIAttributes.get("Font")} {str(self.UIAttributes.get("charSize"))} underline'
+        self.abtLink = Label(abt, font=(self.UIAttributes.get("Font"), self.UIAttributes.get("charSize"), "underline"), text="Read the wiki for more info!", anchor=CENTER, wraplength=160, justify=CENTER)
         self.abtLink.place(x=50,y=170,width=200)
         self.abtLink["fg"] = "#2f81ed"
         self.abtLink.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/leifadev/scout/wiki"))
