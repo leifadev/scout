@@ -9,6 +9,9 @@
 
 ## Videos
 Privated: https://www.youtube.com/watch?v=2nrdwo3gpZU (may exsist anymore)
+
 Region-locked: https://www.youtube.com/watch?v=9ODCnNkK8AE (for USA)
+
 Members Only: https://www.youtube.com/watch?v=UEkiP_ls1iY
+
 Payed Movie: https://youtu.be/ACEswkYYUXU
