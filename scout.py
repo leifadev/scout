@@ -3,6 +3,7 @@ from tkinter import *
 import webbrowser
 from tkinter.filedialog import askdirectory
 from pytube import YouTube
+from pytube import Playlist
 import getpass
 from tkinter import messagebox
 from ruamel import yaml
@@ -15,10 +16,10 @@ from sys import platform as _platform
 from tkinter import ttk
 from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
-import filecmp
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
-import datetime
+from datetime import datetime
+import time
 
 
 class App:
@@ -53,16 +54,15 @@ class App:
         # check OS
         if _platform in ("linux", "linux2"):
             self.fileLoc = "~/.config/Scout/"
-            dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
+            self.dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
             self.ymldir = "~/.config/Scout/settings.yml"
             self.cachedir = "~/.config/Scout/cache.yml"
             if self.path ==  "":
                 self.path = "/home/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Courier' # font that fits the OS UI
-            self.logSize = "12"
             self.restartMsgY = None
+            self.path_slash = "/"
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -73,16 +73,15 @@ class App:
 
         elif _platform == "darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
-            dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
+            self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
             self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
             self.ymldir = "/Users/" + self.getUser + "/Library/Application Support/Scout/settings.yml"
             if self.path ==  "":
                 self.path = "/Users/" + self.getUser + "/Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Source Code Pro'
-            self.logSize = "12"
             self.restartMsgY = None
+            self.path_slash = "/"
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 12,
@@ -93,16 +92,15 @@ class App:
 
         elif _platform in ("win64", "win32"):
             self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
-            dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
+            self.dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
             self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
             self.cachedir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\cache.yml"
             if self.path ==  "":
                 self.path = "C:\\Users\\" + self.getUser + "\Desktop"
             else:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
-            self.logFont = 'Courier'
-            self.logSize = "9"
             self.restartMsgY = None
+            self.path_slash = "\\"
             self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -124,7 +122,7 @@ class App:
         self.payload = [
             {
                 'Options': {
-                    'defaultDir': dirDefaultSetting,
+                    'defaultDir': self.dirDefaultSetting,
                     'errorChoice': True,
                     'changedDefaultDir': False,
                     'hasFilePrefix': self.filePrefix,
@@ -424,7 +422,7 @@ class App:
         if shutil.which('ffmpeg') == None:
             # messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
             self.logfield["state"] = "normal"
-            self.logfield.insert(INSERT, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n | MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n | Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n | Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
+            self.logfield.insert(INSERT, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
             self.ffmpeg = False
             self.logfield["state"] = "disabled"
             print("You don't have FFmpeg installed! You can't use custom file types.")
@@ -433,7 +431,6 @@ class App:
             print("You have FFmpeg installed! You can use custom file types.")
 
     ######################################################################################
-
 
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
@@ -469,12 +466,6 @@ class App:
     # Download buttons scripting, includes all features said abive
 
     def downloadButton_command(self):
-        self.videoq = ""
-        self.audioq = ""
-        self.videof = ""
-        self.audiof = ""
-        self.vfps = 30
-        self.mime_type = ""
 
         error_dict = { # All errors stored in this dictionary to be called later for more clear code
         'VideoPrivate': "\nERROR: This video is privated, you can't download it\n",
@@ -499,16 +490,30 @@ class App:
         if self.videoBool and self.audioBool: # Video and Audio
             self.logfield["state"] = "normal"
             try:
-                yt = YouTube(query)
-                print("Okie dokie!")
-                videoDown = yt.streams.filter(mime_type="video/" + self.videof, fps=self.vfps, res=self.videoq, abr=self.audioq, progressive=True).first()
+                yt = YouTube(query)         # ADD THIS \/\/
+                videoDown = yt.streams.filter(res=self.clickedvq.get(), abr=self.clickedaq.get(), progressive=True).first()
                 try:
                     videoDown.download(self.path, filename_prefix=self.filePrefix)
-                    print(yt.streams.filter(res="720p", progressive=True).all())
+                    print(yt.streams.filter(res=self.clickedvq, progressive=True).all())
                 except:
                     self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
                 self.logfield.insert(INSERT, f'{videoDown}')
                 self.videoFetch(yt, query)
+
+                # Block that converts custom file types, video/audio
+                if self.clickedvf != "mp4":
+                    os.chdir(self.fileLoc)
+                    self.logfield.insert(INSERT, f'\nINFO: Modding UNIX file permissions...\n')
+                    subprocess.run(f"chmod 755 \"{yt.title}.mp4\"", shell=True) # give perms for file with ffmpeg
+                    time.sleep(0.1)
+                    self.logfield.insert(INSERT, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
+                    subprocess.run(f'ffmpeg -i \"{self.fileLoc}{yt.title}.mp4\" \"{self.path}{self.path_slash}{yt.title}.{self.clickedvf.get()}\"', shell=True)
+                    self.logfield.insert(INSERT, f'\nINFO: Removing inital file...\n')
+                    time.sleep(0.1)
+                    # os.remove(f"{yt.title}.{self.clickedvf.get()}")
+                    print("Original file deleted! Enjoy your converted one")
+                    # print(f'ffmpeg -i \"{yt.title}.mp4\" \"{yt.title}.{self.clickedvf.get()}\"')
+                    # print(self.clickedvf.get())
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
@@ -660,8 +665,8 @@ class App:
     def videoButton_command(self):
         if self.videoBool == False:
             self.videoBool = True
-            self.videoformat.place(x=650, y=130, width=75, height=30)
-            self.videoquality.place(x=638, y=160, width=87, height=30)
+            self.videoformat.place(x=650, y=160, width=75, height=30)
+            self.videoquality.place(x=638, y=130, width=87, height=30)
             if self.audioBool:
                 self.audioformat.place_forget()
                 self.audioquality.place_forget()
@@ -670,8 +675,8 @@ class App:
             self.videoformat.place_forget()
             self.videoquality.place_forget()
             if self.audioBool:
-                self.audioformat.place(x=655, y=190, width=70, height=30)
-                self.audioquality.place(x=635, y=220, width=90, height=30)
+                self.audioformat.place(x=655, y=220, width=70, height=30)
+                self.audioquality.place(x=635, y=190, width=90, height=30)
         print("Video status: " + str(self.videoBool))
 
 
@@ -680,8 +685,8 @@ class App:
         if self.audioBool == False:
             self.audioBool = True
             if self.videoBool == False:
-                self.audioformat.place(x=655, y=190, width=70, height=30)
-                self.audioquality.place(x=635, y=220, width=90, height=30)
+                self.audioformat.place(x=655, y=220, width=70, height=30)
+                self.audioquality.place(x=635, y=190, width=90, height=30)
         else:
             self.audioBool = False
             self.audioformat.place_forget()
@@ -760,7 +765,6 @@ class App:
 
         self.abtLink = "Contribute to the wiki!"
         self.abtLink = ttk.Label(abt)
-        lol = f'{self.UIAttributes.get("Font")} {str(self.UIAttributes.get("charSize"))} underline'
         self.abtLink = Label(abt, font=(self.UIAttributes.get("Font"), self.UIAttributes.get("charSize"), "underline"), text="Read the wiki for more info!", anchor=CENTER, wraplength=160, justify=CENTER)
         self.abtLink.place(x=50,y=170,width=200)
         self.abtLink["fg"] = "#2f81ed"
@@ -858,6 +862,23 @@ class App:
         else:
             self.resetDirTip['bg'] = "#ececec"
             self.resetDirTip["fg"] = "black"
+
+        self.aprilFools = ttk.Label(sWin)
+        self.aprilFools = Label(sWin, text="( ͡° ͜ʖ ͡°)", anchor=CENTER, wraplength=169, justify=CENTER)
+        self.aprilFools["font"] = tkFont.Font(sWin, size=59)
+        if self.darkMode:
+            self.aprilFools["bg"] = "#464646" # dark theme gray
+            self.aprilFools["fg"] = "#999999" # light theme gray
+        else:
+            self.aprilFools['bg'] = "#ececec"
+            self.aprilFools["fg"] = "black"
+
+        # print(datetime.now())
+        if "-06-03" in str(datetime.now()):
+            self.aprilFools.place(x=190,y=270,width=200)
+        else:
+            print("Secret works :)")
+
 
     # Scripting for buttons and other things
     def defaultDir_command(self):
