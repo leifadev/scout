@@ -39,8 +39,8 @@ Compiler: Pyinstaller | pyinstaller --onefile --windowed --icon=scout_logo.png -
 - ~~Add support for more file types and or resolutions~~
 - ~~Add extra video file console logging~~
 - ~~Add thumbnail downloading  support~~
-- Add playlist support with video selection
-- Add segmented video download support
+- **Add playlist support with video selection**
+- **Add segmented video download support**
 
 # Help
 
