@@ -36,9 +36,9 @@ Compiler: Pyinstaller | pyinstaller --onefile --windowed --icon=scout_logo.png -
 - ~~Add customizable settings w/ storage file~~
 - ~~Extensive testing on macOS, Windows, and Linux~~
 - ~~Dark Mode~~
-- Add support for more file types and or resolutions
-- Add extra video file console logging
-- Add thumbnail downloading  support
+- ~~Add support for more file types and or resolutions~~
+- ~~Add extra video file console logging~~
+- ~~Add thumbnail downloading  support~~
 - Add playlist support with video selection
 - Add segmented video download support
 
