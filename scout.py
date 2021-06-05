@@ -350,12 +350,12 @@ class App:
 
         self.clickedvq = StringVar()
         self.clickedvq.set("Quality")
-        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "Quality", "1080p", "720p", "480p", "240p", "144p")
+        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "1080p", "720p", "480p", "360p", "240p", "144p")
         self.videoquality["state"] = "normal"
 
         self.clickedaq = StringVar()
         self.clickedaq.set("Quality")
-        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbps", "128kbps", "70kbps", "40kbps")
+        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "160kbps", "128kbps", "70kbps", "40kbps")
         self.audioquality["state"] = "normal"
 
 
@@ -435,6 +435,7 @@ class App:
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
         query = self.urlfield.get()
+        self.logfield.insert(INSERT, f'\n---------------------------------------------------------------------')
         self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
         self.logfield.insert(INSERT, f'\nVideo Title: {yt.title}')
         self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
@@ -465,7 +466,7 @@ class App:
 
     # Download buttons scripting, includes all features said abive
 
-    def downloadButton_command(self):
+    def downloadButton_command(self): # quite a big function ;)
 
         error_dict = { # All errors stored in this dictionary to be called later for more clear code
         'VideoPrivate': "\nERROR: This video is privated, you can't download it\n",
@@ -491,29 +492,34 @@ class App:
             self.logfield["state"] = "normal"
             try:
                 yt = YouTube(query)         # ADD THIS \/\/
-                videoDown = yt.streams.filter(res=self.clickedvq.get(), abr=self.clickedaq.get(), progressive=True).first()
-                try:
-                    videoDown.download(self.path, filename_prefix=self.filePrefix)
-                    print(yt.streams.filter(res=self.clickedvq, progressive=True).all())
-                except:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
-                self.logfield.insert(INSERT, f'{videoDown}')
-                self.videoFetch(yt, query)
-
+                videoDown = yt.streams.filter(res=str(self.clickedvq.get()), progressive=True).first()
+                print("Available streams:\n" + yt.streams.filter(res=str(self.clickedvq.get()), progressive=True).all())
+                # print(self.clickedvq.get())
+                # print(self.clickedvf.get())
                 # Block that converts custom file types, video/audio
+                if videoDown == None:
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
+                    return
+
                 if self.clickedvf != "mp4":
+                    videoDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                     os.chdir(self.fileLoc)
                     self.logfield.insert(INSERT, f'\nINFO: Modding UNIX file permissions...\n')
-                    subprocess.run(f"chmod 755 \"{yt.title}.mp4\"", shell=True) # give perms for file with ffmpeg
-                    time.sleep(0.1)
+                    filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#'})
+                    subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(INSERT, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                    subprocess.run(f'ffmpeg -i \"{self.fileLoc}{yt.title}.mp4\" \"{self.path}{self.path_slash}{yt.title}.{self.clickedvf.get()}\"', shell=True)
-                    self.logfield.insert(INSERT, f'\nINFO: Removing inital file...\n')
-                    time.sleep(0.1)
-                    # os.remove(f"{yt.title}.{self.clickedvf.get()}")
+                    subprocess.run(f'ffmpeg -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    self.logfield.insert(INSERT, f'\nINFO: Removing temp file...\n')
+                    os.remove(f"{filtered}.{self.clickedvf.get()}")
+
                     print("Original file deleted! Enjoy your converted one")
-                    # print(f'ffmpeg -i \"{yt.title}.mp4\" \"{yt.title}.{self.clickedvf.get()}\"')
-                    # print(self.clickedvf.get())
+
+                    self.logfield.insert(INSERT, f'\nINFO: The {videoDown}, codec/itag was used.\n')
+                    self.videoFetch(yt, query)
+                else:
+                    videoDown.download(self.path, filename_prefix=self.filePrefix)
+                    self.logfield.insert(INSERT, f'\nINFO: The {videoDown}, codec/itag was used.\n')
+                    self.videoFetch(yt, query)
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
@@ -530,6 +536,7 @@ class App:
                 self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
                  self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
+            self.videoFetch(yt, query)
             self.logfield["state"] = "disabled"
 
 
@@ -537,16 +544,26 @@ class App:
             self.logfield["state"] = "normal"
             try:
                 yt = YouTube(query)
-                query = self.urlfield.get()
-                try:
-                    audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
-                    high_audioDown.download(self.path, filename_prefix=self.filePrefix)
-                # print(yt.streams.filter(only_audio=True).all())
-                except:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
+                audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
+                print("Available streams:\n" + str(yt.streams.filter(abr=self.audioq, only_audio=True).all()))
 
-                self.logfield.insert(INSERT, f'{audioDown}')
-                self.videoFetch(yt, query)
+                if audioDown == None:
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
+                    return
+
+                audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
+                os.chdir(self.fileLoc)
+                self.logfield.insert(INSERT, f'\nINFO: Modding UNIX file permissions...\n')
+                filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#'})
+                subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
+                self.logfield.insert(INSERT, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
+                subprocess.run(f'ffmpeg -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                self.logfield.insert(INSERT, f'\nINFO: Removing temp file...\n')
+                os.remove(f"{filtered}.{self.clickedaf.get()}")
+
+                print("Original file deleted! Enjoy your converted one")
+
+                self.logfield.insert(INSERT, f'\nINFO: The {audioDown}, codec/itag was used.\n')
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
@@ -563,7 +580,9 @@ class App:
                 self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
                  self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
+            self.videoFetch(yt, query)
             self.logfield["state"] = "disable"
+
 
         elif self.audioBool == False and self.videoBool: # Video only
             self.logfield["state"] = "normal"
@@ -576,11 +595,10 @@ class App:
                 try:
                     silent_audioDown = yt.streams.filter(mime_type="video/" + self.videof, fps=self.vfps, res=self.videoq)
                     silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                    self.logfield.insert(INSERT, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
+                    self.videoFetch(yt, query)
                 except:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings\n')
-
-                self.logfield.insert(INSERT, f'{silent_audioDown}')
-                self.videoFetch(yt, query)
+                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
@@ -607,7 +625,7 @@ class App:
                 self.logfield.insert(INSERT, f'\nERROR: URL field is empty and cannot be parsed')
 
             elif self.enablePrompts: # hasnt selected video nor audio
-                self.logfield.insert(INSERT, f'\nERROR: You can\'t download a video with video or audio\n')
+                self.logfield.insert(INSERT, f'\nERROR: You can\'t download a video with video or audio!\n')
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
@@ -801,7 +819,6 @@ class App:
             self.settingsTitle["fg"] = "black"
 
         self.defaultDirButton=ttk.Button(sWin, text="Choose") # Disabled default dir until further notice
-#        self.defaultDirButton["text"] = "Choose"
         self.defaultDirButton.place(x=287,y=50,width=120)
         self.defaultDirButton["command"] = self.defaultDir_command
 
@@ -819,12 +836,12 @@ class App:
 
         self.warnMenu = ttk.Button(sWin)
         self.warnMenu["text"] = "Toggle Off"
-        self.warnMenu.place(x=292,y=102,width=110)
+        self.warnMenu.place(x=292,y=92,width=110)
         self.warnMenu["command"] = self.errorToggle     #  toggle button for prompts lolz
 
         self.warnTip = ttk.Label(sWin)
         self.warnTip = Label(sWin, text="Recieve Prompts")
-        self.warnTip.place(x=165,y=108,width=110)
+        self.warnTip.place(x=165,y=92,width=110)
         if self.darkMode:
             self.warnTip["bg"] = "#464646" # dark theme gray
             self.warnTip["fg"] = "#999999" # light theme gray
@@ -834,12 +851,12 @@ class App:
 
         self.prefixMenu = ttk.Button(sWin)
         self.prefixMenu["text"] = "Toggle Off"
-        self.prefixMenu.place(x=292,y=152,width=110)
+        self.prefixMenu.place(x=292,y=137,width=110)
         self.prefixMenu["command"] = self.togglePrefix   # SECOND
 
         self.prefixTip = ttk.Label(sWin)
         self.prefixTip = Label(sWin, text="File Prefix")
-        self.prefixTip.place(x=165,y=157,width=110)
+        self.prefixTip.place(x=165,y=137,width=110)
         if self.darkMode:
             self.prefixTip["bg"] = "#464646" # dark theme gray
             self.prefixTip["fg"] = "#999999" # light theme gray
@@ -849,7 +866,7 @@ class App:
 
         self.resetDefaultDir = ttk.Button(sWin)
         self.resetDefaultDir["text"] = "Reset Default Directory"
-        self.resetDefaultDir.place(x=210,y=201,width=170)
+        self.resetDefaultDir.place(x=200,y=181,width=180)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
         self.resetDefaultDir["state"] = "normal"
 
@@ -877,7 +894,7 @@ class App:
         if "-06-03" in str(datetime.now()):
             self.aprilFools.place(x=190,y=270,width=200)
         else:
-            print("Secret works :)")
+            pass
 
 
     # Scripting for buttons and other things
