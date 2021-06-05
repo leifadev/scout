@@ -350,12 +350,12 @@ class App:
 
         self.clickedvq = StringVar()
         self.clickedvq.set("Quality")
-        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "1080p", "720p", "480p", "360p", "240p", "144p")
+        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "Quality", "1080p", "720p", "480p", "360p", "240p", "144p")
         self.videoquality["state"] = "normal"
 
         self.clickedaq = StringVar()
         self.clickedaq.set("Quality")
-        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "160kbps", "128kbps", "70kbps", "40kbps")
+        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbps", "128kbps", "70kbps", "40kbps")
         self.audioquality["state"] = "normal"
 
 
@@ -694,7 +694,7 @@ class App:
             self.videoquality.place_forget()
             if self.audioBool:
                 self.audioformat.place(x=655, y=220, width=70, height=30)
-                self.audioquality.place(x=635, y=190, width=90, height=30)
+                self.audioquality.place(x=635, y=190, width=95, height=30)
         print("Video status: " + str(self.videoBool))
 
 
@@ -703,8 +703,8 @@ class App:
         if self.audioBool == False:
             self.audioBool = True
             if self.videoBool == False:
-                self.audioformat.place(x=655, y=220, width=70, height=30)
-                self.audioquality.place(x=635, y=190, width=90, height=30)
+                self.audioformat.place(x=650, y=220, width=75, height=30)
+                self.audioquality.place(x=638, y=190, width=87, height=30)
         else:
             self.audioBool = False
             self.audioformat.place_forget()
