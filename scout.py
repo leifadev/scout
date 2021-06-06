@@ -101,7 +101,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
-            self.UIAttributes = { # pre-made attrbutes to be place holders for multiple tkinter parames later on
+            self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
                 "restartTextPos": 302,
@@ -341,12 +341,12 @@ class App:
         # self.videoformat.place(x=650, y=121, width=70, height=30)
         self.videoformat["state"] = "normal"
 
+
         self.clickedaf = StringVar()
         self.clickedaf.set("mp4")
         self.audioformat = ttk.OptionMenu(root, self.clickedaf, "mp3", "mp3", "wav", "ogg")
         # self.audioformat.place(x=650, y=171, width=70, height=30)
         self.audioformat["state"] = "normal"
-
 
         self.clickedvq = StringVar()
         self.clickedvq.set("Quality")
@@ -355,7 +355,7 @@ class App:
 
         self.clickedaq = StringVar()
         self.clickedaq.set("Quality")
-        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbps", "128kbps", "70kbps", "40kbps")
+        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbps", "128kbps", "70kbps", "50kbps")
         self.audioquality["state"] = "normal"
 
 
@@ -392,7 +392,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -420,12 +420,16 @@ class App:
         self.ffmpeg = bool
 
         if shutil.which('ffmpeg') == None:
-            # messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
             self.logfield["state"] = "normal"
-            self.logfield.insert(INSERT, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
+            self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
             self.ffmpeg = False
             self.logfield["state"] = "disabled"
             print("You don't have FFmpeg installed! You can't use custom file types.")
+            # Disable menus that require ffmpeg
+            self.audioquality["state"] = "disabled"
+            self.videoquality["state"] = "disabled"
+            self.videoformat["state"] = "disabled"
+            self.audioformat["state"] = "disabled"
         else:
             self.ffmpeg = True
             print("You have FFmpeg installed! You can use custom file types.")
@@ -435,15 +439,15 @@ class App:
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
         query = self.urlfield.get()
-        self.logfield.insert(INSERT, f'\n---------------------------------------------------------------------')
-        self.logfield.insert(INSERT, f'\n\nStarting download to path: {self.path}')
-        self.logfield.insert(INSERT, f'\nVideo Title: {yt.title}')
-        self.logfield.insert(INSERT, f'\nVideo Author: {yt.author}')
-        self.logfield.insert(INSERT, f'\nPublish Date: {yt.publish_date}')
-        self.logfield.insert(INSERT, f'\nVideo Duration (sec): {yt.length}')
-        self.logfield.insert(INSERT, f'\nViews: {yt.views}')
-        self.logfield.insert(INSERT, f'\nRating ratio: {yt.rating}')
-        self.logfield.insert(INSERT, f'\n\n---------------------------------------------------------------------\n\n')
+        self.logfield.insert(END, f'\n---------------------------------------------------------------------')
+        self.logfield.insert(END, f'\n\nStarting download to path: {self.path}')
+        self.logfield.insert(END, f'\nVideo Title: {yt.title}')
+        self.logfield.insert(END, f'\nVideo Author: {yt.author}')
+        self.logfield.insert(END, f'\nPublish Date: {yt.publish_date}')
+        self.logfield.insert(END, f'\nVideo Duration (sec): {yt.length}')
+        self.logfield.insert(END, f'\nViews: {yt.views}')
+        self.logfield.insert(END, f'\nRating ratio: {yt.rating}')
+        self.logfield.insert(END, f'\n\n---------------------------------------------------------------------\n\n')
 
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log after done inserting
 
@@ -491,51 +495,81 @@ class App:
         if self.videoBool and self.audioBool: # Video and Audio
             self.logfield["state"] = "normal"
             try:
-                yt = YouTube(query)         # ADD THIS \/\/
-                videoDown = yt.streams.filter(res=str(self.clickedvq.get()), progressive=True).first()
-                print("Available streams:\n" + yt.streams.filter(res=str(self.clickedvq.get()), progressive=True).all())
-                # print(self.clickedvq.get())
-                # print(self.clickedvf.get())
-                # Block that converts custom file types, video/audio
-                if videoDown == None:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
+                yt = YouTube(query)
+                res = self.clickedvq.get()
+                streams = str(yt.streams.filter(progressive=True).all())
+                attributes = {
+                    "res": ["1080p", "720p", "480p", "360p", "240p", "144p"],
+                    "fps": [24, 30, 60]
+                }
+                aRes = []
+                aFPS = []
+                for key in attributes:
+                    for i in attributes.get(key):
+                        if str(i) in str(streams):
+                            if key == "res":
+                                aRes.append(i)
+                            else:
+                                aFPS.append(i)
+                try:
+                    if self.clickedvq.get() == "Quality":
+                        res = aRes[0]
+                    # elif self.clickedvfps.get() == "Fps":
+                    #     fps = aFPS[0]
+                except:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+
+                videoDown = yt.streams.filter(res=res, progressive=True).first()
+                print(res)
+                print(f'\nAvailable stream(s):\n{videoDown}', f'All streams:\n{streams}')
+
+                # Block that converts custom file types, video/audio #
+
+                if videoDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
+
+                    print("Gathered available quality options: ", aRes) # extra verbose input
+                    suggestMsg = f'\nINFO: Try the {aRes} resolutions instead\n'
+                    self.logfield.insert(END, f'{suggestMsg}')
+
+                    self.logfield["state"] = "disabled"
                     return
 
                 if self.clickedvf != "mp4":
                     videoDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                     os.chdir(self.fileLoc)
-                    self.logfield.insert(INSERT, f'\nINFO: Modding UNIX file permissions...\n')
+                    self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
                     filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
-                    self.logfield.insert(INSERT, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                    subprocess.run(f'ffmpeg -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
-                    self.logfield.insert(INSERT, f'\nINFO: Removing temp file...\n')
-                    os.remove(f"{filtered}.{self.clickedvf.get()}")
+                    self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
+                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
+                    os.remove(f"{filtered}.mp4")
 
                     print("Original file deleted! Enjoy your converted one")
 
-                    self.logfield.insert(INSERT, f'\nINFO: The {videoDown}, codec/itag was used.\n')
+                    self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
                     self.videoFetch(yt, query)
                 else:
                     videoDown.download(self.path, filename_prefix=self.filePrefix)
-                    self.logfield.insert(INSERT, f'\nINFO: The {videoDown}, codec/itag was used.\n')
+                    self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
                     self.videoFetch(yt, query)
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
-                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
             self.videoFetch(yt, query)
             self.logfield["state"] = "disabled"
 
@@ -548,38 +582,39 @@ class App:
                 print("Available streams:\n" + str(yt.streams.filter(abr=self.audioq, only_audio=True).all()))
 
                 if audioDown == None:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
+                    self.logfield["state"] = "disabled"
                     return
 
                 audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                 os.chdir(self.fileLoc)
-                self.logfield.insert(INSERT, f'\nINFO: Modding UNIX file permissions...\n')
+                self.logfield.insert(END, f'\n\nINFO: Modding file permissions...\n')
                 filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
-                self.logfield.insert(INSERT, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                subprocess.run(f'ffmpeg -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
-                self.logfield.insert(INSERT, f'\nINFO: Removing temp file...\n')
-                os.remove(f"{filtered}.{self.clickedaf.get()}")
+                self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
+                subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
+                os.remove(f"{filtered}.mp4")
 
                 print("Original file deleted! Enjoy your converted one")
 
-                self.logfield.insert(INSERT, f'\nINFO: The {audioDown}, codec/itag was used.\n')
+                self.logfield.insert(END, f'\nINFO: The {audioDown}, codec/itag was used.\n')
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
-                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
             self.videoFetch(yt, query)
             self.logfield["state"] = "disable"
 
@@ -588,33 +623,33 @@ class App:
             self.logfield["state"] = "normal"
             if self.enablePrompts:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                self.logfield.insert(INSERT, f'\nINFO: As of now videos downloaded without audio are fixed to 360p\n')
+                self.logfield.insert(END, f'\nINFO: As of now videos downloaded without audio are fixed to 360p\n')
             try:
                 yt = YouTube(query)
                 query = self.urlfield.get()
                 try:
-                    silent_audioDown = yt.streams.filter(mime_type="video/" + self.videof, fps=self.vfps, res=self.videoq)
+                    silent_audioDown = yt.streams.filter(mime_type="video/" + self.videof, res=self.videoq)
                     silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
-                    self.logfield.insert(INSERT, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
+                    self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
                     self.videoFetch(yt, query)
                 except:
-                    self.logfield.insert(INSERT, f'\nERROR: This video is unavailable with these download settings!\n')
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
 
             # Try statments using pytube errors repeats for each selection mode of video
             except VideoPrivate:
-                self.logfield.insert(INSERT, error_dict.get('VideoPrivate'))
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
             except RegexMatchError:
-                self.logfield.insert(INSERT, error_dict.get('RegexMatchError'))
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
             except RecordingUnavailable:
-                self.logfield.insert(INSERT, error_dict.get('RecordingUnavailable'))
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
             except MembersOnly:
-                self.logfield.insert(INSERT, error_dict.get('MembersOnly'))
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
             except LiveStreamError:
-                self.logfield.insert(INSERT, error_dict.get('LiveStreamError'))
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
             except HTMLParseError:
-                self.logfield.insert(INSERT, error_dict.get('HTMLParseError'))
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
             except VideoUnavailable:
-                 self.logfield.insert(INSERT, error_dict.get('VideoUnavailable'))
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
         else:
             self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -622,10 +657,10 @@ class App:
             query = self.urlfield.get() # gets entry input (the users specifed URL)
 
             if self.urlfield.get() == "":
-                self.logfield.insert(INSERT, f'\nERROR: URL field is empty and cannot be parsed')
+                self.logfield.insert(END, f'\nERROR: URL field is empty and cannot be parsed')
 
             elif self.enablePrompts: # hasnt selected video nor audio
-                self.logfield.insert(INSERT, f'\nERROR: You can\'t download a video with video or audio!\n')
+                self.logfield.insert(END, f'\nERROR: You can\'t download a video with video or audio!\n')
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
@@ -694,7 +729,7 @@ class App:
             self.videoquality.place_forget()
             if self.audioBool:
                 self.audioformat.place(x=655, y=220, width=70, height=30)
-                self.audioquality.place(x=635, y=190, width=95, height=30)
+                self.audioquality.place(x=635, y=190, width=87, height=30)
         print("Video status: " + str(self.videoBool))
 
 
@@ -715,6 +750,9 @@ class App:
 
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
+        self.logfield["state"] = "normal"
+        self.logfield.insert(END, "\nINFO: Launched help page! Documentation, Code, Wiki, and more :)\n")
+        self.logfield["state"] = "disabled"
         print("This is opening the github page to for Scout. All versions of scout, a public wiki, and an issues page\nare there to help!")
 
     # Clear the whole test entry, deleting line until the end, still restarting the welcome message!
@@ -723,10 +761,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(INSERT, "Scout launched successfully!\nVersion: " + self.version + "\n")
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
