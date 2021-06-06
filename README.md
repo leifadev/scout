@@ -16,7 +16,11 @@ Using main packages/frameworks/libraries:
 - ttkthemes
 - ffmpeg
 
-Compiler: Pyinstaller | pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
+Compiler: Pyinstaller v4.2 (6/6/21)
+```
+**Pyinstaller Command**
+```cs
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
 ### Supported Versions
 
