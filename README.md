@@ -15,7 +15,9 @@ Using main packages/frameworks/libraries:
 - wget
 - ttkthemes
 - ffmpeg
-
+```
+**Pyinstaller Command**
+```cs
 Compiler: Pyinstaller | pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
 ### Supported Versions
