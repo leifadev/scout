@@ -15,10 +15,12 @@ Using main packages/frameworks/libraries:
 - wget
 - ttkthemes
 - ffmpeg
+
+Compiler: Pyinstaller v4.2 (6/6/21)
 ```
 **Pyinstaller Command**
 ```cs
-Compiler: Pyinstaller | pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
 ### Supported Versions
 
