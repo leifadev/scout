@@ -6,4 +6,5 @@ dist/
 .DS_Store
 *.pyc
 .swp
-DEEZ NUTZ/
+Scout.spec
+scout.spec
