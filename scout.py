@@ -44,6 +44,7 @@ class App:
         self.audiof = "" # audio format example: wav
         # DEVS DONT INCLUDE "."s ^^^BEFORE EXTENSIONS^^^
 
+        print("\n\n**THIS IS A BETA VERSION. IF YOU DOWNLOADED THIS FROM GITHUB THEN THIS SHOULD BE GONE.**\n")
 
         ####################################################
         #                                                  #
@@ -420,9 +421,8 @@ class App:
     # These coinside with the log field element itself
 
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
-        print(os.environ["PATH"])
         self.ffmpeg = bool
-        if shutil.which('ffmpeg') is None:
+        if os.system("ffmpeg -version >/dev/null 2>&1") != 0: # exit code 0 for ffmpeg being absent # ">/dev/null 2>&1" silences output ;)
             self.logfield["state"] = "normal"
             self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
             self.ffmpeg = False
@@ -433,6 +433,7 @@ class App:
             self.videoquality["state"] = "disabled"
             self.videoformat["state"] = "disabled"
             self.audioformat["state"] = "disabled"
+            print("\nFFmpeg isn't installed, read console for instructions!\n")
         else:
             self.ffmpeg = True
             print("\nYou have FFmpeg installed! You can use custom file types.\n")
