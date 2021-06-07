@@ -422,7 +422,6 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
 
         self.ffmpeg = bool
-
         if shutil.which('ffmpeg') == None:
             self.logfield["state"] = "normal"
             self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -834,11 +833,9 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            time.sleep(0.5) # more realistic log effect :)
             self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
         else:
             self.logfield.delete("1.0","end")
-            time.sleep(0.5)
             self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
