@@ -25,7 +25,7 @@ import time
 class App:
     def __init__(self, root):
 
-        # Iniatiating variables, some temporary, some stored in settings.yml
+        # Iniatiating variables for all sorts of stuff
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
