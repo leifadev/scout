@@ -420,9 +420,9 @@ class App:
     # These coinside with the log field element itself
 
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
-
+        print(os.environ["PATH"])
         self.ffmpeg = bool
-        if shutil.which('ffmpeg') == None:
+        if shutil.which('ffmpeg') is None:
             self.logfield["state"] = "normal"
             self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
             self.ffmpeg = False
