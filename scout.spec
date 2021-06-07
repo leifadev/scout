@@ -30,8 +30,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False , icon='scout_logo.icns')
-app = BUNDLE(exe,
-             name='Scout.app',
-             icon='scout_logo.icns',
-             bundle_identifier='com.leifadev.scout')
+          console=True , icon='scout_logo.icns')
