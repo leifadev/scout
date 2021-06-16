@@ -1,0 +1,6 @@
+- Options:
+    defaultDir: /Users/example/example
+    errorChoice: true
+    changedDefaultDir: false
+    hasFilePrefix: ''
+    darkMode: false

@@ -1,0 +1,23 @@
+{
+  "TARGET": "scout",
+  "CC": "gcc",
+  "LD": "gcc",
+  "C_FLAGS": [
+    "-c",
+    "-Wall"
+  ],
+  "LD_FLAGS": [],
+  "LIBS": [tkinter, pytube, ttkthemes, wget, ruamel.yaml],
+  "INCLUDE_PATHS": [],
+  "EXTENSIONS": [
+    "c",
+    "cc",
+    "cpp"
+  ],
+  "IGNORE_PATHS": [],
+  "CUSTOM_TARGETS": {},
+  "VERBOSE": true,
+  "RM": "rm -v",
+  "BUILD_DIRECTORY": "./build",
+  "BIN_DIRECTORY": "./dist"
+}
