@@ -427,6 +427,7 @@ class App:
         # self.logfield["state"] = "normal"
         # self.logfield.insert(END, cool)
         # if os.system("ffmpeg -version >/dev/null 2>&1") != 0: # exit code 0 for ffmpeg being absent # ">/dev/null 2>&1" silences output ;)
+
         if shutil.which('ffmpeg') is None:
             self.logfield["state"] = "normal"
             self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
