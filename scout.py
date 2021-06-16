@@ -54,10 +54,10 @@ class App:
         # Sets various variables for each OS being used.
         # Fonts, directories, special boolean values, etc.
         if _platform in ("linux", "linux2"):
-            self.fileLoc = "~/.config/Scout/"
+            self.fileLoc = os.path.expanduser("~/.config/Scout/")
             self.dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
-            self.ymldir = "~/.config/Scout/settings.yml"
-            self.cachedir = "~/.config/Scout/cache.yml"
+            self.ymldir = os.path.expanduser("~/.config/Scout/settings.yml")
+            self.cachedir = os.path.expanduser("~/.config/Scout/cache.yml")
             if self.path ==  "":
                 self.path = "/home/" + self.getUser + "/Desktop"
             else:
