@@ -443,8 +443,15 @@ class App:
                 self.ffmpeg = True
                 print("\nYou have FFmpeg installed! You can use custom file types.\n")
         else:
+            self.logfield["state"] = "normal"
             if not os.path.isfile(self.fileLoc + "ffmpeg"):
-                print("\nYou don't have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
+                messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
+
+                self.logfield["state"] = "normal"
+
+                self.logfield.insert(END, f'\nINFO: If don\'t have an internet connection to isntall FFmpeg, you can for now use file formatting features.\n\nJust relaunch scout when you have internet and you are good to go.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
+
+                print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
 
                 os.chdir(self.fileLoc)
                 wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
@@ -461,21 +468,26 @@ class App:
                 os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
                 print("\nPurged inital zip file\n")
 
-                print("FFmpeg was sucessfully automatically installed to your config directory!")\
+                print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
-            if os.path.isfile(self.fileLoc + "ffmpeg"): # check again if it is now installed
-                print("FFmpeg is present in your config folder!")
+                messagebox.showinfo("Success!", "FFmpeg was installed! Continue.")
+
+            if os.path.isfile(self.fileLoc + "ffmpeg"): # chevck again if it is now installed
+                print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
                 self.ffmpeg = True
             else: # If the binary file still isnt present after the first if block which downloads/installs it
                 print("\n----!!\nCould not find the ffmpeg binary (your source to convert files and more) in your config \ndirecotry after attempting to install it for you. \n\n**Please** contact the developer if you see this message in an issue on github preferabley!\n----!!\n")
+                self.logfield.insert(END, f'\nINFO: Could not find the ffmpeg binary (your source to convert files and more) in your config \ndirecotry after attempting to install it for you. \n\nYou can STILL USE SCOUT but without file formatting features.')
                 self.audioquality["state"] = "disabled"
                 self.videoquality["state"] = "disabled"
                 self.videoformat["state"] = "disabled"
                 self.audioformat["state"] = "disabled"
                 self.ffmpeg = False
+            self.logfield["state"] = "disabled"
 
 
     ######################################################################################
+
 
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
         yt = YouTube(query)
@@ -1030,6 +1042,8 @@ class App:
             self.resetDirTip['bg'] = "#ececec"
             self.resetDirTip["fg"] = "black"
 
+
+
         self.aprilFools = ttk.Label(sWin)
         self.aprilFools = Label(sWin, text="( ͡° ͜ʖ ͡°)", anchor=CENTER, wraplength=169, justify=CENTER)
         self.aprilFools["font"] = tkFont.Font(sWin, size=59)
@@ -1066,7 +1080,7 @@ class App:
 
         with open(self.ymldir,"w+") as yml:
             data[0]['Options']['changedDefaultDir'] = False
-            data[0]['Options']['defaultDir'] = None # done once reset
+            data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
             self.resetDefaultDir["state"] = "disabled"
             self.resetDirTip["text"] = "Setting reset!"
