@@ -20,6 +20,7 @@ import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
 import time
+from zipfile import ZipFile
 
 
 class App:
@@ -64,6 +65,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffDir = f'ffmpeg'
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -83,6 +85,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffDir = f'{self.fileLoc}ffmpeg'
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 12,
@@ -102,6 +105,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
+            self.ffDir = f'ffmpeg'
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -421,28 +425,55 @@ class App:
 
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
-        # print('ffmpeg' in os.listdir('/usr/local/bin'))
-        # cool = shutil.which('python3')
-        # print(cool)
-        # self.logfield["state"] = "normal"
-        # self.logfield.insert(END, cool)
-        # if os.system("ffmpeg -version >/dev/null 2>&1") != 0: # exit code 0 for ffmpeg being absent # ">/dev/null 2>&1" silences output ;)
 
-        if shutil.which('ffmpeg') is None:
-            self.logfield["state"] = "normal"
-            self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
-            self.ffmpeg = False
-            self.logfield["state"] = "disabled"
-            print("You don't have FFmpeg installed! You can't use custom file types.")
-            # Disable menus that require ffmpeg
-            self.audioquality["state"] = "disabled"
-            self.videoquality["state"] = "disabled"
-            self.videoformat["state"] = "disabled"
-            self.audioformat["state"] = "disabled"
-            print("\nFFmpeg isn't installed, read console for instructions!\n")
+        if _platform != "darwin":
+            if shutil.which('ffmpeg') is None:
+                self.logfield["state"] = "normal"
+                self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
+                self.ffmpeg = False
+                self.logfield["state"] = "disabled"
+                print("You don't have FFmpeg installed! You can't use custom file types.")
+                # Disable menus that require ffmpeg
+                self.audioquality["state"] = "disabled"
+                self.videoquality["state"] = "disabled"
+                self.videoformat["state"] = "disabled"
+                self.audioformat["state"] = "disabled"
+                print("\nFFmpeg isn't installed, read console for instructions!\n")
+            else:
+                self.ffmpeg = True
+                print("\nYou have FFmpeg installed! You can use custom file types.\n")
         else:
-            self.ffmpeg = True
-            print("\nYou have FFmpeg installed! You can use custom file types.\n")
+            if not os.path.isfile(self.fileLoc + "ffmpeg"):
+                print("\nYou don't have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
+
+                os.chdir(self.fileLoc)
+                wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
+
+                print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
+
+                with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
+                    zip.extractall()
+                print("\nFile extracted...\n")
+
+                subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
+                print("\nFFmpeg binary is now executable! :)\n")
+
+                os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
+                print("\nPurged inital zip file\n")
+
+                print("FFmpeg was sucessfully automatically installed to your config directory!")\
+
+            if os.path.isfile(self.fileLoc + "ffmpeg"): # check again if it is now installed
+                print("FFmpeg is present in your config folder!")
+                self.ffmpeg = True
+            else: # If the binary file still isnt present after the first if block which downloads/installs it
+                print("\n----!!\nCould not find the ffmpeg binary (your source to convert files and more) in your config \ndirecotry after attempting to install it for you. \n\n**Please** contact the developer if you see this message in an issue on github preferabley!\n----!!\n")
+                self.audioquality["state"] = "disabled"
+                self.videoquality["state"] = "disabled"
+                self.videoformat["state"] = "disabled"
+                self.audioformat["state"] = "disabled"
+                self.ffmpeg = False
+
 
     ######################################################################################
 
@@ -476,7 +507,7 @@ class App:
     # self.videof = "mp4"
     # self.audiof = "mp3"
 
-    # ffmpeg -hide_banner -loglevel error -y -i xbox.mp3 xboxx.wav
+    # ffmpeg -hide_banner -loglevel error -y -i xboxyay.mp3 xboxyayyy.wav
 
     # Download buttons scripting, includes all features said abive
 
@@ -555,7 +586,7 @@ class App:
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
                     # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
 
@@ -628,7 +659,7 @@ class App:
                 filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                 self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
                 self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                 os.remove(f"{filtered}.mp4")
 
@@ -700,7 +731,7 @@ class App:
                     filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
 
