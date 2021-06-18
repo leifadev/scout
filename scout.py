@@ -33,6 +33,7 @@ class App:
         self.changedDefaultDir = bool
         self.thumbBool = bool
         self.videoRes = False
+        self.hasFilePrefix = True
         self.filePrefix = ""
         ssl._create_default_https_context = ssl._create_unverified_context
         self.path = ""
@@ -132,7 +133,7 @@ class App:
                     'defaultDir': self.dirDefaultSetting,
                     'errorChoice': True,
                     'changedDefaultDir': False,
-                    'hasFilePrefix': self.filePrefix,
+                    'hasFilePrefix': self.hasFilePrefix,
                     'darkMode': self.darkMode,
                     'thumbnail': False
                 }
@@ -199,8 +200,6 @@ class App:
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
             wget.download(url, self.fileLoc + "scout_logo.png")
         self.icon = PhotoImage(file=self.fileLoc + "scout_logo.png")
-
-
 
 
         ####################################################
@@ -987,25 +986,6 @@ class App:
         sWin.geometry(sWin_alignstr)
         sWin.resizable(width=False, height=False)
 
-        # Initialzing toggle button variables, look below to see them actually in action for more context
-        self.warnMenu = bool
-        self.prefixMenu = bool
-        self.thumbMenu = bool
-
-        # Load toggle button values
-        l = ["errorChoice", "hasFilePrefix", "thumbnail"]
-
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-            for key, value in data[0]['Options']:
-                if key in l:
-                    print(value)
-
-            # data[0]['Options']['changedDefaultDir'] = False
-            # data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
-
-        print("\nFetched Menu button values sucessfully!\n")
-
 
         self.settingsTitle = ttk.Label(sWin)
         self.settingsTitle = Label(sWin, text="Settings")
@@ -1064,10 +1044,10 @@ class App:
             self.prefixTip["fg"] = "black"
 
 
-        self.thmubMenu = ttk.Button(sWin)
-        self.thmubMenu["text"] = "Toggle Off"
-        self.thmubMenu.place(x=292,y=181,width=110)
-        self.thmubMenu["command"] = self.toggleThumb
+        self.thumbMenu = ttk.Button(sWin)
+        self.thumbMenu["text"] = "Toggle Off"
+        self.thumbMenu.place(x=292,y=181,width=110)
+        self.thumbMenu["command"] = self.toggleThumb
 
         self.thumbTip = ttk.Label(sWin)
         self.thumbTip = Label(sWin, text="Get Thumbnail")
@@ -1113,6 +1093,9 @@ class App:
         else:
             pass
 
+        # Updates buttons when they are loaded initially. Scroll down to enbd of button script section to see
+        self.updateButtons()
+
 
     # Scripting for buttons and other things
     def defaultDir_command(self):
@@ -1140,45 +1123,31 @@ class App:
         print("Reset the default directory in settings.")
 
 
-    def togglePrefix(self):
-        if self.filePrefix == "Scout_":
-            self.filePrefix = ""
-            self.prefixMenu["text"] = "Toggle Off"
-            print("Prefix off!")
-        else:
-            self.filePrefix = "Scout_"
-            self.prefixMenu["text"] = "Toggle On"
-            print("Prefix on!")
-
+    def togglePrefix(self): # Coudln't use the function for this, sticking with the value being a string for the sake of it
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
 
         with open(self.ymldir,"w+") as yml:
+            if self.prefixMenu['text'] == "Toggle On":
+                self.filePrefix = ""
+                self.prefixMenu["text"] = "Toggle Off"
+                print("Prefix off!")
+            else:
+                self.filePrefix = "Scout_"
+                self.prefixMenu["text"] = "Toggle On"
+                print("Prefix on!")
+
             data[0]['Options']['hasFilePrefix'] = self.filePrefix
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            self.filePrefix = data[0]['Options']['hasFilePrefix']
-            print(self.filePrefix)
-        print("\nCurrently updating settings.yml...")
+
 
     def toggleThumb(self):
-        if self.thumbBool:
-            self.thumbBool = False
-            self.thmubMenu["text"] = "Toggle Off"
-            print("Prefix off!")
+        if self.thumbMenu['text'] == "Toggle On":
+            self.thumbMenu["text"] = "Toggle Off"
         else:
-            self.thumbBool = True
-            self.thmubMenu["text"]     = "Toggle On"
-            print("Prefix on!")
+            self.thumbMenu["text"] = "Toggle On"
 
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-
-        with open(self.ymldir,"w+") as yml:
-            data[0]['Options']['thumbnail'] = self.thumbBool
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            self.thumbBool = data[0]['Options']['thumbnail']
-            print(self.thumbBool)
-        print("\nCurrently updating settings.yml...")
+        self.dump('thumbnail', self.thumbBool)
 
 
     def errorToggle(self):
@@ -1186,19 +1155,48 @@ class App:
             self.warnMenu["text"] = "Toggle Off"
         else:
             self.warnMenu["text"] = "Toggle On"
-        self.dump()
+        self.dump('errorChoice', self.enablePrompts)
 
 
-    def dump(self):
+    def updateButtons(self):
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            l = ["errorChoice", "hasFilePrefix", "thumbnail"]
+
+            for i in data[0]['Options']:
+                if i in l:
+                    if i == 'errorChoice':
+                        self.errorChoice = data[0]['Options'][str(i)]
+                        if self.errorChoice:
+                            self.warnMenu["text"] = "Toggle Off"
+                        else:
+                            self.warnMenu["text"] = "Toggle On"
+
+                    elif i == 'hasFilePrefix':
+                        self.filePrefix = data[0]['Options'][str(i)]
+                        if self.filePrefix:
+                            self.prefixMenu["text"] = "Toggle Off"
+                        else:
+                            self.prefixMenu["text"] = "Toggle On"
+
+                    elif i == 'thumbnail':
+                        self.thumbBool = data[0]['Options'][str(i)]
+                        if self.thumbBool:
+                            self.thumbMenu["text"] = "Toggle Off"
+                        else:
+                            self.thumbMenu["text"] = "Toggle On"
+
+    # Dump function to write new values made by toggle buttons
+    def dump(self, setting, var):
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
 #            print(str(data))
 
         with open(self.ymldir,"w+") as yml:
-            data[0]['Options']['errorChoice'] = not data[0]['Options']['errorChoice']
+            data[0]['Options'][setting] = not data[0]['Options'][setting]
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            self.enablePrompts = data[0]['Options']['errorChoice']
-            print(self.enablePrompts)
+            var = data[0]['Options'][setting]
+            print(var)
         print("\nCurrently updating settings.yml...")
 
 
