@@ -47,7 +47,5 @@ clean:
 build:
 	@echo "Building standalone application, pip is required!"
 	pip3 install pyinstaller && pip install pyinstaller
-	pip3 freeze >> requirements.txt
-	pip freeze >> requirements.txt
 	$ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
 	@echo "Done building! :)"
