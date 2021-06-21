@@ -546,7 +546,7 @@ class App:
             except RegexMatchError:
                 print("Regex match error! Invalid...")
 
-                self.logfield.insert(END, f'\nwERROR: Regex match error! Please make sure you have a valid URL in place\n')
+                self.logfield.insert(END, f'\nERROR: Regex match error! Please make sure you have a valid URL in place\n')
                 self.logfield["state"] = "disabled"
 
             with open(self.ymldir, "r") as yml:
