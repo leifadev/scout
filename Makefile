@@ -1,3 +1,5 @@
+# CURRENTLY THIS MAKEFILE IS BROKEN, MAKE AN ISSUE ON GITHUB FOR MORE INFO
+
 PYTHON = python3
 PIP = pip3
 PROJECT_DIR = /
@@ -20,11 +22,11 @@ help:
 	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout"
 
 setup: setup
-	@echo "Setting up project"
-	${PIP} freeze >> requirements.txt
-	${PIP} install -r requirements.txt
+	@echo "Setting up project"$
+	pip3 freeze >> requirements.txt && pip freeze >> requirements.txt
+	pip3 install -r requirements.txt && pip install -r requirements.txt
 	@echo "Launching scout, new files will be generated."
-	${PYTHON} ${PROJECT_MAIN} && python ${PROJECT_MAIN}
+	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
 
 clean:
 	@echo "Cleaning project\n\n--------------------------"
@@ -37,13 +39,13 @@ clean:
 	rm -rf *.dist/
 	rm -rf requirements.txt
 	@echo "\nFreezing your project! Updated requirements.txt\n"
-	${PIP} freeze >> requirements.txt
+	pip3 freeze >> requirements.txt
+	pip freeze >> requirements.txt
 	@echo "\n--------------------------"
 
 
 build:
 	@echo "Building standalone application, pip is required!"
-	${PIP} install pyinstaller
-	${PIP} freeze >> requirements.txt
+	pip3 install pyinstaller && pip install pyinstaller
 	$ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
 	@echo "Done building! :)"
