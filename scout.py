@@ -68,7 +68,6 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
-            self.ffDir = f'ffmpeg'
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -88,7 +87,6 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
-            self.ffDir = f'{self.fileLoc}ffmpeg'
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 12,
@@ -108,7 +106,6 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
-            self.ffDir = f'ffmpeg'
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -420,7 +417,8 @@ class App:
                 self.modeButton["text"] = "Dark Mode"
 
 
-    ######################################################################################
+    #############################################################################
+
 
     ## Triggers and Scripts ##
     # These coinside with the log field element itself
@@ -538,21 +536,25 @@ class App:
         'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
 
         try:
-            # Quickly download the thumbnail
-            query = self.urlfield.get() # gets entry input
-            yt = YouTube(query)
-
-            wget.download(f'{yt.thumbnail_url}', self.path + self.filePrefix + yt.title + ".png")
-
             try:
                 self.logfield["state"] = "normal"
 
                 query = self.urlfield.get() # gets entry input
                 yt = YouTube(query)
 
+
             except RegexMatchError:
+                print("Regex match error! Invalid...")
+
+                self.logfield.insert(END, f'\nwERROR: Regex match error! Please make sure you have a valid URL in place\n')
                 self.logfield["state"] = "disabled"
 
+            with open(self.ymldir, "r") as yml:
+                data = yaml.load(yml, Loader=yaml.Loader)
+                self.thumbBool = data[0]['Options']['thumbnail']
+                if self.thumbBool:
+                    wget.download(yt.thumbnail_url, self.path + "/" + self.filePrefix + yt.title + ".jpg")
+                    print("\nDownloading the thumbnail as well :) \nIf your seeing this and your thumbnail setting is off, please delete your config file and restart scout.\nConfig file path: " + self.ymldir + "\n")
 
             if self.videoBool and self.audioBool: # Video and Audio
                 self.logfield["state"] = "normal"
@@ -598,16 +600,18 @@ class App:
                         self.logfield["state"] = "disabled"
                         return
 
-                    if self.clickedvf != "mp4": # see if selected file types aren't the default and therefore need to be converted
+                    if self.clickedvf.get() != "mp4": # see if selected file types aren't the default and therefore need to be converted
                         videoDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                         os.chdir(self.fileLoc)
                         # From below we mod the downloaded file for perms to be used with, UNIX system only apply
                         self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                        filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
+                        filtered = yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
                         subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                         self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
+
                         # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
-                        subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                        subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+
                         self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                         os.remove(f"{filtered}.mp4")
 
@@ -619,6 +623,9 @@ class App:
                         videoDown.download(self.path, filename_prefix=self.filePrefix)
                         self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
                         self.videoFetch(yt, query)
+
+                    self.videoFetch(yt, query)
+                    self.logfield["state"] = "disabled"
 
                 # Try statments using pytube errors repeats for each selection mode of video
                 except VideoPrivate:
@@ -635,7 +642,6 @@ class App:
                     self.logfield.insert(END, error_dict.get('HTMLParseError'))
                 except VideoUnavailable:
                      self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.videoFetch(yt, query)
                 self.logfield["state"] = "disabled"
 
 
@@ -680,13 +686,16 @@ class App:
                     filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                    subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
 
                     print("Original file deleted! Enjoy your converted one")
 
                     self.logfield.insert(END, f'\nINFO: The {audioDown}, codec/itag was used.\n')
+
+                    self.videoFetch(yt, query)
+                    self.logfield["state"] = "disabled"
 
                 # Try statments using pytube errors repeats for each selection mode of video
                 except VideoPrivate:
@@ -703,8 +712,7 @@ class App:
                     self.logfield.insert(END, error_dict.get('HTMLParseError'))
                 except VideoUnavailable:
                      self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.videoFetch(yt, query)
-                self.logfield["state"] = "disable"
+                self.logfield["state"] = "disabled"
 
 
             elif self.audioBool == False and self.videoBool: # Video only
@@ -752,7 +760,7 @@ class App:
                         filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                         subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                         self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                        subprocess.run(f'{self.ffDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                        subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
                         self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                         os.remove(f"{filtered}.mp4")
 
@@ -762,6 +770,9 @@ class App:
                     else:
                         silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
                         self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
+
+                    self.videoFetch(yt, query)
+                    self.logfield["state"] = "disabled"
 
                 # Try statments using pytube errors repeats for each selection mode of video
                 except VideoPrivate:
@@ -778,8 +789,8 @@ class App:
                     self.logfield.insert(END, error_dict.get('HTMLParseError'))
                 except VideoUnavailable:
                      self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.videoFetch(yt, query)
                 self.logfield["state"] = "disabled"
+
 
             else:
                 self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -796,9 +807,9 @@ class App:
 
         except HTTPError as err:
             self.logfield["state"] = "normal" # disable log after any erros are detected
-            print("\n\nThere was a 404 Not Found error:\n" + str(err) + "\n")
+            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
 
-            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug needed to be fixed by the pytube library.\n')
+            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to thr github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
 
