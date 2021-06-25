@@ -531,273 +531,16 @@ class App:
         'HTMLParseError': "\nERROR: HTML parsing or extraction has failed",
         'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
 
+
         try:
-            try:
-                self.logfield["state"] = "normal"
+            self.logfield["state"] = "normal"
 
-                query = self.urlfield.get() # gets entry input
-                yt = YouTube(query)
-
-
-            except RegexMatchError:
-                print("Regex match error! Invalid...")
+            query = self.urlfield.get() # gets entry input
+            yt = YouTube(query)
 
 
-            with open(self.ymldir, "r") as yml:
-                data = yaml.load(yml, Loader=yaml.Loader)
-                self.thumbBool = data[0]['Options']['thumbnail']
-                if self.thumbBool:
-                    wget.download(yt.thumbnail_url, self.path + "/" + self.filePrefix + yt.title + ".jpg")
-                    print("\nDownloading the thumbnail as well :) \nIf your seeing this and your thumbnail setting is off, please delete your config file and restart scout.\nConfig file path: " + self.ymldir + "\n")
-
-            if self.videoBool and self.audioBool: # Video and Audio
-                self.logfield["state"] = "normal"
-                try:
-                    yt = YouTube(query)
-                    res = self.clickedvq.get()
-                    # This block searches through a dictionary of known quality values, then suggests available values later
-                    streams = str(yt.streams.filter(progressive=True).all())
-                    attributes = {
-                        "res": ["1080p", "720p", "480p", "360p", "240p", "144p"],
-                        "fps": [24, 30, 60]
-                    }
-                    aRes = []
-                    aFPS = []
-                    for key in attributes: # Looping through "attributes" and "streams" to match available ones
-                        for i in attributes.get(key):
-                            if str(i) in str(streams):
-                                if key == "res":
-                                    aRes.append(i) # Put into a list to be printed later
-                                else:
-                                    aFPS.append(i)
-                    try:
-                        if self.clickedvq.get() == "Quality":
-                            res = aRes[0]
-                        # elif self.clickedvfps.get() == "Fps":
-                        #     fps = aFPS[0]
-                    except:
-                        print("\nNo other available values were found to fallback on, check for any stream query objects above!")
-
-                    videoDown = yt.streams.filter(res=res, progressive=True).first()
-                    print(res)
-                    print(f'\nAvailable stream(s):\n{videoDown}', f'All streams:\n{streams}')
-
-                    # Block that converts custom file types, video/audio #
-
-                    if videoDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
-                        self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
-
-                        print("Gathered available quality options: ", aRes) # extra verbose input
-                        suggestMsg = f'\nINFO: Try the {aRes} resolutions instead\n'
-                        self.logfield.insert(END, f'{suggestMsg}') # Suggest available values from aRes/aFPS
-
-                        self.logfield["state"] = "disabled"
-                        return
-
-                    if self.clickedvf.get() != "mp4": # see if selected file types aren't the default and therefore need to be converted
-                        videoDown.download(self.fileLoc, filename_prefix=self.filePrefix)
-                        os.chdir(self.fileLoc)
-                        # From below we mod the downloaded file for perms to be used with, UNIX system only apply
-                        self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                        filtered = yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
-                        subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
-                        self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-
-                        # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
-                        subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
-
-                        self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
-                        os.remove(f"{filtered}.mp4")
-
-                        print("Original file deleted! Enjoy your converted one")
-
-                        self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n') # This and below show in the log what actually stream object they downloaded with there video. Helpful for debugging!
-                        self.videoFetch(yt, query) # Fetching post-log video info, function up top this download function
-                    else:
-                        videoDown.download(self.path, filename_prefix=self.filePrefix)
-                        self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
-                        self.videoFetch(yt, query)
-
-                    self.videoFetch(yt, query)
-                    self.logfield["state"] = "disabled"
-
-                # Try statments using pytube errors repeats for each selection mode of video
-                except VideoPrivate:
-                    self.logfield.insert(END, error_dict.get('VideoPrivate'))
-                except RegexMatchError:
-                    self.logfield.insert(END, error_dict.get('RegexMatchError'))
-                except RecordingUnavailable:
-                    self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
-                except MembersOnly:
-                    self.logfield.insert(END, error_dict.get('MembersOnly'))
-                except LiveStreamError:
-                    self.logfield.insert(END, error_dict.get('LiveStreamError'))
-                except HTMLParseError:
-                    self.logfield.insert(END, error_dict.get('HTMLParseError'))
-                except VideoUnavailable:
-                     self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.logfield["state"] = "disabled"
-
-
-            elif self.audioBool:  # Audio only
-                self.logfield["state"] = "normal"
-                try:
-                    yt = YouTube(query)
-                    audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
-                    abr = self.clickedaq.get()
-                    streams = str(yt.streams.filter(only_audio=True).all())
-                    attributes = {
-                        "abr": ["160kbs", "128kbs", "70kbs", "50kbs"]
-                    }
-                    aAbr = []
-                    for key in attributes:
-                        for i in attributes.get(key):
-                            if str(i) in str(streams):
-                                aAbr.append(i)
-
-                    try:
-                        if self.clickedvq.get() == "Quality":
-                            abr = aAbr[0]
-                    except:
-                        print("\nNo other available values were found to fallback on, check for any stream query objects above!")
-
-                    print(abr)
-                    print(f'\nAvailable stream(s):\n{audioDown}', f'All streams:\n{streams}')
-
-                    if audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
-                        self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
-
-                        print("Gathered available quality options: ", aAbr) # extra verbose input
-                        suggestMsg = f'\nINFO: Try the {aAbr} resolutions instead\n'
-                        self.logfield.insert(END, f'{suggestMsg}')
-
-                        self.logfield["state"] = "disabled"
-                        return
-
-                    audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
-                    os.chdir(self.fileLoc)
-                    self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
-                    subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
-                    self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
-                    self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
-                    os.remove(f"{filtered}.mp4")
-
-                    print("Original file deleted! Enjoy your converted one")
-
-                    self.logfield.insert(END, f'\nINFO: The {audioDown}, codec/itag was used.\n')
-
-                    self.videoFetch(yt, query)
-                    self.logfield["state"] = "disabled"
-
-                # Try statments using pytube errors repeats for each selection mode of video
-                except VideoPrivate:
-                    self.logfield.insert(END, error_dict.get('VideoPrivate'))
-                except RegexMatchError:
-                    self.logfield.insert(END, error_dict.get('RegexMatchError'))
-                except RecordingUnavailable:
-                    self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
-                except MembersOnly:
-                    self.logfield.insert(END, error_dict.get('MembersOnly'))
-                except LiveStreamError:
-                    self.logfield.insert(END, error_dict.get('LiveStreamError'))
-                except HTMLParseError:
-                    self.logfield.insert(END, error_dict.get('HTMLParseError'))
-                except VideoUnavailable:
-                     self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.logfield["state"] = "disabled"
-
-
-            elif self.audioBool == False and self.videoBool: # Video only
-                self.logfield["state"] = "normal"
-                if self.enablePrompts:
-                    messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                    self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
-                try:
-                    yt = YouTube(query)
-                    silent_audioDown = yt.streams.filter(res=self.videoq, only_video=True).first()
-                    res = self.clickedvq.get()
-                    streams = str(yt.streams.filter(only_video=True).all())
-                    print(streams)
-                    attributes = {
-                        "res": ["1080p", "720p", "480p", "360p", "240p", "144p"]
-                    }
-                    aRes = []
-                    for key in attributes:
-                        for i in attributes.get(key):
-                            if str(i) in str(streams):
-                                aRes.append(i)
-
-                    try:
-                        if self.clickedvq.get() == "Quality":
-                            res = aRes[0]
-                    except:
-                        print("\nNo other available values were found to fallback on, check for any stream query objects above!")
-
-                    print(res)
-                    print(f'\nAvailable stream(s):\n{silent_audioDown}', f'All streams:\n{streams}')
-
-                    if silent_audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
-                        self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
-
-                        print("Gathered available quality options: ", aRes) # extra verbose input
-                        suggestMsg = f'\nINFO: Try the {aRes} resolutions instead\n'
-                        self.logfield.insert(END, f'{suggestMsg}')
-
-                        self.logfield["state"] = "disabled"
-                        return
-                    if self.clickedvf != "mp4":
-                        silent_audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
-                        os.chdir(self.fileLoc)
-                        self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                        filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
-                        subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
-                        self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                        subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
-                        self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
-                        os.remove(f"{filtered}.mp4")
-
-                        print("Original file deleted! Enjoy your converted one")
-
-                        self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
-                    else:
-                        silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
-                        self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
-
-                    self.videoFetch(yt, query)
-                    self.logfield["state"] = "disabled"
-
-                # Try statments using pytube errors repeats for each selection mode of video
-                except VideoPrivate:
-                    self.logfield.insert(END, error_dict.get('VideoPrivate'))
-                except RegexMatchError:
-                    self.logfield.insert(END, error_dict.get('RegexMatchError'))
-                except RecordingUnavailable:
-                    self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
-                except MembersOnly:
-                    self.logfield.insert(END, error_dict.get('MembersOnly'))
-                except LiveStreamError:
-                    self.logfield.insert(END, error_dict.get('LiveStreamError'))
-                except HTMLParseError:
-                    self.logfield.insert(END, error_dict.get('HTMLParseError'))
-                except VideoUnavailable:
-                     self.logfield.insert(END, error_dict.get('VideoUnavailable'))
-                self.logfield["state"] = "disabled"
-
-
-            else:
-                self.logfield["state"] = "normal" # disable log after any erros are detected
-
-                query = self.urlfield.get() # gets entry input (the users specifed URL)
-
-                if self.urlfield.get() == "":
-                    self.logfield["state"] = "normal" # disable log after any erros are detected
-
-                elif self.enablePrompts: # hasnt selected video nor audio
-                    self.logfield.insert(END, f'\nERROR: You can\'t download a video with video or audio!\n')
-
-                self.logfield["state"] = "disabled" # disabled the entirity again
+        except RegexMatchError:
+            print("Regex match error! Invalid...")
 
         except HTTPError as err:
             self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -805,6 +548,265 @@ class App:
 
             self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to thr github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
+
+        # Thumbnail download
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.thumbBool = data[0]['Options']['thumbnail']
+            if self.thumbBool:
+                wget.download(yt.thumbnail_url, self.path + "/" + self.filePrefix + yt.title + ".jpg")
+                print("\nDownloading the thumbnail as well :) \nIf your seeing this and your thumbnail setting is off, please delete your config file and restart scout.\nConfig file path: " + self.ymldir + "\n")
+
+
+        if self.videoBool and self.audioBool: # Video and Audio
+            self.logfield["state"] = "normal"
+            try:
+                yt = YouTube(query)
+                res = self.clickedvq.get()
+                # This block searches through a dictionary of known quality values, then suggests available values later
+                streams = str(yt.streams.filter(progressive=True).all())
+                attributes = {
+                    "res": ["1080p", "720p", "480p", "360p", "240p", "144p"],
+                    "fps": [24, 30, 60]
+                }
+                aRes = []
+                aFPS = []
+                for key in attributes: # Looping through "attributes" and "streams" to match available ones
+                    for i in attributes.get(key):
+                        if str(i) in str(streams):
+                            if key == "res":
+                                aRes.append(i) # Put into a list to be printed later
+                            else:
+                                aFPS.append(i)
+                try:
+                    if self.clickedvq.get() == "Quality":
+                        res = aRes[0]
+                    # elif self.clickedvfps.get() == "Fps":
+                    #     fps = aFPS[0]
+                except:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+
+                videoDown = yt.streams.filter(res=res, progressive=True).first()
+                print(res)
+                print(f'\nAvailable stream(s):\n{videoDown}', f'All streams:\n{streams}')
+
+                # Block that converts custom file types, video/audio #
+
+                if videoDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
+
+                    print("Gathered available quality options: ", aRes) # extra verbose input
+                    suggestMsg = f'\nINFO: Try the {aRes} resolutions instead\n'
+                    self.logfield.insert(END, f'{suggestMsg}') # Suggest available values from aRes/aFPS
+
+                    self.logfield["state"] = "disabled"
+                    return
+
+                if self.clickedvf.get() != "mp4": # see if selected file types aren't the default and therefore need to be converted
+                    videoDown.download(self.fileLoc, filename_prefix=self.filePrefix)
+                    os.chdir(self.fileLoc)
+                    # From below we mod the downloaded file for perms to be used with, UNIX system only apply
+                    self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
+                    filtered = yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
+                    subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
+                    self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
+
+                    # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
+                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+
+                    self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
+                    os.remove(f"{filtered}.mp4")
+
+                    print("Original file deleted! Enjoy your converted one")
+
+                    self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n') # This and below show in the log what actually stream object they downloaded with there video. Helpful for debugging!
+                    self.videoFetch(yt, query) # Fetching post-log video info, function up top this download function
+                else:
+                    videoDown.download(self.path, filename_prefix=self.filePrefix)
+                    self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
+                    self.videoFetch(yt, query)
+
+                self.videoFetch(yt, query)
+                self.logfield["state"] = "disabled"
+
+            # Try statments using pytube errors repeats for each selection mode of video
+            except VideoPrivate:
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
+            except RegexMatchError:
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
+            except RecordingUnavailable:
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
+            except MembersOnly:
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
+            except LiveStreamError:
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
+            except HTMLParseError:
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
+            except VideoUnavailable:
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
+            self.logfield["state"] = "disabled"
+
+        lol = pytube.exceptions
+
+        elif self.audioBool:  # Audio only
+            self.logfield["state"] = "normal"
+            try:
+                yt = YouTube(query)
+                audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
+                abr = self.clickedaq.get()
+                streams = str(yt.streams.filter(only_audio=True).all())
+                attributes = {
+                    "abr": ["160kbs", "128kbs", "70kbs", "50kbs"]
+                }
+                aAbr = []
+                for key in attributes:
+                    for i in attributes.get(key):
+                        if str(i) in str(streams):
+                            aAbr.append(i)
+
+                try:
+                    if self.clickedvq.get() == "Quality":
+                        abr = aAbr[0]
+                except:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+
+                print(abr)
+                print(f'\nAvailable stream(s):\n{audioDown}', f'All streams:\n{streams}')
+
+                if audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
+
+                    print("Gathered available quality options: ", aAbr) # extra verbose input
+                    suggestMsg = f'\nINFO: Try the {aAbr} resolutions instead\n'
+                    self.logfield.insert(END, f'{suggestMsg}')
+
+                    self.logfield["state"] = "disabled"
+                    return
+
+                audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
+                os.chdir(self.fileLoc)
+                self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
+                filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
+                self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
+                subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
+                os.remove(f"{filtered}.mp4")
+
+                print("Original file deleted! Enjoy your converted one")
+
+                self.logfield.insert(END, f'\nINFO: The {audioDown}, codec/itag was used.\n')
+
+                self.videoFetch(yt, query)
+                self.logfield["state"] = "disabled"
+
+            # Try statments using pytube errors repeats for each selection mode of video
+            except VideoPrivate:
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
+            except RegexMatchError:
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
+            except RecordingUnavailable:
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
+            except MembersOnly:
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
+            except LiveStreamError:
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
+            except HTMLParseError:
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
+            except VideoUnavailable:
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
+            self.logfield["state"] = "disabled"
+
+
+        elif self.audioBool == False and self.videoBool: # Video only
+            self.logfield["state"] = "normal"
+            if self.enablePrompts:
+                messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
+                self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
+            try:
+                yt = YouTube(query)
+                silent_audioDown = yt.streams.filter(res=self.videoq, only_video=True).first()
+                res = self.clickedvq.get()
+                streams = str(yt.streams.filter(only_video=True).all())
+                print(streams)
+                attributes = {
+                    "res": ["1080p", "720p", "480p", "360p", "240p", "144p"]
+                }
+                aRes = []
+                for key in attributes:
+                    for i in attributes.get(key):
+                        if str(i) in str(streams):
+                            aRes.append(i)
+
+                try:
+                    if self.clickedvq.get() == "Quality":
+                        res = aRes[0]
+                except:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+
+                print(res)
+                print(f'\nAvailable stream(s):\n{silent_audioDown}', f'All streams:\n{streams}')
+
+                if silent_audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                    self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
+
+                    print("Gathered available quality options: ", aRes) # extra verbose input
+                    suggestMsg = f'\nINFO: Try the {aRes} resolutions instead\n'
+                    self.logfield.insert(END, f'{suggestMsg}')
+
+                    self.logfield["state"] = "disabled"
+                    return
+                if self.clickedvf != "mp4":
+                    silent_audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
+                    os.chdir(self.fileLoc)
+                    self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
+                    filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                    subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
+                    self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
+                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
+                    os.remove(f"{filtered}.mp4")
+
+                    print("Original file deleted! Enjoy your converted one")
+
+                    self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
+                else:
+                    silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
+                    self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
+
+                self.videoFetch(yt, query)
+                self.logfield["state"] = "disabled"
+
+            # Try statments using pytube errors repeats for each selection mode of video
+            except VideoPrivate:
+                self.logfield.insert(END, error_dict.get('VideoPrivate'))
+            except RegexMatchError:
+                self.logfield.insert(END, error_dict.get('RegexMatchError'))
+            except RecordingUnavailable:
+                self.logfield.insert(END, error_dict.get('RecordingUnavailable'))
+            except MembersOnly:
+                self.logfield.insert(END, error_dict.get('MembersOnly'))
+            except LiveStreamError:
+                self.logfield.insert(END, error_dict.get('LiveStreamError'))
+            except HTMLParseError:
+                self.logfield.insert(END, error_dict.get('HTMLParseError'))
+            except VideoUnavailable:
+                 self.logfield.insert(END, error_dict.get('VideoUnavailable'))
+            self.logfield["state"] = "disabled"
+
+
+        else:
+            self.logfield["state"] = "normal" # disable log after any erros are detected
+
+            query = self.urlfield.get() # gets entry input (the users specifed URL)
+
+            if self.urlfield.get() == "":
+                self.logfield["state"] = "normal" # disable log after any erros are detected
+
+            elif self.enablePrompts: # hasnt selected video nor audio
+                self.logfield.insert(END, f'\nERROR: You can\'t download a video with video or audio!\n')
+
+            self.logfield["state"] = "disabled" # disabled the entirity again
 
 
     ########################################################################################################
