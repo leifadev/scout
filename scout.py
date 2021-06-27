@@ -646,7 +646,6 @@ class App:
                  self.logfield.insert(END, error_dict.get('VideoUnavailable'))
             self.logfield["state"] = "disabled"
 
-        lol = pytube.exceptions
 
         elif self.audioBool:  # Audio only
             self.logfield["state"] = "normal"
