@@ -2,10 +2,11 @@ import tkinter as tk
 import tkinter as ttk
 from tkinter import ttk
 from tkinter import *
-from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
+from ttkthemes import ThemedTk,THEMES,ThemedStyle # dark mode theme and stuff
 import tkinter.font as tkFont
 import webbrowser
-import pytube
+from pytube import YouTube
+from pytube.exceptions import *
 import getpass
 from ruamel import yaml
 import os
