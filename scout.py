@@ -1,8 +1,8 @@
-import tkinter as tk # main gui framework
-from tkinter import *
+import tkinter as tk
+import tkinter as ttk
 from tkinter import ttk
+from tkinter import *
 from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
-from PIL import Image, ImageTk
 import tkinter.font as tkFont
 import webbrowser
 import pytube
@@ -12,10 +12,10 @@ import os
 import wget
 import ssl
 from sys import platform as _platform
+from PIL import Image, ImageTk
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
-import time
 from zipfile import ZipFile
 from urllib.error import HTTPError
 
