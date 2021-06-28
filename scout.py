@@ -1,25 +1,21 @@
-import tkinter as tk # main gui framework
+import tkinter as tk
+import tkinter as ttk
+from tkinter import ttk
 from tkinter import *
+from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
+import tkinter.font as tkFont
 import webbrowser
-from tkinter.filedialog import askdirectory
-from pytube import YouTube
-from pytube import Playlist
+import pytube
 import getpass
-from tkinter import messagebox
 from ruamel import yaml
 import os
-import tkinter.font as tkFont
-from pytube.exceptions import * # all excpetions I use for error handling in log field
 import wget
 import ssl
 from sys import platform as _platform
-from tkinter import ttk
-from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 from PIL import Image, ImageTk
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
-import time
 from zipfile import ZipFile
 from urllib.error import HTTPError
 
