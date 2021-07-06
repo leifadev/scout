@@ -23,13 +23,11 @@ help:
 
 setup: setup
 	@echo "Setting up project"$
-	pip3 freeze >> requirements.txt && pip freeze >> requirements.txt
-	pip3 install -r requirements.txt && pip install -r requirements.txt
-	@echo "Launching scout, new files will be generated."
-	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
+	rm -rf requirements.txt
+	python setup.py
 
 clean:
-	@echo "Cleaning project\n\n--------------------------"
+	@echo "\nCleaning project...\n\n--------------------------\n"
 	rm -rf *.pyc
 	rm -rf *.pyo
 	rm -rf build/
@@ -37,15 +35,13 @@ clean:
 	rm -rf *.egg-info
 	rm -rf *.build/
 	rm -rf *.dist/
-	rm -rf requirements.txt
-	@echo "\nFreezing your project! Updated requirements.txt\n"
-	pip3 freeze >> requirements.txt
-	pip freeze >> requirements.txt
+	rm -rf __pycache__
+	@echo "\nFreezing your project! Updated requirements.txt"
 	@echo "\n--------------------------"
+	@echo "\nMake sure to checkout the project at https://github.com/leifadev/scout\n"
 
 
 build:
 	@echo "Building standalone application, pip is required!"
-	pip3 install pyinstaller && pip install pyinstaller
-	$ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
+	@python3 setup.py
 	@echo "Done building! :)"

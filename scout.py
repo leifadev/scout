@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter as ttk
 from tkinter import ttk
 from tkinter import *
+from tkinter.filedialog import askdirectory
+from tkinter import messagebox
 from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 import tkinter.font as tkFont
 import webbrowser
