@@ -24,7 +24,7 @@ help:
 setup: setup
 	@echo "Setting up project"$
 	rm -rf requirements.txt
-	python setup.py
+	@echo "Use make build to build :)"
 
 clean:
 	@echo "\nCleaning project...\n\n--------------------------\n"
