@@ -1097,7 +1097,7 @@ class App:
             self.aprilFools["fg"] = "black"
 
         # print(datetime.now())
-        if "-07-06" in str(datetime.now()):
+        if "-04-01" in str(datetime.now()):
             self.aprilFools.place(x=190,y=290,width=200)
         else:
             pass
