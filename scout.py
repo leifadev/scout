@@ -8,7 +8,7 @@ from tkinter import messagebox
 from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
 import tkinter.font as tkFont
 import webbrowser
-from pytube import Youtube
+import pytube as Youtube
 import getpass
 from ruamel import yaml
 import os
@@ -24,7 +24,7 @@ from urllib.error import HTTPError
 
 
 class App:
-    def __init__(self, root):
+    def __init__(self, parent):
 
         # Iniatiating variables for all sorts of stuff
         self.audioBool = False
@@ -147,13 +147,13 @@ class App:
                 os.chdir(self.fileLoc)
                 print(os.getcwd())
                 f = open("settings.yml","w+")
-                f.close
+                f.close()
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
                 print("if statement passes")
         # makes a copy of the newest yml/settings structure
         os.chdir(self.fileLoc)
         cache = open("cache.yml", "w+")
-        cache.close
+        cache.close()
         yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
         print("Cache updated!")
 
@@ -181,7 +181,7 @@ class App:
                         data = yaml.load(yml, Loader=yaml.Loader)
                         os.chdir(self.fileLoc)
                         cache = open("cache.yml", "w+")
-                        cache.close
+                        cache.close()
                         yaml.dump(self.payload, yml, Dumper=yaml.RoundTripDumper)
                         print("Cache updated!")
 
@@ -207,37 +207,37 @@ class App:
 
         ## Attributes ##
 
-        root.title("Scout")
-        root.tk.call('wm', 'iconphoto', root._w, self.icon)
+        parent.title("Scout")
+        parent.tk.call('wm', 'iconphoto', parent._w, self.icon)
 
         width=845
         height=350
-        screenwidth = root.winfo_screenwidth()
-        screenheight = root.winfo_screenheight()
+        screenwidth = parent.winfo_screenwidth()
+        screenheight = parent.winfo_screenheight()
         style = ttk.Style()
 
         with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.darkMode = data[0]['Options']['darkMode']
             if self.darkMode:
-                root.set_theme("equilux")
+                parent.set_theme("equilux")
             else:
                 if _platform == "darwin":
-                    root['bg'] = "#ececec"
+                    parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
                 elif _platform == "linux" or _platform == "linux2":
-                    root['bg'] = "#ececec"
+                    parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
 
 
         alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
-        root.geometry(alignstr)
-        root.resizable(width=False, height=False)
+        parent.geometry(alignstr)
+        parent.resizable(width=False, height=False)
 
         # DEPRECATED \/\/\/
         ## area where clicks are detected ##
 
-#        frame = Frame(root, width=100, height=30)
+#        frame = Frame(parent, width=100, height=30)
 #        frame.bind("<Button-1>", leftclick)
 #        frame.place(x=170,y=300,width=35)
 #        if self.darkMode:
@@ -255,20 +255,20 @@ class App:
 
         ## Menu items ##
 
-        menubar = Menu(root)
+        menubar = Menu(parent)
         filemenu = Menu(menubar)
         filemenu = Menu(menubar, tearoff=0)
 
-        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: root.focus_get().event_generate('<<Cut>>'))
+        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: parent.focus_get().event_generate('<<Cut>>'))
 
-        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: root.focus_get().event_generate('<<Copy>>'))
+        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: parent.focus_get().event_generate('<<Copy>>'))
 
-        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: root.focus_get().event_generate('<<Paste>>'))
-        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: root.focus_get().select_range(0, 'end'))
+        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: parent.focus_get().event_generate('<<Paste>>'))
+        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: parent.focus_get().select_range(0, 'end'))
 
         filemenu.add_separator()
 
-        filemenu.add_command(label="Exit", accelerator="Command+Q", command=root.quit)
+        filemenu.add_command(label="Exit", accelerator="Command+Q", command=parent.quit)
         menubar.add_cascade(label="File", menu=filemenu)
 
         helpmenu = Menu(menubar)
@@ -280,64 +280,64 @@ class App:
         helpmenu.add_command(label="Settings", command=self.settings_button)
         menubar.add_cascade(label="About", menu=helpmenu)
 
-        root.config(menu=menubar)
-        root.update()   # Updates window at startup to be interactive and lifted, DO NOT TOUCH
+        parent.config(menu=menubar)
+        parent.update()   # Updates window at startup to be interactive and lifted, DO NOT TOUCH
 
 
         ## Elements ##
 
-        root.lift() # lift window to the top
+        parent.lift() # lift window to the top
 
-        self.urlfield = ttk.Entry(root)
+        self.urlfield = ttk.Entry(parent)
         self.urlfield["justify"] = "left"
         self.urlfield["text"] = ""
         self.urlfield.insert(0, '')   # add pre made message
         self.urlfield.place(x=20,y=60,width=540)
 
 
-        self.downloadButton=ttk.Button(root)
+        self.downloadButton=ttk.Button(parent)
 #        self.downloadButton["justify"] = "center"
         self.downloadButton["text"] = "Download"
         self.downloadButton.place(x=570,y=59,width=120)
         self.downloadButton["command"] = self.downloadButton_command
 
 
-        self.browseButton=ttk.Button(root)
+        self.browseButton=ttk.Button(parent)
         self.browseButton["text"] = "File Destination"
         self.browseButton["command"] = self.browseButton_command
         self.browseButton.place(x=690,y=59,width=140)
 
 
-        self.videoButton=tk.Checkbutton(root)
+        self.videoButton=tk.Checkbutton(parent)
         self.videoButton["text"] = "Video"
         self.videoButton.place(x=730,y=130,width=70,height=30)
         self.videoButton["offvalue"] = False
         self.videoButton["onvalue"] = True
         self.videoButton["command"] = self.videoButton_command
 
-        self.audioButton=tk.Checkbutton(root)
+        self.audioButton=tk.Checkbutton(parent)
         self.audioButton["text"] = "Audio"
         self.audioButton.place(x=730,y=190,width=70,height=30)
         self.audioButton["offvalue"] = False
         self.audioButton["onvalue"] = True
         self.audioButton["command"] = self.audioButton_command
 
-        helpButton=ttk.Button(root)
+        helpButton=ttk.Button(parent)
         helpButton["text"] = "Help"
         helpButton.place(x=20,y=300,width=70)
         helpButton["command"] = self.helpButton_command
 
-        clearButton=ttk.Button(root)
+        clearButton=ttk.Button(parent)
         clearButton["text"] = "Clear"
         clearButton.place(x=95,y=300,width=70)
         clearButton["command"] = self.clearConsole_command
 
-        self.modeButton=ttk.Button(root)
+        self.modeButton=ttk.Button(parent)
         self.modeButton.place(x=170,y=300,width=100)
         self.modeButton["command"] = self.switchMode
 
-        self.versionText = tk.Label(root)
-        self.versionText = Label(root, text=self.version)
+        self.versionText = tk.Label(parent)
+        self.versionText = Label(parent, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"))
 
@@ -346,25 +346,25 @@ class App:
 
         self.clickedvf = StringVar()
         self.clickedvf.set("mp4")
-        self.videoformat = ttk.OptionMenu(root, self.clickedvf, "mp4", "mp4", "mov", "webm")
+        self.videoformat = ttk.OptionMenu(parent, self.clickedvf, "mp4", "mp4", "mov", "webm")
         # self.videoformat.place(x=650, y=121, width=70, height=30)
         self.videoformat["state"] = "normal"
 
 
         self.clickedaf = StringVar()
         self.clickedaf.set("mp4")
-        self.audioformat = ttk.OptionMenu(root, self.clickedaf, "mp3", "mp3", "wav", "ogg")
+        self.audioformat = ttk.OptionMenu(parent, self.clickedaf, "mp3", "mp3", "wav", "ogg")
         # self.audioformat.place(x=650, y=171, width=70, height=30)
         self.audioformat["state"] = "normal"
 
         self.clickedvq = StringVar()
         self.clickedvq.set("Quality")
-        self.videoquality = ttk.OptionMenu(root, self.clickedvq, "Quality", "1080p", "720p", "480p", "360p", "240p", "144p")
+        self.videoquality = ttk.OptionMenu(parent, self.clickedvq, "Quality", "1080p", "720p", "480p", "360p", "240p", "144p")
         self.videoquality["state"] = "normal"
 
         self.clickedaq = StringVar()
         self.clickedaq.set("Quality")
-        self.audioquality = ttk.OptionMenu(root, self.clickedaq, "Quality", "160kbs", "128kbs", "70kbs", "50kbs")
+        self.audioquality = ttk.OptionMenu(parent, self.clickedaq, "Quality", "160kbs", "128kbs", "70kbs", "50kbs")
         self.audioquality["state"] = "normal"
 
 
@@ -393,7 +393,7 @@ class App:
         # Logfield #
         # Comes with error handling, video info, system/scout info/errors
 
-        self.logfield = tk.Text(root)
+        self.logfield = tk.Text(parent)
         self.logfield.place(x=20,y=100,width=540, height=180)
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
@@ -587,7 +587,7 @@ class App:
                     # elif self.clickedvfps.get() == "Fps":
                     #     fps = aFPS[0]
                 except:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
 
                 videoDown = yt.streams.filter(res=res, progressive=True).first()
                 print(res)
@@ -595,7 +595,7 @@ class App:
 
                 # Block that converts custom file types, video/audio #
 
-                if videoDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                if videoDown is None: # This tiny block for error handling no known download settings, suggests them afterwards
                     self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
 
                     print("Gathered available quality options: ", aRes) # extra verbose input
@@ -669,13 +669,13 @@ class App:
                 try:
                     if self.clickedvq.get() == "Quality":
                         abr = aAbr[0]
-                except:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+                except Exception as e:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
 
                 print(abr)
                 print(f'\nAvailable stream(s):\n{audioDown}', f'All streams:\n{streams}')
 
-                if audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                if audioDown is None: # This tiny block for error handling no known download settings, suggests them afterwards
                     self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
 
                     print("Gathered available quality options: ", aAbr) # extra verbose input
@@ -739,17 +739,17 @@ class App:
                     for i in attributes.get(key):
                         if str(i) in str(streams):
                             aRes.append(i)
-
                 try:
                     if self.clickedvq.get() == "Quality":
                         res = aRes[0]
-                except:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!")
+
+                except Exception as e:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
 
                 print(res)
                 print(f'\nAvailable stream(s):\n{silent_audioDown}', f'All streams:\n{streams}')
 
-                if silent_audioDown == None: # This tiny block for error handling no known download settings, suggests them afterwards
+                if silent_audioDown is None: # This tiny block for error handling no known download settings, suggests them afterwards
                     self.logfield.insert(END, f'\nERROR: This video is unavailable with these download settings!\n')
 
                     print("Gathered available quality options: ", aRes) # extra verbose input
@@ -838,7 +838,7 @@ class App:
         self.maxModeUse += 1
         if self.maxModeUse == 1:
             self.modeButton["state"] = "disabled"
-            self.maxWarn = Label(root, text=self.version)
+            self.maxWarn = Label(parent, text=self.version)
             if self.darkMode:
                 self.maxWarn["fg"] = "#464646" # light theme gray
                 self.maxWarn["bg"] = "#ececec"
@@ -1217,8 +1217,8 @@ class App:
 # https://docs.python.org/3/library/subprocess.html || subprocess docs
 
 
-# Declaring root and looping it :D
+# Declaring parent and looping it :D
 if __name__ == "__main__":
-    root = ThemedTk(themebg=True)
-    app = App(root)
-    root.mainloop()
+    parent = ThemedTk(themebg=True)
+    app = App(parent)
+    parent.mainloop()
