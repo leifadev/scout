@@ -147,14 +147,14 @@ class App:
                 os.chdir(self.fileLoc)
                 print(os.getcwd())
                 f = open("settings.yml","w+")
-                f.close()
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
                 print("if statement passes")
+                f.close()
         # makes a copy of the newest yml/settings structure
         os.chdir(self.fileLoc)
         cache = open("cache.yml", "w+")
-        cache.close()
         yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
+        cache.close()
         print("Cache updated!")
 
 
