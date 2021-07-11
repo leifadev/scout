@@ -10,7 +10,6 @@ you have a github account :)
 Thank you for supporting by downloading Scout :D
 
 """
-
 import glob
 import subprocess
 import os
@@ -33,10 +32,13 @@ class setup:
         ##########################################
 
         # print(os.getcwd())
-        print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **\n")
-        time.sleep(1)
-        print("Starting compile process...")
+        print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **")
+        print(" *** RUN WITH ELEVATED PRIVILAGES ***")
+        print("\nNote: Elevated priviledges are needed for the dist/ folder deletetion, same as make clean\n\n")
 
+        time.sleep(1)
+
+        print("Starting compile process...")
 
         self.moveOn = (input("What python path/version are you using? (python, python3.8): "))
         if "python" in self.moveOn:
@@ -113,7 +115,7 @@ class setup:
         print("Debug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.")
 
         # Asking for compile options
-        debug = str(input("\nPress enter for windowed mode, type anything for debug mode: "))
+        self.debug = str(input("\nPress enter for windowed mode, type anything for debug mode: "))
 
         print(f'\nFound these image files in current working directory\nDetected Possible Icons:')
 
@@ -130,33 +132,39 @@ class setup:
             print(f'[{key}]: {options.get(key)}')
 
 
-        icon = str(input("\nPress enter to skip setting an icon, or specify file name: "))
+        self.icon = str(input("\nPress enter to skip setting an icon, or specify file name: "))
 
         try:
-            if int(icon) in range(0,3):
-                for key, value in enumerate(options):
-                    if icon == key:
-                        icon = options.get(key)
-                        print(icon)
+            if self.icon != "":
+                if int(self.icon) in range(0,3):
+                    for key, value in enumerate(options):
+                        self.icon = options.get(key)
                     else:
                         pass
+                else:
+                    print("Not a valid option! If you don't see your icon, it may not be supported!\nAdd your file extension in setup.py at line 32")
+                    return
             else:
-                print("Not a valid option! If you don't see your icon, it may not be supported!\nAdd your file extension in setup.py at line 32")
-                return
+                pass
         except NameError as e:
             print(f'Detected no specifed icon...')
             print(e)
 
+        # get rid of bs
+        self.icon = str(self.icon)
+        self.icon = self.icon.translate({ord(i): None for i in '[],'})
 
-        name = str(input("Press enter for no name of your app, other wise specify: "))
+        self.name = str(input("Press enter for no name of your app, other wise specify: "))
 
-        bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
+        self.bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
 
-        while "." not in bundleId:
-            uSure = input("\nYour bundle ID didn't include any periods to seperate the developer \nand the apps name for example.\nDo you want to try again? Y/n: ")
-            if uSure in "Yy":
-                continue
-            elif uSure in "Nn":
+        while "." not in self.bundleId:
+            self.bundleWarn = input("\nYour bundle ID didn't include any periods to seperate the developer \nand the apps name for example.\nDo you want to try again? Y/n: ")
+            if self.bundleWarn in "Yy":
+                self.bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
+            elif self.bundleWarn in "Nn":
+                if self.bundleId == "":
+                    self.bundleId = "com.leifadev.scout"
                 break
             else:
                 continue
@@ -164,18 +172,19 @@ class setup:
             pass
 
         # config final variable forms
-        for x in (icon, name, bundleId):
-            if x is None or "":
-                print(f'Counted a parameter be none value')
-                x = ""
-        if debug == "":
-            debug = "--windowed"
+
+        if self.bundleWarn == "":
+            self.bundleId = "com.leifadev.scout"
         else:
-            debug = "--console"
+            pass
 
+        if self.debug == "":
+            self.debug = "--windowed"
+        else:
+            self.debug = "--console"
 
-        print(f'\n-------------------------------\nYou have configured debug to "{debug}",\nYou have configured your icon to the path: "{icon}",\nYou have configured name to be: "{name}",\nYou configured bundle ID is: "{bundleId}"\n\nSettings saved!\n-------------------------------')
-        time.sleep(3)
+        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: "{self.icon}",\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
+        time.sleep(2)
 
         print("Are you sure you want to compile?")
         comp = input("Do you want to proceed? Y/n: ")
@@ -185,13 +194,22 @@ class setup:
             return
         else:
             return
+
+        subprocess.run("make clean", shell=True)
+        os.remove("dist/")
+        print(f'Removing dist folder, unnecesssary if you are running with admin priviledges, etc.')
+
+        time.sleep(2)
+
         # compile command
         try:
-            # print(f'Compiling configurations: {debug}, {icon}, {name}, {bundleId}')
-            subprocess.run(f'{self.version} -m PyInstaller --onefile {debug} --icon={icon} --osx-bundle-identifier={bundleId} -n={name} scout.py', shell=True)
+            # print(f'Compiling configurations: {self.debug}, {self.icon}, {self.name}, {self.bundleId}')
+            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py', shell=True)
 
         except ModuleNotFoundError as e:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
+        except PermissionError as d:
+            print(f"Permission error! This script doesn't have certain permissions.\n{d}")
 
 
 if __name__ == '__main__':
