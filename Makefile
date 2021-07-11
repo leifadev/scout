@@ -37,6 +37,7 @@ clean:
 	rm -rf *.egg-info
 	rm -rf *.build/
 	rm -rf *.dist/
+	rm -rf __pycache__/
 	rm -rf requirements.txt
 	@echo "\nFreezing your project! Updated requirements.txt\n"
 	pip3 freeze >> requirements.txt
@@ -48,4 +49,4 @@ build:
 	@echo "Building standalone application, pip is required!"
 	@echo "Change your PYTHON path in Makefile accordingly if I fail!"
 	@${PYTHON} setup.py
-	@echo "Done building! :)"
+	@echo "Done with session! :)"
