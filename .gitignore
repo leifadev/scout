@@ -6,6 +6,6 @@ dist/
 .DS_Store
 *.pyc
 .swp
-Scout.spec
 .idea/.name
 Scout.spec
+requirements.txt
