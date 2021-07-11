@@ -1038,7 +1038,7 @@ class App:
         self.prefixMenu = ttk.Button(sWin)
         self.prefixMenu["text"] = "Toggle Off"
         self.prefixMenu.place(x=292,y=137,width=110)
-        self.prefixMenu["command"] = self.togglePrefix   # SECOND
+        self.prefixMenu["command"] = self.togglePrefix
 
         self.prefixTip = ttk.Label(sWin)
         self.prefixTip = Label(sWin, text="File Prefix")
