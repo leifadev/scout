@@ -38,7 +38,7 @@ class setup:
         print("Starting compile process...")
 
 
-        self.moveOn = (input("What pip version are you using? (python, python3.8): "))
+        self.moveOn = (input("What python path/version are you using? (python, python3.8): "))
         if "python" in self.moveOn:
             self.version = "python"
             print("You selected: " + self.version)

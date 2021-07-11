@@ -46,6 +46,6 @@ clean:
 
 build:
 	@echo "Building standalone application, pip is required!"
-	pip3 install pyinstaller && pip install pyinstaller
-	$ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout"  ${PROJECT_MAIN}
+	@echo "Change your PYTHON path in Makefile accordingly if I fail!"
+	@${PYTHON} setup.py
 	@echo "Done building! :)"
