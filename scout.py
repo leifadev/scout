@@ -147,14 +147,14 @@ class App:
                 os.chdir(self.fileLoc)
                 print(os.getcwd())
                 f = open("settings.yml","w+")
-                f.close()
                 yaml.dump(self.payload, f, Dumper=yaml.RoundTripDumper)
                 print("if statement passes")
+                f.close()
         # makes a copy of the newest yml/settings structure
         os.chdir(self.fileLoc)
         cache = open("cache.yml", "w+")
-        cache.close()
         yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
+        cache.close()
         print("Cache updated!")
 
 
@@ -181,6 +181,7 @@ class App:
                         data = yaml.load(yml, Loader=yaml.Loader)
                         os.chdir(self.fileLoc)
                         cache = open("cache.yml", "w+")
+                        print("s")
                         cache.close()
                         yaml.dump(self.payload, yml, Dumper=yaml.RoundTripDumper)
                         print("Cache updated!")
@@ -336,6 +337,7 @@ class App:
         self.modeButton.place(x=170,y=300,width=100)
         self.modeButton["command"] = self.switchMode
 
+
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
         self.versionText.place(x=795,y=300,width=40,height=25)
@@ -387,8 +389,15 @@ class App:
             self.audioButton["bg"] = "#ececec"
             self.videoButton["bg"] = "#ececec"
 
-
-
+        # Loading dark mode value from settings.yml for inital launch
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.darkMode = data[0]['Options']['darkMode']
+            if self.darkMode:
+                self.modeButton["text"] = "Light Mode"
+            else:
+                self.modeButton["text"] = "Dark Mode"
 
         # Logfield #
         # Comes with error handling, video info, system/scout info/errors
@@ -405,15 +414,8 @@ class App:
         else:
             self.logfield["bg"] = "#f6f6f6" # if you want change this into 1 line for a bg dont keep it there for future adjustments
 
-        # Loading dark mode value from settings.yml for inital launch
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-            self.enablePrompts = data[0]['Options']['errorChoice']
-            self.darkMode = data[0]['Options']['darkMode']
-            if self.darkMode:
-                self.modeButton["text"] = "Light Mode"
-            else:
-                self.modeButton["text"] = "Dark Mode"
+    # Loading dark mode value from settings.yml for inital launch
+
 
 
     #############################################################################
@@ -824,22 +826,14 @@ class App:
             self.darkMode = False
             self.modeButton["text"] = "Dark Mode"
 
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-
-        with open(self.ymldir,"w+") as yml: # updates dark mode boolean to YML settings
-            data[0]['Options']['darkMode'] = self.darkMode
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            self.darkMode = data[0]['Options']['darkMode']
-            print(self.darkMode)
-        print("\nCurrently updating settings.yml...")
+        self.dump('darkMode', self.darkMode)
 
         # Stop more than 1 use for user to restart app, avoid spam clicking issues and such
         self.maxModeUse += 1
         if self.maxModeUse == 1:
             self.modeButton["state"] = "disabled"
             self.maxWarn = Label(parent, text=self.version)
-            if self.darkMode:
+            if self.darkMode == False:
                 self.maxWarn["fg"] = "#464646" # light theme gray
                 self.maxWarn["bg"] = "#ececec"
             else:
@@ -904,6 +898,9 @@ class App:
 
     # Clear the whole test entry, deleting line until the end, still restarting the welcome message!
     def clearConsole_command(self):
+        with open(self.ymldir,"r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice'] # Fetch any set default directories specificed in settings pane
         self.logfield["state"] = "normal"
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
@@ -956,7 +953,7 @@ class App:
             self.abtTitle["fg"] = "black"
 
         ## All below are just the elements to the about pane, you can figure these out I'm sure :)
-        abtMsg = "Author: leifadev\nLicense: GPL/GNU v3\nVersion: " + self.version + "\n\nLanguage: Python 3\nCompilier: Pyinstaller\nFramework: Tkinter"
+        abtMsg = "Author: leifadev\nLicense: GPL/GNU v3\nVersion: " + self.version + "\n\nLanguage: Python 3.6+\nCompilier: Pyinstaller\nFramework: Tkinter"
         self.msg = ttk.Label(abt)
         self.msg = Label(abt, text=abtMsg, anchor=CENTER, wraplength=160, justify=CENTER)
         self.msg.place(x=50,y=40,width=200)
@@ -981,6 +978,12 @@ class App:
 
     # Settings pane UI and scripting
     def settings_button(self): # Settings pane, offers custiomizable features!
+        with open(self.ymldir, "r") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.darkMode = data[0]['Options']['darkMode']
+            self.filePrefix = data[0]['Options']['hasFilePrefix']
+            self.thumbBool = data[0]['Options']['thumbnail']
 
         sWin = ThemedTk(themebg=True)
         sWin.iconbitmap = PhotoImage(file=self.fileLoc + "scout_logo.png")
@@ -1040,7 +1043,7 @@ class App:
         self.prefixMenu = ttk.Button(sWin)
         self.prefixMenu["text"] = "Toggle Off"
         self.prefixMenu.place(x=292,y=137,width=110)
-        self.prefixMenu["command"] = self.togglePrefix
+        self.prefixMenu["command"] = self.togglePrefix   # SECOND
 
         self.prefixTip = ttk.Label(sWin)
         self.prefixTip = Label(sWin, text="File Prefix")
@@ -1110,8 +1113,6 @@ class App:
     def defaultDir_command(self):
         self.path = askdirectory()
         print(self.path)
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
 
         with open(self.ymldir,"w+") as yml:
             data[0]['Options']['changedDefaultDir'] = True
@@ -1120,9 +1121,6 @@ class App:
 
 
     def resetDefaultDir_command(self):
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-
         with open(self.ymldir,"w+") as yml:
             data[0]['Options']['changedDefaultDir'] = False
             data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
@@ -1133,21 +1131,15 @@ class App:
 
 
     def togglePrefix(self): # Coudln't use the function for this, sticking with the value being a string for the sake of it
-        with open(self.ymldir,"r") as yml:
-            data = yaml.load(yml, Loader=yaml.Loader)
-
-        with open(self.ymldir,"w+") as yml:
-            if self.prefixMenu['text'] == "Toggle On":
-                self.filePrefix = ""
-                self.prefixMenu["text"] = "Toggle Off"
-                print("Prefix off!")
-            else:
-                self.filePrefix = "Scout_"
-                self.prefixMenu["text"] = "Toggle On"
-                print("Prefix on!")
-
-            data[0]['Options']['hasFilePrefix'] = self.filePrefix
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+        if self.prefixMenu['text'] == "Toggle On":
+            self.filePrefix = ""
+            self.prefixMenu["text"] = "Toggle Off"
+            print("Prefix off!")
+        else:
+            self.filePrefix = "Scout_"
+            self.prefixMenu["text"] = "Toggle On"
+            print("Prefix on!")
+        self.dump('hasFilePrefix', self.filePrefix)
 
 
     def toggleThumb(self):
@@ -1167,45 +1159,55 @@ class App:
         self.dump('errorChoice', self.enablePrompts)
 
 
+
     def updateButtons(self):
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            l = ["errorChoice", "hasFilePrefix", "thumbnail"]
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.filePrefix = data[0]['Options']['hasFilePrefix']
+            self.thumbBool = data[0]['Options']['thumbnail']
+        l = ["errorChoice", "hasFilePrefix", "thumbnail"]
 
-            for i in data[0]['Options']:
-                if i in l:
-                    if i == 'errorChoice':
-                        self.errorChoice = data[0]['Options'][str(i)]
-                        if self.errorChoice:
-                            self.warnMenu["text"] = "Toggle Off"
-                        else:
-                            self.warnMenu["text"] = "Toggle On"
+        for i in data[0]['Options']:
+            if i in l:
+                if i == 'errorChoice':
+                    self.errorChoice = data[0]['Options'][str(i)]
+                    if self.errorChoice:
+                        self.warnMenu["text"] = "Toggle Off"
+                    else:
+                        self.warnMenu["text"] = "Toggle On"
 
-                    elif i == 'hasFilePrefix':
-                        self.filePrefix = data[0]['Options'][str(i)]
-                        if self.filePrefix:
-                            self.prefixMenu["text"] = "Toggle Off"
-                        else:
-                            self.prefixMenu["text"] = "Toggle On"
+                elif i == 'hasFilePrefix':
+                    self.filePrefix = data[0]['Options'][str(i)]
+                    if self.filePrefix:
+                        self.prefixMenu["text"] = "Toggle Off"
+                    else:
+                        self.prefixMenu["text"] = "Toggle On"
 
-                    elif i == 'thumbnail':
-                        self.thumbBool = data[0]['Options'][str(i)]
-                        if self.thumbBool:
-                            self.thumbMenu["text"] = "Toggle Off"
-                        else:
-                            self.thumbMenu["text"] = "Toggle On"
+                elif i == 'thumbnail':
+                    self.thumbBool = data[0]['Options'][str(i)]
+                    if self.thumbBool:
+                        self.thumbMenu["text"] = "Toggle Off"
+                    else:
+                        self.thumbMenu["text"] = "Toggle On"
 
-    # Dump function to write new values made by toggle buttons
+
+
+    # Dump function to write new values made by toggle buttons, etc.
     def dump(self, setting, var):
-        with open(self.ymldir,"r") as yml:
+        with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-#            print(str(data))
+            # print(f'\nHERE IT IS\n{data}\n')
+            self.enablePrompts = data[0]['Options']['errorChoice']
+            self.darkMode = data[0]['Options']['darkMode']
+            self.filePrefix = data[0]['Options']['hasFilePrefix']
+            self.thumbBool = data[0]['Options']['thumbnail']
 
-        with open(self.ymldir,"w+") as yml:
-            data[0]['Options'][setting] = not data[0]['Options'][setting]
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            var = data[0]['Options'][setting]
-            print(var)
+            with open(self.ymldir,"w+") as yml:
+                data[0]['Options'][setting] = not data[0]['Options'][setting]
+                write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+                var = data[0]['Options'][setting]
+                print(var, setting)
         print("\nCurrently updating settings.yml...")
 
 
