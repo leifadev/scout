@@ -23,11 +23,13 @@ help:
 
 setup: setup
 	@echo "Setting up project"$
-	rm -rf requirements.txt
-	@echo "Use make build to build :)"
+	pip3 freeze >> requirements.txt && pip freeze >> requirements.txt
+	pip3 install -r requirements.txt && pip install -r requirements.txt
+	@echo "Launching scout, new files will be generated."
+	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
 
 clean:
-	@echo "\nCleaning project...\n\n--------------------------\n"
+	@echo "Cleaning project\n\n--------------------------"
 	rm -rf *.pyc
 	rm -rf *.pyo
 	rm -rf build/
@@ -35,13 +37,14 @@ clean:
 	rm -rf *.egg-info
 	rm -rf *.build/
 	rm -rf *.dist/
-	rm -rf __pycache__
-	@echo "\nFreezing your project! Updated requirements.txt"
+	rm -rf __pycache__/
+	rm -rf requirements.txt
+	@echo "\nFreezing your project! Updated requirements.txt\n"
 	@echo "\n--------------------------"
-	@echo "\nMake sure to checkout the project at https://github.com/leifadev/scout\n"
 
 
 build:
 	@echo "Building standalone application, pip is required!"
-	@python3 setup.py
-	@echo "Done building! :)"
+	@echo "Change your PYTHON path in Makefile accordingly if I fail!"
+	@${PYTHON} setup.py
+	@echo "Done with session! :)"
