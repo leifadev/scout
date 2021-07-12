@@ -24,7 +24,7 @@ exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.zipfiles,
-          a.datas,  
+          a.datas,
           [],
           name='Scout',
           debug=False,
@@ -37,8 +37,8 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None , icon='1')
+          entitlements_file=None , icon='/images/scout_logo.icns')
 app = BUNDLE(exe,
              name='Scout.app',
-             icon='1',
-             bundle_identifier='wer')
+             icon='scout_logo.icns',
+             bundle_identifier='com.leifadev.scout')
