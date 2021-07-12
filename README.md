@@ -27,7 +27,7 @@ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="
 | OS Platform | Supported   |
 | ------- | ------------------|
 | Windows 10 | :white_check_mark:|
-| MacOS 10.15-16 | :white_check_mark: |
+| MacOS 10.11-16 | :white_check_mark: |
 | Linux   | :white_check_mark: |
 
 *Since this is based only with python it is versatile for OS support*
