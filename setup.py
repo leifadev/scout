@@ -213,6 +213,7 @@ class setup:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
         except PermissionError as d:
             print(f"Permission error! This script doesn't have certain permissions.\n{d}")
+            
 
 
 if __name__ == '__main__':
