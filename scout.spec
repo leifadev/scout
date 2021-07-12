@@ -37,8 +37,8 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None , icon='1')
+          entitlements_file=None )
 app = BUNDLE(exe,
              name='Scout.app',
-             icon='1',
-             bundle_identifier='wer')
+             icon=None,
+             bundle_identifier='com.leifadev.scout')
