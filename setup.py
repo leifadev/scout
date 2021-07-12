@@ -183,7 +183,7 @@ class setup:
         else:
             self.debug = "--console"
 
-        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: "{self.icon}",\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
+        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
         time.sleep(2)
 
         print("Are you sure you want to compile?")
@@ -195,8 +195,8 @@ class setup:
         else:
             return
 
+
         subprocess.run("make clean", shell=True)
-        os.remove("dist/")
         print(f'Removing dist folder, unnecesssary if you are running with admin priviledges, etc.')
 
         time.sleep(2)
