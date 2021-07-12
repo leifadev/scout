@@ -29,7 +29,7 @@ setup: setup
 	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
 
 clean:
-	@echo "Cleaning project\n\n--------------------------"
+	@echo "Cleaning project\n\n--------------------------\n"
 	rm -rf *.pyc
 	rm -rf *.pyo
 	rm -rf build/
@@ -39,7 +39,7 @@ clean:
 	rm -rf *.dist/
 	rm -rf __pycache__/
 	rm -rf requirements.txt
-	@echo "\nFreezing your project! Updated requirements.txt\n"
+	@echo "\nFreezing your project! Updated requirements.txt"
 	@echo "\n--------------------------"
 
 
