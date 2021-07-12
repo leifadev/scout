@@ -10,6 +10,7 @@ you have a github account :)
 Thank you for supporting by downloading Scout :D
 
 """
+
 import glob
 import subprocess
 import os
@@ -117,6 +118,12 @@ class setup:
         # Asking for compile options
         self.debug = str(input("\nPress enter for windowed mode, type anything for debug mode: "))
 
+        if self.debug == "":
+            self.debug = "--windowed"
+        else:
+            self.debug = "--console"
+        print(f'\nYou chose:\n>>{self.debug}<<\n')
+
         print(f'\nFound these image files in current working directory\nDetected Possible Icons:')
 
         options = {}
@@ -131,14 +138,20 @@ class setup:
         for key in options:
             print(f'[{key}]: {options.get(key)}')
 
-
         self.icon = str(input("\nPress enter to skip setting an icon, or specify file name: "))
 
         try:
             if self.icon != "":
                 if int(self.icon) in range(0,3):
                     for key, value in enumerate(options):
-                        self.icon = options.get(key)
+                        if str(self.icon) == str(key):
+                            self.icon = (options.get(key))
+                            print(f'\nYou chose:\n[{key}]: {self.icon}')
+                        else:
+                            pass
+                            # print(key, self.icon)
+                            # print("---")
+
                     else:
                         pass
                 else:
@@ -150,11 +163,20 @@ class setup:
             print(f'Detected no specifed icon...')
             print(e)
 
+        print("")
+
         # get rid of bs
         self.icon = str(self.icon)
         self.icon = self.icon.translate({ord(i): None for i in '[],'})
 
         self.name = str(input("Press enter for no name of your app, other wise specify: "))
+
+        if self.name == "":
+            self.name = "Scout"
+        else:
+            pass
+
+        print(f'\nYou chose:\n>>{self.name}<<\n')
 
         self.bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
 
@@ -171,19 +193,9 @@ class setup:
         else:
             pass
 
-        # config final variable forms
+        # if self.bundleWarn == "":
+        #     self.bundleId = "com.leifadev.scout"
 
-        if self.bundleWarn == "":
-            self.bundleId = "com.leifadev.scout"
-        elif self.name == "":
-            self.name = "Scout"
-        else:
-            pass
-
-        if self.debug == "":
-            self.debug = "--windowed"
-        else:
-            self.debug = "--console"
 
         print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
         time.sleep(2)
@@ -213,7 +225,7 @@ class setup:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
         except PermissionError as d:
             print(f"Permission error! This script doesn't have certain permissions.\n{d}")
-            
+
 
 
 if __name__ == '__main__':
