@@ -9,3 +9,4 @@ dist/
 .idea/.name
 Scout.spec
 requirements.txt
+*.spec
