@@ -40,8 +40,6 @@ clean:
 	rm -rf __pycache__/
 	rm -rf requirements.txt
 	@echo "\nFreezing your project! Updated requirements.txt\n"
-	pip3 freeze >> requirements.txt
-	pip freeze >> requirements.txt
 	@echo "\n--------------------------"
 
 
