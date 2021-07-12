@@ -34,7 +34,7 @@ class setup:
         # print(os.getcwd())
         print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **")
         print(" *** RUN WITH ELEVATED PRIVILAGES ***")
-        print("\nNote: Elevated priviledges are needed for the dist/ folder deletetion, same as make clean\n\n")
+        print("\nNote: Elevated priviledges are needed for the dist/ folder deletetion, same as make clean\n")
 
         time.sleep(1)
 
@@ -175,6 +175,8 @@ class setup:
 
         if self.bundleWarn == "":
             self.bundleId = "com.leifadev.scout"
+        elif self.name == "":
+            self.name = "Scout"
         else:
             pass
 
@@ -196,10 +198,11 @@ class setup:
             return
 
 
-        subprocess.run("make clean", shell=True)
-        print(f'Removing dist folder, unnecesssary if you are running with admin priviledges, etc.')
-
         time.sleep(2)
+
+        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py')
+
+        time.sleep(1)
 
         # compile command
         try:
