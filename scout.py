@@ -5,7 +5,7 @@ from tkinter import *
 from pytube.exceptions import *
 from tkinter.filedialog import *
 from tkinter import messagebox
-from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
+from ttkthemes import ThemedTk # dark mode theme and stuff
 import tkinter.font as tkFont
 import webbrowser
 import pytube as Youtube
@@ -13,9 +13,7 @@ import getpass
 from ruamel import yaml
 import os
 import wget
-import ssl
 from sys import platform as _platform
-from PIL import Image, ImageTk
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -34,7 +32,6 @@ class App:
         self.videoRes = False
         self.hasFilePrefix = True
         self.filePrefix = ""
-        ssl._create_default_https_context = ssl._create_unverified_context
         self.path = ""
         self.darkMode = False
         self.maxModeUse = 0
@@ -588,8 +585,8 @@ class App:
                         res = aRes[0]
                     # elif self.clickedvfps.get() == "Fps":
                     #     fps = aFPS[0]
-                except:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                except Exception as e:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
                 videoDown = yt.streams.filter(res=res, progressive=True).first()
                 print(res)
@@ -672,7 +669,7 @@ class App:
                     if self.clickedvq.get() == "Quality":
                         abr = aAbr[0]
                 except Exception as e:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
                 print(abr)
                 print(f'\nAvailable stream(s):\n{audioDown}', f'All streams:\n{streams}')
@@ -746,7 +743,7 @@ class App:
                         res = aRes[0]
 
                 except Exception as e:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
                 print(res)
                 print(f'\nAvailable stream(s):\n{silent_audioDown}', f'All streams:\n{streams}')
@@ -1115,6 +1112,7 @@ class App:
         print(self.path)
 
         with open(self.ymldir,"w+") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
             data[0]['Options']['changedDefaultDir'] = True
             data[0]['Options']['defaultDir'] = self.path
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
@@ -1122,6 +1120,7 @@ class App:
 
     def resetDefaultDir_command(self):
         with open(self.ymldir,"w+") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
             data[0]['Options']['changedDefaultDir'] = False
             data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
@@ -1190,7 +1189,6 @@ class App:
                         self.thumbMenu["text"] = "Toggle Off"
                     else:
                         self.thumbMenu["text"] = "Toggle On"
-
 
 
     # Dump function to write new values made by toggle buttons, etc.
