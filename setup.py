@@ -113,16 +113,32 @@ class setup:
 
 
     def compile(self, debug, icon, name, bundleId):
-        print("Debug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.")
+        print("\nTarget File: Specify a .py file that is the main python file to compile with: ")
 
         # Asking for compile options
-        self.debug = str(input("\nPress enter for windowed mode, type anything for debug mode: "))
+
+        self.targetFile = str(input("Press enter for default, otherwise please specify: "))
+
+        if self.targetFile == "":
+            self.targetFile = "scout.py"
+        else:
+            if ".py" not in self.targetFile:
+                print("ERROR: You did not include .py in your file. Please use e.g. main.py, scout.py, app.py.")
+                return
+
+        print(f'\nYou chose:\n >> {self.targetFile} << \n')
+
+
+        print("Debug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.")
+
+        self.debug = str(input("Press enter for windowed mode, type anything for debug mode: "))
 
         if self.debug == "":
             self.debug = "--windowed"
         else:
             self.debug = "--console"
-        print(f'\nYou chose:\n>>{self.debug}<<\n')
+        print(f'\nYou chose:\n >> {self.debug} << \n')
+
 
         print(f'\nFound these image files in current working directory\nDetected Possible Icons:')
 
@@ -176,7 +192,7 @@ class setup:
         else:
             pass
 
-        print(f'\nYou chose:\n>>{self.name}<<\n')
+        print(f'\nYou chose:\n >> {self.name} <<\n')
 
         self.bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
 
@@ -212,14 +228,14 @@ class setup:
 
         time.sleep(2)
 
-        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py')
+        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} {self.targetFile}')
 
         time.sleep(1)
 
         # compile command
         try:
             # print(f'Compiling configurations: {self.debug}, {self.icon}, {self.name}, {self.bundleId}')
-            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py', shell=True)
+            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} {self.targetFile}', shell=True)
 
         except ModuleNotFoundError as e:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
