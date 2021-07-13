@@ -10,3 +10,4 @@ dist/
 Scout.spec
 requirements.txt
 *.spec
+.idea/
