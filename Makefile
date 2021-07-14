@@ -21,7 +21,7 @@ help:
 	@echo "------------------------------------"
 	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout"
 
-setup: setup
+setup:
 	@echo "Setting up project"
 	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
 	@${PIP} install -r requirements.txt
