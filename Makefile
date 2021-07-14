@@ -25,6 +25,7 @@ setup:
 	@echo "Setting up project"
 	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
 	@${PIP} install -r requirements.txt
+	@echo "Pulling from git"
 	@git pull
 	@echo "Launching scout, new files will be generated."
 
