@@ -22,11 +22,11 @@ help:
 	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout"
 
 setup: setup
-	@echo "Setting up project"$
-	pip3 freeze >> requirements.txt && pip freeze >> requirements.txt
-	pip3 install -r requirements.txt && pip install -r requirements.txt
+	@echo "Setting up project"
+	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
+	@${PIP} install -r requirements.txt
+	@git pull
 	@echo "Launching scout, new files will be generated."
-	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
 
 clean:
 	@echo "Cleaning project\n\n--------------------------\n"
