@@ -34,8 +34,7 @@ class setup:
 
         # print(os.getcwd())
         print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **")
-        print(" *** RUN WITH ELEVATED PRIVILAGES ***")
-        print("\nNote: Elevated priviledges are needed for the dist/ folder deletetion, same as make clean\n")
+        print("\nNote: Elevated priviledges may be needed for core file deletion\n")
 
         time.sleep(1)
 
@@ -71,12 +70,12 @@ class setup:
             print("You selected: " + self.which)
             for x in self.which:
                 if x not in self.pip:
-                    print("Your pip version may be outdated or your entry is invalid.")
+                    print("\nYour pip version may be outdated or your entry is invalid.")
                     return
             if "3" in self.which:
-                print("Ok, you seem to be using a pip version of pip3 or pip3.9!")
+                print("/nOk, you seem to be using a pip version of pip3 or pip3.9!")
         else:
-            print("You have to use pip as your package manager!")
+            print("\nYou have to use pip as your package manager!")
             return
         print(f"\nYour using: {self.which}")
 
@@ -129,7 +128,7 @@ class setup:
         print(f'\nYou chose:\n >> {self.targetFile} << \n')
 
 
-        print("Debug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.")
+        print("\nDebug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.\n")
 
         self.debug = str(input("Press enter for windowed mode, type anything for debug mode: "))
 
@@ -140,16 +139,22 @@ class setup:
         print(f'\nYou chose:\n >> {self.debug} << \n')
 
 
-        print(f'\nFound these image files in current working directory\nDetected Possible Icons:')
+        print(f'\nFound these image files in images direcotry\nDetected Possible Icons:')
 
         options = {}
-        count = int()
         count = 0
 
         for ext in self.extensions:
-            files = glob.glob(os.getcwd() + '/**/*' + ext, recursive=True)
-            options.update({count:files})
-            count += 1
+            files = glob.glob(os.getcwd() + "/images" + '/**/*' + ext, recursive=True)
+            if len(files) > 1:
+                for x in files:
+                    options.update({count:x})
+                    count += 1
+            else:
+                for x in files:
+                    options.update({count:x})
+                    count += 1
+            self.icount = count
 
         for key in options:
             print(f'[{key}]: {options.get(key)}')
@@ -158,7 +163,7 @@ class setup:
 
         try:
             if self.icon != "":
-                if int(self.icon) in range(0,3):
+                if int(self.icon) in range(0,self.icount):
                     for key, value in enumerate(options):
                         if str(self.icon) == str(key):
                             self.icon = (options.get(key))
@@ -179,7 +184,6 @@ class setup:
             print(f'Detected no specifed icon...')
             print(e)
 
-        print("")
 
         # get rid of bs
         self.icon = str(self.icon)
