@@ -931,7 +931,6 @@ class App:
         abt = ThemedTk(themebg=True)
         abt.iconbitmap = PhotoImage(file=self.fileLoc + "scout_logo.png")
         self.getTheme(abt)
-
         abt.title("About")
         width=300
         height=300
