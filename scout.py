@@ -346,14 +346,12 @@ class App:
         self.clickedvf = StringVar()
         self.clickedvf.set("mp4")
         self.videoformat = ttk.OptionMenu(parent, self.clickedvf, "mp4", "mp4", "mov", "webm")
-        # self.videoformat.place(x=650, y=121, width=70, height=30)
         self.videoformat["state"] = "normal"
 
 
         self.clickedaf = StringVar()
         self.clickedaf.set("mp4")
         self.audioformat = ttk.OptionMenu(parent, self.clickedaf, "mp3", "mp3", "wav", "ogg")
-        # self.audioformat.place(x=650, y=171, width=70, height=30)
         self.audioformat["state"] = "normal"
 
         self.clickedvq = StringVar()
@@ -374,6 +372,10 @@ class App:
 
             self.audioButton["bg"] = "#464646"
             self.videoButton["bg"] = "#464646"
+            self.videoButton["activebackground"] = "#464646"
+            self.videoButton["activeforeground"] = "#ececec"
+            self.audioButton["activebackground"] = "#464646"
+            self.audioButton["activeforeground"] = "#ececec"
 
             self.audioButton["fg"] = "#ececec"
             self.videoButton["fg"] = "#ececec"
@@ -385,6 +387,7 @@ class App:
             #background color for Checkbuttons
             self.audioButton["bg"] = "#ececec"
             self.videoButton["bg"] = "#ececec"
+
 
         # Loading dark mode value from settings.yml for inital launch
         with open(self.ymldir,"r") as yml:
