@@ -13,13 +13,13 @@ VERSION = v1.2
 .PHONY: help setup clean build
 
 help:
-	@echo "---------------HELP-----------------"
+	@echo "\n---------------HELP-----------------"
 	@echo "make help - display this message"
-	@echo "make setup - setup the project for development"
+	@echo "make setup - setup and update the repo"
 	@echo "make clean - clean up files"
-	@echo "make build - build the project"
+	@echo "make build - build the entire repo"
 	@echo "------------------------------------"
-	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout"
+	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout\n"
 
 setup:
 	@echo "Setting up project"
