@@ -35,7 +35,7 @@ class App:
         self.path = ""
         self.darkMode = False
         self.maxModeUse = 0
-        self.version = "v1.5"
+        self.version = "v1.5-beta2"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
         self.videoq = "" # vid quality example: 720p
@@ -912,6 +912,7 @@ class App:
 
 
     #################################################################
+
 
     ## Settings pane ##
 
