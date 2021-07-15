@@ -24,6 +24,7 @@ class setup:
         self.which = ""
         self.version = ""
         self.debug = ""
+        self.appVersion = ""
         self.pip = "pi3.3456789 "
         self.python = "python3.6789 "
         self.modFile = ""
@@ -139,6 +140,18 @@ class setup:
         print(f'\nYou chose:\n >> {self.debug} << \n')
 
 
+        print("\nVersion: Adds a version file value with your compile arguments\n")
+
+        self.appVersion = str(input("Press enter for windowed mode, type anything for debug mode: "))
+
+        if self.appVersion == "":
+            self.appVersion = "--windowed"
+        else:
+            self.appVersion = "--console"
+        print(f'\nYou chose:\n >> {self.appVersion} << \n')
+
+
+
         print(f'\nFound these image files in images direcotry\nDetected Possible Icons:')
 
         options = {}
@@ -167,7 +180,7 @@ class setup:
                     for key, value in enumerate(options):
                         if str(self.icon) == str(key):
                             self.icon = (options.get(key))
-                            print(f'\nYou chose:\n[{key}]: {self.icon}')
+                            print(f'\nYou chose:\n[{key}]: {self.icon}\n')
                         else:
                             pass
                             # print(key, self.icon)
@@ -189,7 +202,7 @@ class setup:
         self.icon = str(self.icon)
         self.icon = self.icon.translate({ord(i): None for i in '[],'})
 
-        self.name = str(input("Press enter for no name of your app, other wise specify: "))
+        self.name = str(input("Press enter for no name, otherwise specify: "))
 
         if self.name == "":
             self.name = "Scout"
@@ -232,14 +245,14 @@ class setup:
 
         time.sleep(2)
 
-        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} {self.targetFile}')
+        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}')
 
         time.sleep(1)
 
         # compile command
         try:
             # print(f'Compiling configurations: {self.debug}, {self.icon}, {self.name}, {self.bundleId}')
-            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} {self.targetFile}', shell=True)
+            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}', shell=True)
 
         except ModuleNotFoundError as e:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
