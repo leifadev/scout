@@ -35,7 +35,7 @@ class setup:
 
         # print(os.getcwd())
         print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **")
-        print("\nNote: Elevated priviledges may be needed for core file deletion\n")
+        print("\n** ELEVATED PRIVILAGES like sudo, may be NEEDED for the script compiling! **\n")
 
         time.sleep(1)
 
@@ -197,7 +197,7 @@ class setup:
         self.icon = str(self.icon)
         self.icon = self.icon.translate({ord(i): None for i in '[],'})
 
-        self.name = str(input("Press enter for no name, otherwise specify: "))
+        self.name = str(input("Press enter for default name, otherwise specify: "))
 
         if self.name == "":
             self.name = "Scout"
