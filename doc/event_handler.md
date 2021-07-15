@@ -8,7 +8,7 @@
 
 
 ## Videos
-Privated: https://www.youtube.com/watch?v=2nrdwo3gpZU (may exsist anymore)
+Privated: https://www.youtube.com/watch?v=2nrdwo3gpZU (may exist anymore)
 
 Region-locked: https://www.youtube.com/watch?v=9ODCnNkK8AE (for USA)
 
