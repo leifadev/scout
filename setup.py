@@ -142,14 +142,9 @@ class setup:
 
         print("\nVersion: Adds a version file value with your compile arguments\n")
 
-        self.appVersion = str(input("Press enter for windowed mode, type anything for debug mode: "))
+        self.appVersion = str(input("Press enter for no version value, type your desired custom version (e.g. v1.1.1, v.2.1-beta): "))
 
-        if self.appVersion == "":
-            self.appVersion = "--windowed"
-        else:
-            self.appVersion = "--console"
         print(f'\nYou chose:\n >> {self.appVersion} << \n')
-
 
 
         print(f'\nFound these image files in images direcotry\nDetected Possible Icons:')
