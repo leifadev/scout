@@ -20,7 +20,7 @@ Compiler: Pyinstaller v4.2 (6/6/21)
 ```
 **Pyinstaller Command**
 ```cs
-pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" --version-file="1.5" -n="Scout" scout.py
 ```
 ### Supported Versions
 
