@@ -225,7 +225,7 @@ class setup:
         #     self.bundleId = "com.leifadev.scout"
 
 
-        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
+        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your version to be: "{self.appVersion}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
         time.sleep(2)
 
         print("Are you sure you want to compile?")
