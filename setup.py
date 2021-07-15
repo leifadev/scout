@@ -193,6 +193,8 @@ class setup:
             print(e)
 
 
+        print("\nName: Adds a name for the application, with your compile arguments\n")
+
         # get rid of bs
         self.icon = str(self.icon)
         self.icon = self.icon.translate({ord(i): None for i in '[],'})
