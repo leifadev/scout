@@ -13,20 +13,21 @@ VERSION = v1.2
 .PHONY: help setup clean build
 
 help:
-	@echo "---------------HELP-----------------"
+	@echo "\n---------------HELP-----------------"
 	@echo "make help - display this message"
-	@echo "make setup - setup the project for development"
+	@echo "make setup - setup and update the repo"
 	@echo "make clean - clean up files"
-	@echo "make build - build the project"
+	@echo "make build - build the entire repo"
 	@echo "------------------------------------"
-	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout"
+	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout\n"
 
-setup: setup
-	@echo "Setting up project"$
-	pip3 freeze >> requirements.txt && pip freeze >> requirements.txt
-	pip3 install -r requirements.txt && pip install -r requirements.txt
+setup:
+	@echo "Setting up project"
+	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
+	@${PIP} install -r requirements.txt
+	@echo "Pulling from git"
+	@git pull
 	@echo "Launching scout, new files will be generated."
-	python3 ${PROJECT_MAIN} && python ${PROJECT_MAIN}
 
 clean:
 	@echo "Cleaning project\n\n--------------------------\n"

@@ -2,20 +2,18 @@ import tkinter as tk
 import tkinter as ttk
 from tkinter import ttk
 from tkinter import *
+from pytube import YouTube
 from pytube.exceptions import *
 from tkinter.filedialog import *
 from tkinter import messagebox
-from ttkthemes import ThemedTk,THEMES # dark mode theme and stuff
+from ttkthemes import ThemedTk # dark mode theme and stuff
 import tkinter.font as tkFont
 import webbrowser
-import pytube as Youtube
 import getpass
 from ruamel import yaml
 import os
 import wget
-import ssl
 from sys import platform as _platform
-from PIL import Image, ImageTk
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -34,11 +32,10 @@ class App:
         self.videoRes = False
         self.hasFilePrefix = True
         self.filePrefix = ""
-        ssl._create_default_https_context = ssl._create_unverified_context
         self.path = ""
         self.darkMode = False
         self.maxModeUse = 0
-        self.version = "v1.5"
+        self.version = "v1.5-beta2"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
         self.videoq = "" # vid quality example: 720p
@@ -349,14 +346,12 @@ class App:
         self.clickedvf = StringVar()
         self.clickedvf.set("mp4")
         self.videoformat = ttk.OptionMenu(parent, self.clickedvf, "mp4", "mp4", "mov", "webm")
-        # self.videoformat.place(x=650, y=121, width=70, height=30)
         self.videoformat["state"] = "normal"
 
 
         self.clickedaf = StringVar()
         self.clickedaf.set("mp4")
         self.audioformat = ttk.OptionMenu(parent, self.clickedaf, "mp3", "mp3", "wav", "ogg")
-        # self.audioformat.place(x=650, y=171, width=70, height=30)
         self.audioformat["state"] = "normal"
 
         self.clickedvq = StringVar()
@@ -377,6 +372,10 @@ class App:
 
             self.audioButton["bg"] = "#464646"
             self.videoButton["bg"] = "#464646"
+            self.videoButton["activebackground"] = "#464646"
+            self.videoButton["activeforeground"] = "#ececec"
+            self.audioButton["activebackground"] = "#464646"
+            self.audioButton["activeforeground"] = "#ececec"
 
             self.audioButton["fg"] = "#ececec"
             self.videoButton["fg"] = "#ececec"
@@ -388,6 +387,7 @@ class App:
             #background color for Checkbuttons
             self.audioButton["bg"] = "#ececec"
             self.videoButton["bg"] = "#ececec"
+
 
         # Loading dark mode value from settings.yml for inital launch
         with open(self.ymldir,"r") as yml:
@@ -491,16 +491,16 @@ class App:
 
 
     def videoFetch(self, yt, query): # Basic video basic report (used in all download types)
-        yt = YouTube(query)
-        query = self.urlfield.get()
+        self.yt = YouTube(query)
+        self.query = self.urlfield.get()
         self.logfield.insert(END, f'\n---------------------------------------------------------------------')
         self.logfield.insert(END, f'\n\nStarting download to path: {self.path}')
-        self.logfield.insert(END, f'\nVideo Title: {yt.title}')
-        self.logfield.insert(END, f'\nVideo Author: {yt.author}')
-        self.logfield.insert(END, f'\nPublish Date: {yt.publish_date}')
-        self.logfield.insert(END, f'\nVideo Duration (sec): {yt.length}')
-        self.logfield.insert(END, f'\nViews: {yt.views}')
-        self.logfield.insert(END, f'\nRating ratio: {yt.rating}')
+        self.logfield.insert(END, f'\nVideo Title: {self.yt.title}')
+        self.logfield.insert(END, f'\nVideo Author: {self.yt.author}')
+        self.logfield.insert(END, f'\nPublish Date: {self.yt.publish_date}')
+        self.logfield.insert(END, f'\nVideo Duration (sec): {self.yt.length}')
+        self.logfield.insert(END, f'\nViews: {self.yt.views}')
+        self.logfield.insert(END, f'\nRating ratio: {self.yt.rating}')
         self.logfield.insert(END, f'\n\n---------------------------------------------------------------------\n\n')
 
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log after done inserting
@@ -540,8 +540,8 @@ class App:
         try:
             self.logfield["state"] = "normal"
 
-            query = self.urlfield.get() # gets entry input
-            yt = YouTube(query)
+            self.query = self.urlfield.get() # gets entry input
+            self.yt = YouTube(self.query)
 
 
         except RegexMatchError:
@@ -559,17 +559,18 @@ class App:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.thumbBool = data[0]['Options']['thumbnail']
             if self.thumbBool:
-                wget.download(yt.thumbnail_url, self.path + "/" + self.filePrefix + yt.title + ".jpg")
+                wget.download(self.yt.thumbnail_url, self.path + "/" + self.filePrefix + self.yt.title + ".jpg")
                 print("\nDownloading the thumbnail as well :) \nIf your seeing this and your thumbnail setting is off, please delete your config file and restart scout.\nConfig file path: " + self.ymldir + "\n")
 
 
         if self.videoBool and self.audioBool: # Video and Audio
             self.logfield["state"] = "normal"
             try:
-                yt = YouTube(query)
+                self.query = self.urlfield.get()
+                self.yt = YouTube(self.query)
                 res = self.clickedvq.get()
                 # This block searches through a dictionary of known quality values, then suggests available values later
-                streams = str(yt.streams.filter(progressive=True).all())
+                streams = str(self.yt.streams.filter(progressive=True).all())
                 attributes = {
                     "res": ["1080p", "720p", "480p", "360p", "240p", "144p"],
                     "fps": [24, 30, 60]
@@ -588,10 +589,10 @@ class App:
                         res = aRes[0]
                     # elif self.clickedvfps.get() == "Fps":
                     #     fps = aFPS[0]
-                except:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                except Exception as e:
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
-                videoDown = yt.streams.filter(res=res, progressive=True).first()
+                videoDown = self.yt.streams.filter(res=res, progressive=True).first()
                 print(res)
                 print(f'\nAvailable stream(s):\n{videoDown}', f'All streams:\n{streams}')
 
@@ -612,7 +613,7 @@ class App:
                     os.chdir(self.fileLoc)
                     # From below we mod the downloaded file for perms to be used with, UNIX system only apply
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
+                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
 
@@ -625,13 +626,13 @@ class App:
                     print("Original file deleted! Enjoy your converted one")
 
                     self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n') # This and below show in the log what actually stream object they downloaded with there video. Helpful for debugging!
-                    self.videoFetch(yt, query) # Fetching post-log video info, function up top this download function
+                    self.videoFetch(self.yt, self.query) # Fetching post-log video info, function up top this download function
                 else:
                     videoDown.download(self.path, filename_prefix=self.filePrefix)
                     self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
-                    self.videoFetch(yt, query)
+                    self.videoFetch(self.yt, self.query)
 
-                self.videoFetch(yt, query)
+                self.videoFetch(self.yt, self.query)
                 self.logfield["state"] = "disabled"
 
             # Try statments using pytube errors repeats for each selection mode of video
@@ -655,10 +656,11 @@ class App:
         elif self.audioBool:  # Audio only
             self.logfield["state"] = "normal"
             try:
-                yt = YouTube(query)
-                audioDown = yt.streams.filter(abr=self.audioq, only_audio=True).first()
+                self.query = self.urlfield.get()
+                self.yt = YouTube(self.query)
+                audioDown = self.yt.streams.filter(abr=self.audioq, only_audio=True).first()
                 abr = self.clickedaq.get()
-                streams = str(yt.streams.filter(only_audio=True).all())
+                streams = str(self.yt.streams.filter(only_audio=True).all())
                 attributes = {
                     "abr": ["160kbs", "128kbs", "70kbs", "50kbs"]
                 }
@@ -672,7 +674,7 @@ class App:
                     if self.clickedvq.get() == "Quality":
                         abr = aAbr[0]
                 except Exception as e:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
                 print(abr)
                 print(f'\nAvailable stream(s):\n{audioDown}', f'All streams:\n{streams}')
@@ -690,7 +692,7 @@ class App:
                 audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                 os.chdir(self.fileLoc)
                 self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                 self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
                 subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
@@ -701,7 +703,7 @@ class App:
 
                 self.logfield.insert(END, f'\nINFO: The {audioDown}, codec/itag was used.\n')
 
-                self.videoFetch(yt, query)
+                self.videoFetch(self.yt, self.query)
                 self.logfield["state"] = "disabled"
 
             # Try statments using pytube errors repeats for each selection mode of video
@@ -728,10 +730,10 @@ class App:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
                 self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
             try:
-                yt = YouTube(query)
-                silent_audioDown = yt.streams.filter(res=self.videoq, only_video=True).first()
+                self.yt = YouTube(self.query)
+                silent_audioDown = self.yt.streams.filter(res=self.videoq, only_video=True).first()
                 res = self.clickedvq.get()
-                streams = str(yt.streams.filter(only_video=True).all())
+                streams = str(self.yt.streams.filter(only_video=True).all())
                 print(streams)
                 attributes = {
                     "res": ["1080p", "720p", "480p", "360p", "240p", "144p"]
@@ -746,7 +748,7 @@ class App:
                         res = aRes[0]
 
                 except Exception as e:
-                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + e)
+                    print("\nNo other available values were found to fallback on, check for any stream query objects above!\n" + str(e))
 
                 print(res)
                 print(f'\nAvailable stream(s):\n{silent_audioDown}', f'All streams:\n{streams}')
@@ -764,7 +766,7 @@ class App:
                     silent_audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                     os.chdir(self.fileLoc)
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
                     subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
@@ -778,7 +780,7 @@ class App:
                     silent_audioDown.download(self.path, filename_prefix=self.filePrefix)
                     self.logfield.insert(END, f'\nINFO: The {silent_audioDown}, codec/itag was used.\n')
 
-                self.videoFetch(yt, query)
+                self.videoFetch(self.yt, self.query)
                 self.logfield["state"] = "disabled"
 
             # Try statments using pytube errors repeats for each selection mode of video
@@ -802,7 +804,7 @@ class App:
         else:
             self.logfield["state"] = "normal" # disable log after any erros are detected
 
-            query = self.urlfield.get() # gets entry input (the users specifed URL)
+            self.query = self.urlfield.get() # gets entry input (the users specifed URL)
 
             if self.urlfield.get() == "":
                 self.logfield["state"] = "normal" # disable log after any erros are detected
@@ -914,6 +916,7 @@ class App:
 
     #################################################################
 
+
     ## Settings pane ##
 
     def getTheme(self, name): # Dark mode enable fetching from settings YML
@@ -931,7 +934,6 @@ class App:
         abt = ThemedTk(themebg=True)
         abt.iconbitmap = PhotoImage(file=self.fileLoc + "scout_logo.png")
         self.getTheme(abt)
-
         abt.title("About")
         width=300
         height=300
@@ -1115,6 +1117,7 @@ class App:
         print(self.path)
 
         with open(self.ymldir,"w+") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
             data[0]['Options']['changedDefaultDir'] = True
             data[0]['Options']['defaultDir'] = self.path
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
@@ -1122,6 +1125,7 @@ class App:
 
     def resetDefaultDir_command(self):
         with open(self.ymldir,"w+") as yml:
+            data = yaml.load(yml, Loader=yaml.Loader)
             data[0]['Options']['changedDefaultDir'] = False
             data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
             write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
@@ -1190,7 +1194,6 @@ class App:
                         self.thumbMenu["text"] = "Toggle Off"
                     else:
                         self.thumbMenu["text"] = "Toggle On"
-
 
 
     # Dump function to write new values made by toggle buttons, etc.

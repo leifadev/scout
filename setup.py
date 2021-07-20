@@ -24,6 +24,7 @@ class setup:
         self.which = ""
         self.version = ""
         self.debug = ""
+        self.appVersion = ""
         self.pip = "pi3.3456789 "
         self.python = "python3.6789 "
         self.modFile = ""
@@ -34,8 +35,7 @@ class setup:
 
         # print(os.getcwd())
         print("\n** THIS SCRIPT REQURIES PYTHON 3.6+ **")
-        print(" *** RUN WITH ELEVATED PRIVILAGES ***")
-        print("\nNote: Elevated priviledges are needed for the dist/ folder deletetion, same as make clean\n")
+        print("\n** ELEVATED PRIVILAGES like sudo, may be NEEDED for the script compiling! **\n")
 
         time.sleep(1)
 
@@ -71,12 +71,12 @@ class setup:
             print("You selected: " + self.which)
             for x in self.which:
                 if x not in self.pip:
-                    print("Your pip version may be outdated or your entry is invalid.")
+                    print("\nYour pip version may be outdated or your entry is invalid.")
                     return
             if "3" in self.which:
-                print("Ok, you seem to be using a pip version of pip3 or pip3.9!")
+                print("/nOk, you seem to be using a pip version of pip3 or pip3.9!")
         else:
-            print("You have to use pip as your package manager!")
+            print("\nYou have to use pip as your package manager!")
             return
         print(f"\nYour using: {self.which}")
 
@@ -113,27 +113,56 @@ class setup:
 
 
     def compile(self, debug, icon, name, bundleId):
-        print("Debug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.")
+        print("\nTarget File: Specify a .py file that is the main python file to compile with: ")
 
         # Asking for compile options
-        self.debug = str(input("\nPress enter for windowed mode, type anything for debug mode: "))
+
+        self.targetFile = str(input("Press enter for default, otherwise please specify: "))
+
+        if self.targetFile == "":
+            self.targetFile = "scout.py"
+        else:
+            if ".py" not in self.targetFile:
+                print("ERROR: You did not include .py in your file. Please use e.g. main.py, scout.py, app.py.")
+                return
+
+        print(f'\nYou chose:\n >> {self.targetFile} << \n')
+
+
+        print("\nDebug: When enabled will show a verbose logging console for realtime\ntraceback and exception errors.\n")
+
+        self.debug = str(input("Press enter for windowed mode, type anything for debug mode: "))
 
         if self.debug == "":
             self.debug = "--windowed"
         else:
             self.debug = "--console"
-        print(f'\nYou chose:\n>>{self.debug}<<\n')
+        print(f'\nYou chose:\n >> {self.debug} << \n')
 
-        print(f'\nFound these image files in current working directory\nDetected Possible Icons:')
+
+        print("\nVersion: Adds a version file value with your compile arguments\n")
+
+        self.appVersion = str(input("Press enter for no version value, type your desired custom version (e.g. v1.1.1, v.2.1-beta): "))
+
+        print(f'\nYou chose:\n >> {self.appVersion} << \n')
+
+
+        print(f'\nFound these image files in images direcotry\nDetected Possible Icons:')
 
         options = {}
-        count = int()
         count = 0
 
         for ext in self.extensions:
-            files = glob.glob(os.getcwd() + '/**/*' + ext, recursive=True)
-            options.update({count:files})
-            count += 1
+            files = glob.glob(os.getcwd() + "/images" + '/**/*' + ext, recursive=True)
+            if len(files) > 1:
+                for x in files:
+                    options.update({count:x})
+                    count += 1
+            else:
+                for x in files:
+                    options.update({count:x})
+                    count += 1
+            self.icount = count
 
         for key in options:
             print(f'[{key}]: {options.get(key)}')
@@ -142,11 +171,11 @@ class setup:
 
         try:
             if self.icon != "":
-                if int(self.icon) in range(0,3):
+                if int(self.icon) in range(0,self.icount):
                     for key, value in enumerate(options):
                         if str(self.icon) == str(key):
                             self.icon = (options.get(key))
-                            print(f'\nYou chose:\n[{key}]: {self.icon}')
+                            print(f'\nYou chose:\n[{key}]: {self.icon}\n')
                         else:
                             pass
                             # print(key, self.icon)
@@ -163,20 +192,21 @@ class setup:
             print(f'Detected no specifed icon...')
             print(e)
 
-        print("")
+
+        print("\nName: Adds a name for the application, with your compile arguments\n")
 
         # get rid of bs
         self.icon = str(self.icon)
         self.icon = self.icon.translate({ord(i): None for i in '[],'})
 
-        self.name = str(input("Press enter for no name of your app, other wise specify: "))
+        self.name = str(input("Press enter for default name, otherwise specify: "))
 
         if self.name == "":
             self.name = "Scout"
         else:
             pass
 
-        print(f'\nYou chose:\n>>{self.name}<<\n')
+        print(f'\nYou chose:\n >> {self.name} <<\n')
 
         self.bundleId = str(input("Press enter for no bundle ID, other wise specify: "))
 
@@ -197,7 +227,7 @@ class setup:
         #     self.bundleId = "com.leifadev.scout"
 
 
-        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
+        print(f'\n-------------------------------\nYou have configured debug to "{self.debug}",\nYou have configured your version to be: "{self.appVersion}",\nYou have configured your icon to the path: {self.icon},\nYou have configured name to be: "{self.name}",\nYou configured bundle ID is: "{self.bundleId}"\n\nSettings saved!\n-------------------------------')
         time.sleep(2)
 
         print("Are you sure you want to compile?")
@@ -212,14 +242,14 @@ class setup:
 
         time.sleep(2)
 
-        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py')
+        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}')
 
         time.sleep(1)
 
         # compile command
         try:
             # print(f'Compiling configurations: {self.debug}, {self.icon}, {self.name}, {self.bundleId}')
-            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} -n={self.name} scout.py', shell=True)
+            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}', shell=True)
 
         except ModuleNotFoundError as e:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')

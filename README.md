@@ -5,7 +5,7 @@ No bloated javascript ad websites anymore!
 
 ## Native Build Details
 ```cs
-Currently testing on macOS 10.15, Windows 10, Linux Mint 20.1
+Currently testing on macOS 10.15-16, Windows 10, Linux Mint 20.1/GNU Linux
 
 Tested python versions: 3.7 - 9.2
 
@@ -20,7 +20,7 @@ Compiler: Pyinstaller v4.2 (6/6/21)
 ```
 **Pyinstaller Command**
 ```cs
-pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" --version-file="1.5" -n="Scout" scout.py
 ```
 ### Supported Versions
 
