@@ -551,7 +551,7 @@ class App:
             self.logfield["state"] = "normal" # disable log after any erros are detected
             print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
 
-            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to thr github.\n')
+            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n{err}')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
         # Thumbnail download
