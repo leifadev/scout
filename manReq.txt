@@ -1,0 +1,11 @@
+convertapi==1.4.0
+pipdeptree==2.0.0
+pyinstaller==4.4
+pytube==10.9.2
+PyYAML==5.4.1
+ruamel.yaml==0.17.9
+Sphinx==4.0.2
+ttkthemes==3.2.2
+typing-extensions==3.10.0.0
+wget==3.2
+wheel==0.36.2
