@@ -28,6 +28,8 @@ class App:
         self.audioBool = False
         self.videoBool = False
         self.changedDefaultDir = bool
+        self.dirDefaultSetting = ""
+        self.fileLoc = ""
         self.thumbBool = bool
         self.videoRes = False
         self.hasFilePrefix = True

@@ -28,6 +28,7 @@ class setup:
         self.pip = "pi3.3456789 "
         self.python = "python3.6789 "
         self.modFile = ""
+        self.manReqn = bool
 
         ## Supported image file types for icons ##
         self.extensions = [".png", ".icns", ".ico"]
@@ -86,6 +87,7 @@ class setup:
         except ModuleNotFoundError:
             print("You do not have the module 'pipdeptree'")
             subprocess.run(f'{self.which} install pipdeptree', shell=True)
+            # print(f'\n\n{self.which} install pipdeptree\n\n')
 
         if self.which in ("pip","pip3"):
             time.sleep(0.5)
@@ -94,16 +96,34 @@ class setup:
             except FileNotFoundError:
                 print(f'requirements.txt is not present as acting for freezing modules. Maybe you have a file for this under a different name?')
 
+            self.manReq = str(input("\nEnter for genrated, anything for current version repo:\nGenerated modules (pipdeptree) or manual manReq.txt (recommended for Linux users)?"))
+            if self.manReqn is None:
+                self.manReqn = False
+            else:
+                self.manReq = True
 
             print(f"\nRemoving requirements.txt in current folder directory...\n")
             time.sleep(1)
             print(os.getcwd() + ", is the current executing path. \nIf this isn't, maybe look into the code, and/or submit an issue at the github")
             time.sleep(2)
-            print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
-            subprocess.run(f"pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
             print("\n**Installing**")
             time.sleep(1.5)
-            subprocess.run(self.which + f" install -r requirements.txt", shell=True)
+            if self.manReq:
+                print(f"Installing pre-made modules")
+                time.sleep(1)
+                try:
+                    os.mknod("manReq.txt")
+                except FileExistsError as l:
+                    pass
+                subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent
+                subprocess.run(self.which + f" install -r requirements.txt", shell=True)
+
+            elif self.manReq == False:
+                print(f"Installing just now genrated modules...")
+                print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
+                time.sleep(1)
+                subprocess.run(f"pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
+                subprocess.run(self.which + f" install -r requirements.txt", shell=True)
         else:
             print("Not a valid option! Use pip or pip3\nIf you use another version like pip3.9, try pip3, if that doesn't work contact the developer.")
             return
@@ -247,14 +267,18 @@ class setup:
         time.sleep(1)
 
         # compile command
+
+
         try:
             # print(f'Compiling configurations: {self.debug}, {self.icon}, {self.name}, {self.bundleId}')
-            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}', shell=True)
+            subprocess.run(f'{self.which} install pyinstaller', shell=True)
+            subprocess.run(f'{self.version} -m PyInstaller --onefile {self.debug} --icon="{self.icon}" --osx-bundle-identifier="{self.bundleId}" --version-file="{self.appVersion}" -n="{self.name}" {self.targetFile}', shell=True)
 
         except ModuleNotFoundError as e:
             print(f'Pyinstaller wasn\'t not found! Try to install it again, must haven\'t worked')
         except PermissionError as d:
             print(f"Permission error! This script doesn't have certain permissions.\n{d}")
+
 
 
 
