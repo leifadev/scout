@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter as ttk
 from tkinter import ttk
 from tkinter import *
 from pytube import YouTube
@@ -13,7 +12,7 @@ import getpass
 from ruamel import yaml
 import os
 import wget
-from sys import platform as _platform
+import platform
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -37,7 +36,7 @@ class App:
         self.path = ""
         self.darkMode = False
         self.maxModeUse = 0
-        self.version = "v1.5-beta2"
+        self.version = "v1.5"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
         self.videoq = "" # vid quality example: 720p
@@ -53,9 +52,10 @@ class App:
         #                                                  #
         ####################################################
 
+
         # Sets various variables for each OS being used.
         # Fonts, directories, special boolean values, etc.
-        if _platform in ("linux", "linux2"):
+        if platform.system() in "Linux":
             self.fileLoc = os.path.expanduser("~/.config/Scout/")
             self.dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
             self.ymldir = os.path.expanduser("~/.config/Scout/settings.yml")
@@ -71,10 +71,11 @@ class App:
                 "charSize": 10,
                 "restartTextPos": 308,
                 "logFont": "Courier",
-                "logSize": 8
+                "logSize": 9,
+                "verSize": 7
             }
 
-        elif _platform == "darwin":
+        elif platform.system() in "Darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
             self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
             self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
@@ -90,10 +91,11 @@ class App:
                 "charSize": 12,
                 "restartTextPos": 302,
                 "logFont": "Source Code Pro",
-                "logSize": 10
+                "logSize": 10,
+                "verSize": 12
             }
 
-        elif _platform in ("win64", "win32"):
+        elif platform.system() in "Windows": # change value for new platform object
             self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
             self.dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
             self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
@@ -109,7 +111,8 @@ class App:
                 "charSize": 8,
                 "restartTextPos": 302,
                 "logFont": "Courier",
-                "logSize": 8
+                "logSize": 8,
+                "verSize": 8
             }
 
 
@@ -222,10 +225,10 @@ class App:
             if self.darkMode:
                 parent.set_theme("equilux")
             else:
-                if _platform == "darwin":
+                if platform.system() == "darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
-                elif _platform == "linux" or _platform == "linux2":
+                elif platform.system() in "Linuapplyx":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
 
@@ -250,39 +253,48 @@ class App:
 #        canvas.pack()
 #
 #        test = PhotoImage(file="test.png")
-#        canvas.create_image(350,50,image=test)
+#        canvas.create_image(350,50,image=test)apply
 
 
         ## Menu items ##
 
-        menubar = Menu(parent)
-        filemenu = Menu(menubar)
-        filemenu = Menu(menubar, tearoff=0)
 
-        filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: parent.focus_get().event_generate('<<Cut>>'))
+        self.menubar = Menu(parent)
+        self.filemenu = Menu(self.menubar, tearoff=0)
 
-        filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: parent.focus_get().event_generate('<<Copy>>'))
+        try:
+            self.filemenu.add_command(label="Cut", accelerator="Command+X", command=lambda: parent.focus_get().event_generate('<<Cut>>'))
 
-        filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: parent.focus_get().event_generate('<<Paste>>'))
-        filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: parent.focus_get().select_range(0, 'end'))
+            self.filemenu.add_command(label="Copy", accelerator="Command+C", command=lambda: parent.focus_get().event_generate('<<Copy>>'))
 
-        filemenu.add_separator()
+            self.filemenu.add_command(label="Paste", accelerator="Command+V", command=lambda: parent.focus_get().event_generate('<<Paste>>'))
+            self.filemenu.add_command(label="Select All", accelerator="Command+A", command=lambda: parent.focus_get().select_range(0, 'END')) # Does not work as of now v1.5
+        except KeyError as e:
+            self.logfield.insert(END, f"ERROR: Paste and copying functions failed! Try again?")
+            print(f"Paste and copying functions failed!\n{e}")
 
-        filemenu.add_command(label="Exit", accelerator="Command+Q", command=parent.quit)
-        menubar.add_cascade(label="File", menu=filemenu)
+        self.filemenu.add_separator()
 
-        helpmenu = Menu(menubar)
-        helpmenu.add_command(label="About", command=self.about_button)
-        helpmenu.add_command(label="Help", command=self.helpButton_command)
+        self.filemenu.add_command(label="Exit", accelerator="Command+Q", command=lambda: parent.quit())
+        self.menubar.add_cascade(label="File", menu=self.filemenu)
 
-        helpmenu.add_separator()
+        self.helpmenu = Menu(self.menubar, tearoff=0)
 
-        helpmenu.add_command(label="Settings", command=self.settings_button)
-        menubar.add_cascade(label="About", menu=helpmenu)
+        self.helpmenu.add_command(label="About", command=self.about_button)
+        self.helpmenu.add_command(label="Help", command=self.helpButton_command)
 
-        parent.config(menu=menubar)
+        self.helpmenu.add_separator()
+
+        self.helpmenu.add_command(label="Settings", command=self.settings_button)
+
+        self.menubar.add_cascade(label="About", menu=self.helpmenu)
+
+        self.menubar.entryconfig("About", state="normal")
+        parent.config(menu=self.menubar)
         parent.update()   # Updates window at startup to be interactive and lifted, DO NOT TOUCH
 
+
+        # self.menubar.entryconfig("Settings", state="disabled")
 
         ## Elements ##
 
@@ -339,8 +351,8 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
-        self.versionText.place(x=795,y=300,width=40,height=25)
-        self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"))
+        self.versionText.place(x=795,y=300,width=70,height=30)
+        self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
 
 
         ## All selections/menus for format and quailty choice ##
@@ -368,6 +380,11 @@ class App:
 
 
         # Block of code to switch bgs and fgs manually for darkMode using only tk not ttk
+        # static values for checkbuttosn
+        self.audioButton["highlightthickness"] = 0
+        self.videoButton["highlightthickness"] = 0
+
+        # dark/light mode dependent values, colors, formatting, etc.
         if self.darkMode:
             self.versionText["bg"] = "#464646" # dark theme gray
             self.versionText["fg"] = "#ececec" # light theme gray
@@ -375,20 +392,26 @@ class App:
             self.audioButton["bg"] = "#464646"
             self.videoButton["bg"] = "#464646"
             self.videoButton["activebackground"] = "#464646"
-            self.videoButton["activeforeground"] = "#ececec"
+            self.videoButton["activeforeground"] = "#dadada"
             self.audioButton["activebackground"] = "#464646"
-            self.audioButton["activeforeground"] = "#ececec"
+            self.audioButton["activeforeground"] = "#dadada"
 
             self.audioButton["fg"] = "#ececec"
             self.videoButton["fg"] = "#ececec"
 
-        else:
-            self.versionText['bg'] = "#ececec"
-            self.versionText["fg"] = "#464646"
+            self.audioButton["selectcolor"] = "#a2a2a2"
+            self.videoButton["selectcolor"] = "#a2a2a2"
 
-            #background color for Checkbuttons
-            self.audioButton["bg"] = "#ececec"
-            self.videoButton["bg"] = "#ececec"
+        else:
+            # self.versionText['bg'] = "#ececec"
+            # self.versionText["fg"] = "#464646"
+
+            if platform.system() in "Linux":
+                #background color for Checkbuttons
+                self.audioButton["activebackground"] = "#d9d9d9"
+                self.videoButton["activebackground"] = "#d9d9d9"
+            else:
+                print("Tkinter: Ignoring custom checkbutton active backgrounds...")
 
 
         # Loading dark mode value from settings.yml for inital launch
@@ -409,7 +432,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -429,7 +452,7 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        if _platform != "darwin":
+        if platform.system() != "darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -845,6 +868,7 @@ class App:
                 self.maxWarn["bg"] = "#464646"
             self.maxWarn.place(x=280,y=302,width=140)
             self.maxWarn["text"] = "Restart to apply!"
+            self.menubar.entryconfig("About", state="disabled")
             self.maxWarn["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"))
 
     # This is function for the "File Destination" button in the main menu
@@ -896,7 +920,7 @@ class App:
     def helpButton_command(self):
         webbrowser.open("https://github.com/leifadev/scout")
         self.logfield["state"] = "normal"
-        self.logfield.insert(END, "\nINFO: Launched help page! Documentation, Code, Wiki, and more :)\n")
+        self.logfield.insert(END, "\n\nINFO: Launched help page! Documentation, Code, Wiki, and more :)\n")
         self.logfield["state"] = "disabled"
         print("This is opening the github page to for Scout. All versions of scout, a public wiki, and an issues page\nare there to help!")
 
@@ -909,10 +933,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n")
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
@@ -1078,7 +1102,7 @@ class App:
 
         self.resetDefaultDir = ttk.Button(sWin)
         self.resetDefaultDir["text"] = "Reset Default Directory"
-        self.resetDefaultDir.place(x=200,y=235,width=180)
+        self.resetDefaultDir.place(x=200,y=225,width=180)
         self.resetDefaultDir["command"] = self.resetDefaultDir_command
         self.resetDefaultDir["state"] = "normal"
 
@@ -1116,23 +1140,25 @@ class App:
     # Scripting for buttons and other things
     def defaultDir_command(self):
         self.path = askdirectory()
-        print(self.path)
-
-        with open(self.ymldir,"w+") as yml:
+        print(f'\nSelected path: {self.path}')
+        with open(self.ymldir, "r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            data[0]['Options']['changedDefaultDir'] = True
-            data[0]['Options']['defaultDir'] = self.path
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+            with open(self.ymldir, "w+") as yml:
+                self.changedDefaultDir = True
+                data[0]['Options']['changedDefaultDir'] = self.changedDefaultDir
+                data[0]['Options']['defaultDir'] = self.path
+                write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
 
 
     def resetDefaultDir_command(self):
-        with open(self.ymldir,"w+") as yml:
+        with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
-            data[0]['Options']['changedDefaultDir'] = False
-            data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
-            write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
-            self.resetDefaultDir["state"] = "disabled"
-            self.resetDirTip["text"] = "Setting reset!"
+            with open(self.ymldir, "w+") as yml:
+                data[0]['Options']['changedDefaultDir'] = self.changedDefaultDir
+                data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
+                write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
+                self.resetDefaultDir["state"] = "disabled"
+                self.resetDirTip["text"] = "Setting reset!"
         print("Reset the default directory in settings.")
 
 
@@ -1207,6 +1233,7 @@ class App:
             self.darkMode = data[0]['Options']['darkMode']
             self.filePrefix = data[0]['Options']['hasFilePrefix']
             self.thumbBool = data[0]['Options']['thumbnail']
+            self.changedDefaultDir = False
 
             with open(self.ymldir,"w+") as yml:
                 data[0]['Options'][setting] = not data[0]['Options'][setting]
@@ -1223,9 +1250,14 @@ class App:
 # https://opensource.com/article/17/6/ffmpeg-convert-media-file-formats
 # https://docs.python.org/3/library/subprocess.html || subprocess docs
 
+# def quitall():
+#     print("QUITTING ALL WINDOWS")
+#     parent.quit()
+#     sWin.quit()
 
 # Declaring parent and looping it :D
 if __name__ == "__main__":
     parent = ThemedTk(themebg=True)
     app = App(parent)
+    # parent.protocol("WM_DELETE_WINDOW", quitall())
     parent.mainloop()
