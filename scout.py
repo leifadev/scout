@@ -225,10 +225,10 @@ class App:
             if self.darkMode:
                 parent.set_theme("equilux")
             else:
-                if platform.system() == "darwin":
+                if platform.system() in "Darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
-                elif platform.system() in "Linuapplyx":
+                elif platform.system() in "Linux":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
 
@@ -403,15 +403,17 @@ class App:
             self.videoButton["selectcolor"] = "#a2a2a2"
 
         else:
-            # self.versionText['bg'] = "#ececec"
-            # self.versionText["fg"] = "#464646"
-
             if platform.system() in "Linux":
                 #background color for Checkbuttons
                 self.audioButton["activebackground"] = "#d9d9d9"
                 self.videoButton["activebackground"] = "#d9d9d9"
             else:
-                print("Tkinter: Ignoring custom checkbutton active backgrounds...")
+                self.versionText['bg'] = "#ececec"
+                self.versionText["fg"] = "#464646"
+
+                self.audioButton["bg"] = "#ececec"
+                self.videoButton["bg"] = "#ececec"
+
 
 
         # Loading dark mode value from settings.yml for inital launch
@@ -1154,6 +1156,7 @@ class App:
         with open(self.ymldir,"r") as yml:
             data = yaml.load(yml, Loader=yaml.Loader)
             with open(self.ymldir, "w+") as yml:
+                self.changedDefaultDir = False
                 data[0]['Options']['changedDefaultDir'] = self.changedDefaultDir
                 data[0]['Options']['defaultDir'] = self.dirDefaultSetting # done once reset
                 write = yaml.dump(data, yml, Dumper=yaml.RoundTripDumper)
