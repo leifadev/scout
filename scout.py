@@ -1253,6 +1253,8 @@ class App:
 # https://opensource.com/article/17/6/ffmpeg-convert-media-file-formats
 # https://docs.python.org/3/library/subprocess.html || subprocess docs
 
+# docs: https://github.com/leifadev/scout/wiki
+
 # def quitall():
 #     print("QUITTING ALL WINDOWS")
 #     parent.quit()
