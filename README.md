@@ -43,6 +43,7 @@ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="
 - ~~Add extra video file console logging~~
 - ~~Add thumbnail downloading  support~~
 - **Add playlist support with video selection**
+- **Add custom theme integration (TkkThemes)**
 - **Add segmented video download support**
 
 # Help
