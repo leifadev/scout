@@ -17,8 +17,7 @@ import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
 from zipfile import ZipFile
-from urllib.error import HTTPError
-
+import urllib.error
 
 class App:
     def __init__(self, parent):
@@ -434,7 +433,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -571,14 +570,16 @@ class App:
             self.yt = YouTube(self.query)
 
 
-        except RegexMatchError:
-            print("Regex match error! Invalid...")
-
-        except HTTPError as err:
+        except RegexMatchError as e:
+            print("Regex match error! Invalid...\n" + str(e) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
-            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            self.logfield.insert(END, f'\nERROR: There was a regex match error. Invalid link or entry!\n')
+            self.logfield["state"] = "disabled" # disable log after any erros are detected
 
-            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n{err}')
+        except urllib.error.HTTPError as err:
+            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            self.logfield["state"] = "normal" # disable log after any erros are detected
+            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
         # Thumbnail download
@@ -935,10 +936,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
