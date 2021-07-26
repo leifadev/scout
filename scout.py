@@ -155,7 +155,7 @@ class App:
                 f.close()
         # makes a copy of the newest yml/settings structure
         os.chdir(self.fileLoc)
-        cache = open("cache.yml", "w+")
+        cache = open(self.cachedir, "w+")
         yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
         cache.close()
         print("Cache updated!")
@@ -758,7 +758,7 @@ class App:
             self.logfield["state"] = "normal"
             if self.enablePrompts:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
+                # self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
             try:
                 self.yt = YouTube(self.query)
                 silent_audioDown = self.yt.streams.filter(res=self.videoq, only_video=True).first()
