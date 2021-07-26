@@ -14,6 +14,7 @@ Thank you for supporting by downloading Scout :D
 import glob
 import subprocess
 import os
+import urllib.error
 import time # asthetic reasons, slowing down time for verbose messages to be seen!
 
 # script compiles scout based on OS from makefile :D
@@ -28,7 +29,7 @@ class setup:
         self.pip = "pi3.3456789 "
         self.python = "python3.6789 "
         self.modFile = ""
-        self.manReqn = bool
+        self.manReq = bool
 
         ## Supported image file types for icons ##
         self.extensions = [".png", ".icns", ".ico"]
@@ -55,7 +56,7 @@ class setup:
             else:
                 pass
         else:
-            print("You have to use a supported version of python! (sorry if customized your path to pysnake69, etc.)")
+            print("You have to use a supported version of python! (sorry if you customized your path to pysnake69, etc.)")
             return
         self.version = self.moveOn
         print(f"\nYour using: {self.version}")
@@ -83,11 +84,11 @@ class setup:
 
         # Make and/or reset module requirements!
         try:
+            import wget
             import pipdeptree
         except ModuleNotFoundError:
             print("You do not have the module 'pipdeptree'")
-            subprocess.run(f'{self.which} install pipdeptree', shell=True)
-            # print(f'\n\n{self.which} install pipdeptree\n\n')
+            subprocess.run(f'{self.which} install pipdeptree wget', shell=True)
 
         if self.which in ("pip","pip3"):
             time.sleep(0.5)
@@ -96,33 +97,52 @@ class setup:
             except FileNotFoundError:
                 print(f'requirements.txt is not present as acting for freezing modules. Maybe you have a file for this under a different name?')
 
-            self.manReq = str(input("\nEnter for genrated, anything for current version repo:\nGenerated modules (pipdeptree) or manual manReq.txt (recommended for Linux users)?"))
-            if self.manReqn is None:
-                self.manReqn = False
-            else:
+            self.manReq = str(input("\n*Premade option reccomended!*\nEnter for default version modules, anything for generated:"))
+            if self.manReq is not None:
                 self.manReq = True
-
+            else:
+                self.manReq = False
+                time.sleep(0.5)
+                print(self.manReq)
+                if self.manReq != None:
+                    print("\nIf you are ON WINDOWS, genrated modules will NOT work, UNIX only.")
+                    self.manReqConfirm = str(input("Press enter to start over, other UNIX systems go ahead!"))
+                    if self.manReqConfirm is None:
+                        pass
+                    else:
+                        exit()
+                else:
+                    pass
             print(f"\nRemoving requirements.txt in current folder directory...\n")
             time.sleep(1)
             print(os.getcwd() + ", is the current executing path. \nIf this isn't, maybe look into the code, and/or submit an issue at the github")
             time.sleep(2)
             print("\n**Installing**")
+            print(self.manReq)
             time.sleep(1.5)
             if self.manReq:
                 print(f"Installing pre-made modules")
                 time.sleep(1)
+                if os.path.isfile("manReq.txt"):
+                    print("No manReq.txt! Making fresh one")
+                    os.remove("manReq.txt")
                 try:
-                    os.mknod("manReq.txt")
-                except FileExistsError as l:
-                    pass
-                subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent
-                subprocess.run(self.which + f" install -r requirements.txt", shell=True)
+                    wget.download("https://raw.githubusercontent.com/leifadev/scout/main/manReq.txt", "manReq.txt")
+                    print("manReq.txt not present! Generating new one")
+                except urllib.error.HTTPError as err:
+                    print("ERROR: Request for new manReq.txt from github url not found/invalid!")
+
+
+            # subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent
+                subprocess.run(self.which + f" install -r manReq.txt", shell=True)
+                print(f"\n\n **MANREQ INDTALING**\n\n")
 
             elif self.manReq == False:
                 print(f"Installing just now genrated modules...")
                 print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
                 time.sleep(1)
-                subprocess.run(f"pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
+                open('requirements.txt', "w+").close()
+                subprocess.run(f"{self.version} -m pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
                 subprocess.run(self.which + f" install -r requirements.txt", shell=True)
         else:
             print("Not a valid option! Use pip or pip3\nIf you use another version like pip3.9, try pip3, if that doesn't work contact the developer.")
