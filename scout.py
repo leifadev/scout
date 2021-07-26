@@ -19,6 +19,8 @@ from datetime import datetime
 from zipfile import ZipFile
 import urllib.error
 
+
+
 class App:
     def __init__(self, parent):
 
@@ -340,7 +342,7 @@ class App:
 
         clearButton=ttk.Button(parent)
         clearButton["text"] = "Clear"
-        clearButton.place(x=95,y=300,width=70)
+        clearButton.place(x=95, y=300,width=70)
         clearButton["command"] = self.clearConsole_command
 
         self.modeButton=ttk.Button(parent)
@@ -350,7 +352,7 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
-        self.versionText.place(x=795,y=300,width=70,height=30)
+        self.versionText.place(x=740,y=300,width=125,height=30)
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
 
 
