@@ -15,13 +15,17 @@ Using main packages/frameworks/libraries:
 - wget
 - ttkthemes
 - ffmpeg
-
+```
+### Compiling
 Compiler: Pyinstaller v4.2 (6/6/21)
-```
-**Pyinstaller Command**
+
+**Example [setup.py](https://github.com/leifadev/scout/blob/main/setup.py) output [pyinstaller](https://www.pyinstaller.org/) command**
 ```cs
-pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" --version-file="1.5" -n="Scout" scout.py
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
+In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more! 
+
+
 ### Supported Versions
 
 | OS Platform | Supported   |
