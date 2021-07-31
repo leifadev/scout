@@ -3,6 +3,8 @@
 A simple but powerful python-based cross-platform youtube video/audio downloader.
 No bloated javascript ad websites anymore!
 
+
+
 ## Native Build Details
 ```cs
 Currently testing on macOS 10.15-16, Windows 10, Linux Mint 20.1/GNU Linux
@@ -19,12 +21,14 @@ Using main packages/frameworks/libraries:
 ### Compiling
 Compiler: Pyinstaller v4.2 (6/6/21)
 
-**Example [setup.py](https://github.com/leifadev/scout/blob/main/setup.py) output [pyinstaller](https://www.pyinstaller.org/) command**
+Example of [setup.py](https://github.com/leifadev/scout/blob/main/setup.py) output [pyinstaller](https://www.pyinstaller.org/) command:
 ```cs
 pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
 ```
-In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more! 
+In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more!
 
+
+> <img src="https://github.com/leifadev/scout/blob/main/doc/images/compile%20example.png" alt="Example" height="400" width="600"/>
 
 ### Supported Versions
 
