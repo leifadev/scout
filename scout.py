@@ -352,14 +352,9 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
-<<<<<<< HEAD
         self.versionText.place(x=795,y=300,width=40,height=25)
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("charSize"), wraplength=160)
 
-=======
-        self.versionText.place(x=740,y=300,width=125,height=30)
-        self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
->>>>>>> fb630e615ff66e7e8b5d0b8fd3f763f41c2cbfb5
 
 
         ## All selections/menus for format and quailty choice ##
