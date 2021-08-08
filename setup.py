@@ -76,7 +76,7 @@ class setup:
                     print("\nYour pip version may be outdated or your entry is invalid.")
                     return
             if "3" in self.which:
-                print("/nOk, you seem to be using a pip version of pip3 or pip3.9!")
+                print("\nOk, you seem to be using a pip version of pip3 or pip3.9!")
         else:
             print("\nYou have to use pip as your package manager!")
             return
@@ -97,20 +97,19 @@ class setup:
             except FileNotFoundError:
                 print(f'requirements.txt is not present as acting for freezing modules. Maybe you have a file for this under a different name?')
 
-            self.manReq = str(input("\n*Premade option reccomended!*\nEnter for default version modules, anything for generated:"))
-            if self.manReq is not None:
+            self.manReq = str(input("\n*Premade option reccomended!*\nEnter for default version modules, anything for generated: "))
+            if self.manReq == "":
                 self.manReq = True
             else:
                 self.manReq = False
                 time.sleep(0.5)
-                print(self.manReq)
                 if self.manReq != None:
-                    print("\nIf you are ON WINDOWS, genrated modules will NOT work, UNIX only.")
-                    self.manReqConfirm = str(input("Press enter to start over, other UNIX systems go ahead!"))
-                    if self.manReqConfirm is None:
-                        pass
-                    else:
+                    print("\nIf you are ON WINDOWS, genrated modules will NOT work, for UNIX only.")
+                    self.manReqConfirm = str(input("Press enter to start over, other UNIX systems go ahead enter anything: "))
+                    if self.manReqConfirm is "":
                         exit()
+                    else:
+                        pass
                 else:
                     pass
             print(f"\nRemoving requirements.txt in current folder directory...\n")
