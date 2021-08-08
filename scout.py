@@ -17,7 +17,8 @@ import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
 from zipfile import ZipFile
-from urllib.error import HTTPError
+import urllib.error
+
 
 
 class App:
@@ -138,6 +139,8 @@ class App:
             }
         ]
 
+        print(platform.system())
+
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc):
             path = os.path.join(self.fileLoc)
@@ -154,7 +157,7 @@ class App:
                 f.close()
         # makes a copy of the newest yml/settings structure
         os.chdir(self.fileLoc)
-        cache = open("cache.yml", "w+")
+        cache = open(self.cachedir, "w+")
         yaml.dump(self.payload, cache, Dumper=yaml.RoundTripDumper)
         cache.close()
         print("Cache updated!")
@@ -193,7 +196,7 @@ class App:
         # Building scout on windows with Pyinstaller needs the .ico file for use at first!
 
         print("Attemping logo downloading...")
-        url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
+        url = "https://raw.githubusercontent.com/leifadev/scout/main/images/scout_logo.png"
 
         # Download icon for use if not present
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
@@ -341,7 +344,7 @@ class App:
 
         clearButton=ttk.Button(parent)
         clearButton["text"] = "Clear"
-        clearButton.place(x=95,y=300,width=70)
+        clearButton.place(x=95, y=300,width=70)
         clearButton["command"] = self.clearConsole_command
 
         self.modeButton=ttk.Button(parent)
@@ -351,8 +354,13 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
+<<<<<<< HEAD
         self.versionText.place(x=770,y=300,width=70,height=30)
+=======
+        self.versionText.place(x=740,y=300,width=125,height=30)
+>>>>>>> d357f7e873af419b55cb66a444727b8d4aef2954
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
+
 
 
         ## All selections/menus for format and quailty choice ##
@@ -429,7 +437,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -449,7 +457,13 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        if platform.system() != "darwin":
+        # if platform.system() != "Darwin":
+        #     print("BS")
+        # else:
+        #     print("LOLOLOL")
+
+        if platform.system() != "Darwin":
+            print("ITS WORKING 1")
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -468,6 +482,8 @@ class App:
         else:
             self.logfield["state"] = "normal"
             if not os.path.isfile(self.fileLoc + "ffmpeg"):
+                print(self.fileLoc + "\nIS HERE <<<<<")
+                print("\nNO FFMPEG OK\n")
                 messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
@@ -566,14 +582,16 @@ class App:
             self.yt = YouTube(self.query)
 
 
-        except RegexMatchError:
-            print("Regex match error! Invalid...")
-
-        except HTTPError as err:
+        except RegexMatchError as e:
+            print("Regex match error! Invalid...\n" + str(e) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
-            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            self.logfield.insert(END, f'\nERROR: There was a regex match error. Invalid link or entry!\n')
+            self.logfield["state"] = "disabled" # disable log after any erros are detected
 
-            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n{err}')
+        except urllib.error.HTTPError as err:
+            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            self.logfield["state"] = "normal" # disable log after any erros are detected
+            self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
         # Thumbnail download
@@ -750,7 +768,7 @@ class App:
             self.logfield["state"] = "normal"
             if self.enablePrompts:
                 messagebox.showwarning("Warning", "Video resolutions for this option are lower quailty.")
-                self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
+                # self.logfield.insert(END, f'\nINFO: These downloads take extra long, don\'t quit me!\n')
             try:
                 self.yt = YouTube(self.query)
                 silent_audioDown = self.yt.streams.filter(res=self.videoq, only_video=True).first()
@@ -930,10 +948,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
