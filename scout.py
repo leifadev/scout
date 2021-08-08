@@ -351,7 +351,7 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
-        self.versionText.place(x=795,y=300,width=70,height=30)
+        self.versionText.place(x=770,y=300,width=70,height=30)
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
 
 
@@ -403,16 +403,11 @@ class App:
             self.videoButton["selectcolor"] = "#a2a2a2"
 
         else:
-            if platform.system() in "Linux":
-                #background color for Checkbuttons
-                self.audioButton["activebackground"] = "#d9d9d9"
-                self.videoButton["activebackground"] = "#d9d9d9"
-            else:
-                self.versionText['bg'] = "#ececec"
-                self.versionText["fg"] = "#464646"
+            self.versionText['bg'] = "#ececec"
+            self.versionText["fg"] = "#464646"
 
-                self.audioButton["bg"] = "#ececec"
-                self.videoButton["bg"] = "#ececec"
+            self.audioButton["bg"] = "#ececec"
+            self.videoButton["bg"] = "#ececec"
 
 
 
