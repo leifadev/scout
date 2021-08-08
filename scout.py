@@ -12,7 +12,8 @@ import getpass
 from ruamel import yaml
 import os
 import wget
-import platform
+import distro
+# import platform
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -40,6 +41,7 @@ class App:
         self.version = "v1.5"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
+        self.OS = distro.name(pretty=False)
         self.videoq = "" # vid quality example: 720p
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
@@ -56,7 +58,7 @@ class App:
 
         # Sets various variables for each OS being used.
         # Fonts, directories, special boolean values, etc.
-        if platform.system() in "Linux":
+        if self.OS not in "Windows Darwin":
             self.fileLoc = os.path.expanduser("~/.config/Scout/")
             self.dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
             self.ymldir = os.path.expanduser("~/.config/Scout/settings.yml")
@@ -76,7 +78,7 @@ class App:
                 "verSize": 7
             }
 
-        elif platform.system() in "Darwin":
+        elif self.OS in "Darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
             self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
             self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
@@ -96,7 +98,7 @@ class App:
                 "verSize": 12
             }
 
-        elif platform.system() in "Windows": # change value for new platform object
+        elif self.OS in "Windows": # change value for new platform object
             self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
             self.dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
             self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
@@ -139,7 +141,7 @@ class App:
             }
         ]
 
-        print(platform.system())
+        print(self.OS)
 
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc):
@@ -228,10 +230,10 @@ class App:
             if self.darkMode:
                 parent.set_theme("equilux")
             else:
-                if platform.system() in "Darwin":
+                if self.OS in "Darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
-                elif platform.system() in "Linux":
+                elif self.OS not in "Windows Darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
 
@@ -354,11 +356,7 @@ class App:
 
         self.versionText = tk.Label(parent)
         self.versionText = Label(parent, text=self.version)
-<<<<<<< HEAD
-        self.versionText.place(x=770,y=300,width=70,height=30)
-=======
         self.versionText.place(x=740,y=300,width=125,height=30)
->>>>>>> d357f7e873af419b55cb66a444727b8d4aef2954
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
 
 
@@ -437,7 +435,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -457,13 +455,12 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        # if platform.system() != "Darwin":
+        # if self.OS != "Darwin":
         #     print("BS")
         # else:
         #     print("LOLOLOL")
 
-        if platform.system() != "Darwin":
-            print("ITS WORKING 1")
+        if self.OS != "Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -482,8 +479,6 @@ class App:
         else:
             self.logfield["state"] = "normal"
             if not os.path.isfile(self.fileLoc + "ffmpeg"):
-                print(self.fileLoc + "\nIS HERE <<<<<")
-                print("\nNO FFMPEG OK\n")
                 messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
@@ -948,10 +943,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
