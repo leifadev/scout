@@ -41,6 +41,7 @@ class App:
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
         self.OS = distro.name(pretty=False)
+        self.ffmpegDir = self.fileLoc + "ffmpeg"
         self.videoq = "" # vid quality example: 720p
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
@@ -68,6 +69,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -88,6 +90,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffmpegDir = "/Users/" + self.getUser + "/Library/Application\ Support/Scout/ffmpeg"
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 12,
@@ -108,6 +111,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
+            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -652,7 +656,7 @@ class App:
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
 
                     # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
 
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
@@ -725,11 +729,12 @@ class App:
 
                 audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                 os.chdir(self.fileLoc)
+                print("\n\n"+os.getcwd()+"\n\n")
                 self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
                 filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                 self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
                 self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                 os.remove(f"{filtered}.mp4")
 
@@ -803,7 +808,7 @@ class App:
                     filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
 
