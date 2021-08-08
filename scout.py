@@ -139,6 +139,8 @@ class App:
             }
         ]
 
+        print(platform.system())
+
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc):
             path = os.path.join(self.fileLoc)
@@ -194,7 +196,7 @@ class App:
         # Building scout on windows with Pyinstaller needs the .ico file for use at first!
 
         print("Attemping logo downloading...")
-        url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
+        url = "https://raw.githubusercontent.com/leifadev/scout/main/images/scout_logo.png"
 
         # Download icon for use if not present
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
@@ -456,7 +458,13 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        if platform.system() != "darwin":
+        # if platform.system() != "Darwin":
+        #     print("BS")
+        # else:
+        #     print("LOLOLOL")
+
+        if platform.system() != "Darwin":
+            print("ITS WORKING 1")
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -475,6 +483,8 @@ class App:
         else:
             self.logfield["state"] = "normal"
             if not os.path.isfile(self.fileLoc + "ffmpeg"):
+                print(self.fileLoc + "\nIS HERE <<<<<")
+                print("\nNO FFMPEG OK\n")
                 messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
