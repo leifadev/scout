@@ -1,9 +1,22 @@
 # Scout
 
-A simple but powerful python-based cross-platform youtube video/audio downloader.
-No bloated javascript ad websites anymore!
+A simple but powerful python-based __cross-platform__ youtube video/audio downloader.
 
+No bloated javascript fishy redirect ad websites anymore!
 
+> <img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="250" width="570"/>
+
+## Why use Scout?
+|              Features             	|      Websites      	|        Scout       	|
+|:---------------------------------:	|:------------------:	|:------------------:	|
+| Download videos                   	| :white_check_mark: 	| :white_check_mark: 	|
+| Only  video  or audio             	|          ➖        	| :white_check_mark: 	|
+| No Ads                            	|          ❌         	| :white_check_mark: 	|
+| No fishy redirect links            	|          ❌         	| :white_check_mark: 	|
+|       Application stability       	|          ❌         	| :white_check_mark: 	|
+| Multiple file formats                  	|          ❌         	| :white_check_mark: 	|
+|         Dark Mode       	          |         ➖   	      | :white_check_mark:|
+|       Download Thumbnails         	|         ➖         	| :white_check_mark:|
 
 ## Native Build Details
 ```cs
@@ -28,7 +41,7 @@ pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="
 In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more!
 
 
-> <img src="https://github.com/leifadev/scout/blob/main/doc/images/compile%20example.png" alt="Example" height="400" width="600"/>
+> <img src="https://github.com/leifadev/scout/blob/main/doc/images/compile%20example.png" alt="Example" height="350" width="550"/>
 
 ### Supported Versions
 
