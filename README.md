@@ -6,7 +6,7 @@ No bloated javascript fishy redirect ad websites anymore!
 
 <img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="300" width="690"/>
 
-## Why use Scout?
+## Why Scout?
 |              Features             	|      Websites      	|        Scout       	|
 |:---------------------------------:	|:------------------:	|:------------------:	|
 | Download videos                   	| :white_check_mark: 	| :white_check_mark: 	|
@@ -17,6 +17,7 @@ No bloated javascript fishy redirect ad websites anymore!
 | Multiple file formats                  	|          ❌         	| :white_check_mark: 	|
 |         Dark Mode       	          |         ➖   	      | :white_check_mark:|
 |       Download Thumbnails         	|         ➖         	| :white_check_mark:|
+
 
 ## Native Build Details
 ```cs
@@ -31,17 +32,6 @@ Using main packages/frameworks/libraries:
 - ttkthemes
 - ffmpeg
 ```
-### Compiling
-Compiler: Pyinstaller v4.2 (6/6/21)
-
-Example of [setup.py](https://github.com/leifadev/scout/blob/main/setup.py) output [pyinstaller](https://www.pyinstaller.org/) command:
-```cs
-pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
-```
-In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more!
-
-
-> <img src="https://github.com/leifadev/scout/blob/main/doc/images/compile%20example.png" alt="Example" height="350" width="550"/>
 
 ### Supported Versions
 
@@ -52,6 +42,20 @@ In the makefile, or just using the setup.py you can easily configure and build y
 | Linux   | :white_check_mark: |
 
 *Since this is based only with python it is versatile for OS support*
+
+## Compiling
+Compiler: Pyinstaller v4.2 (6/6/21)
+
+Example of [setup.py](https://github.com/leifadev/scout/blob/main/setup.py) output [pyinstaller](https://www.pyinstaller.org/) command:
+```cs
+pyinstaller --onefile --windowed --icon=scout_logo.png --osx-bundle-identifier="com.leifadev.scout" -n="Scout" scout.py
+```
+In the makefile, or just using the setup.py you can easily configure and build your own instance of scout. It uses your paths to python and automatically installs all the needed modules and dependcies for Scout (by default), asks for version, name, bundleId, debug, and more!
+
+
+> <img src="https://github.com/leifadev/scout/blob/main/doc/images/compile%20example.png" alt="Example" height="350" width="560"/>
+
+
 
  ## To-do list
 - ~~Release alpha version include barebones of functionality~~
