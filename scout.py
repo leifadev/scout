@@ -12,7 +12,7 @@ import getpass
 from ruamel import yaml
 import os
 import wget
-import platform
+import distro
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -40,6 +40,8 @@ class App:
         self.version = "v1.5"
         self.logFont = "No value!"
         self.getUser = getpass.getuser()
+        self.OS = distro.name(pretty=False)
+        self.ffmpegDir = self.fileLoc + "ffmpeg"
         self.videoq = "" # vid quality example: 720p
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
@@ -56,7 +58,7 @@ class App:
 
         # Sets various variables for each OS being used.
         # Fonts, directories, special boolean values, etc.
-        if platform.system() in "Linux":
+        if self.OS not in "Windows Darwin":
             self.fileLoc = os.path.expanduser("~/.config/Scout/")
             self.dirDefaultSetting = "/home/" + self.getUser + "/Desktop"
             self.ymldir = os.path.expanduser("~/.config/Scout/settings.yml")
@@ -67,6 +69,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 10,
@@ -76,7 +79,7 @@ class App:
                 "verSize": 7
             }
 
-        elif platform.system() in "Darwin":
+        elif self.OS in "Darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
             self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
             self.cachedir = "/Users/" + self.getUser + "/Library/Application Support/Scout/cache.yml"
@@ -87,6 +90,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "/"
+            self.ffmpegDir = "/Users/" + self.getUser + "/Library/Application\ Support/Scout/ffmpeg"
             self.UIAttributes = { # dictionarys for each OS to match aesthics
                 "Font": "Source Code Pro",
                 "charSize": 12,
@@ -96,7 +100,7 @@ class App:
                 "verSize": 12
             }
 
-        elif platform.system() in "Windows": # change value for new platform object
+        elif self.OS in "Windows": # change value for new platform object
             self.fileLoc = "C:\\Users\\" + self.getUser + "\\Appdata\\Roaming\\Scout\\"
             self.dirDefaultSetting = "C:\\Users\\" + self.getUser + "\Desktop"
             self.ymldir = "C:\\Users\\" + self.getUser + "\\AppData\\Roaming\\Scout\\settings.yml"
@@ -107,6 +111,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
+            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -138,6 +143,8 @@ class App:
                 }
             }
         ]
+
+        print(self.OS)
 
         # Generates initial yml file and folder, detects missing files as well
         if not os.path.isfile(self.fileLoc):
@@ -194,7 +201,7 @@ class App:
         # Building scout on windows with Pyinstaller needs the .ico file for use at first!
 
         print("Attemping logo downloading...")
-        url = "https://raw.githubusercontent.com/leifadev/scout/main/scout_logo.png"
+        url = "https://raw.githubusercontent.com/leifadev/scout/main/images/scout_logo.png"
 
         # Download icon for use if not present
         if not os.path.isfile(self.fileLoc + "scout_logo.png"):
@@ -226,10 +233,10 @@ class App:
             if self.darkMode:
                 parent.set_theme("equilux")
             else:
-                if platform.system() in "Darwin":
+                if self.OS in "Darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
-                elif platform.system() in "Linux":
+                elif self.OS not in "Windows Darwin":
                     parent['bg'] = "#ececec"
                     print("\nLaunching in light mode!")
 
@@ -356,6 +363,7 @@ class App:
         self.versionText["font"] = tkFont.Font(family=self.UIAttributes.get("Font"), size=self.UIAttributes.get("verSize"))
 
 
+
         ## All selections/menus for format and quailty choice ##
 
         self.clickedvf = StringVar()
@@ -404,16 +412,11 @@ class App:
             self.videoButton["selectcolor"] = "#a2a2a2"
 
         else:
-            if platform.system() in "Linux":
-                #background color for Checkbuttons
-                self.audioButton["activebackground"] = "#d9d9d9"
-                self.videoButton["activebackground"] = "#d9d9d9"
-            else:
-                self.versionText['bg'] = "#ececec"
-                self.versionText["fg"] = "#464646"
+            self.versionText['bg'] = "#ececec"
+            self.versionText["fg"] = "#464646"
 
-                self.audioButton["bg"] = "#ececec"
-                self.videoButton["bg"] = "#ececec"
+            self.audioButton["bg"] = "#ececec"
+            self.videoButton["bg"] = "#ececec"
 
 
 
@@ -435,7 +438,7 @@ class App:
         ft = tkFont.Font(family=self.UIAttributes.get("logFont"), size=self.UIAttributes.get("logSize"))
         self.logfield["font"] = ft
         self.logfield["highlightthickness"] = 0
-        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+        self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         self.logfield["state"] = "disabled"
         if self.darkMode:
             self.logfield["bg"] = "#e5e5e5"
@@ -455,7 +458,12 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        if platform.system() != "darwin":
+        # if self.OS != "Darwin":
+        #     print("BS")
+        # else:
+        #     print("LOLOLOL")
+
+        if self.OS != "Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
@@ -648,7 +656,7 @@ class App:
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
 
                     # Running ffmpeg in console with subprocess, multiple flags to leave out extra verbose output from ffpmeg, and say yes to all arguments
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
 
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
@@ -721,11 +729,12 @@ class App:
 
                 audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                 os.chdir(self.fileLoc)
+                print("\n\n"+os.getcwd()+"\n\n")
                 self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                 self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
-                subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
+                subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
                 self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                 os.remove(f"{filtered}.mp4")
 
@@ -796,10 +805,10 @@ class App:
                     silent_audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                     os.chdir(self.fileLoc)
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#"'})
+                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
-                    subprocess.run(f'ffmpeg -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
+                    subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
                     self.logfield.insert(END, f'\nINFO: Removing temp file...\n')
                     os.remove(f"{filtered}.mp4")
 
@@ -938,10 +947,10 @@ class App:
         if self.enablePrompts:
             messagebox.showwarning("Warning", "Are you sure you want to clear the console?")
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         else:
             self.logfield.delete("1.0","end")
-            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {platform.system()}\n')
+            self.logfield.insert(END, "Scout launched successfully!\nVersion: " + self.version + "\n" + f'OS: {self.OS}\n')
         self.logfield["state"] = "disabled" # quickly disbaled user ability to edit log
 
 
