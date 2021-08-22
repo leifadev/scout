@@ -14,7 +14,7 @@ No bloated javascript fishy redirect ad websites anymore!
 | No Ads                            	|          ❌         	| :white_check_mark: 	|
 | No fishy redirect links            	|          ❌         	| :white_check_mark: 	|
 |       Application stability       	|          ❌         	| :white_check_mark: 	|
-| Multiple file formats                  	|          ❌         	| :white_check_mark: 	|
+| Multiple file formats                  	|          ❌     	| :white_check_mark: 	|
 |         Dark Mode       	          |         ➖   	      | :white_check_mark:|
 |       Download Thumbnails         	|         ➖         	| :white_check_mark:|
 
@@ -23,7 +23,7 @@ No bloated javascript fishy redirect ad websites anymore!
 ```cs
 Currently testing on macOS 10.15-16, Windows 10, Linux Mint 20.1/GNU Linux
 
-Tested python versions: 3.7 - 9.2
+Tested on Python 3, uses f-strings requiring 3.6+
 
 Using main packages/frameworks/libraries:
 - pytube
