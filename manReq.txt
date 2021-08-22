@@ -9,3 +9,4 @@ ttkthemes==3.2.2
 typing-extensions==3.10.0.0
 wget==3.2
 wheel==0.36.2
+distro==1.4.0
