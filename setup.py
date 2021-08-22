@@ -282,7 +282,7 @@ class setup:
 
         time.sleep(2)
 
-        print(f'\nCommand:\n{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file={self.appVersion} -n={self.name} {self.targetFile}\n')
+        print(f'\nCommand:\n{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file="{self.appVersion}" -n={self.name} {self.targetFile}\n')
 
         time.sleep(1)
 
