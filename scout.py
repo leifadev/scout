@@ -13,6 +13,7 @@ from ruamel import yaml
 import os
 import wget
 import distro
+import platform
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -54,6 +55,13 @@ class App:
         #             Backend Config and Logos             #
         #                                                  #
         ####################################################
+
+
+
+        if "Windows" in platform.platform():
+            self.OS = "Windows"
+        else:
+            pass
 
 
         # Sets various variables for each OS being used.
@@ -932,7 +940,7 @@ class App:
 
     # Help button takes user the github page, has wiki, code,issues, readme.md file and more
     def helpButton_command(self):
-        webbrowser.open("https://github.com/leifadev/scout")
+        webbrowser.open("https://github.com/leifadev/scout/wiki#help")
         self.logfield["state"] = "normal"
         self.logfield.insert(END, "\n\nINFO: Launched help page! Documentation, Code, Wiki, and more :)\n")
         self.logfield["state"] = "disabled"
