@@ -16,6 +16,8 @@ import subprocess
 import os
 import urllib.error
 import time # asthetic reasons, slowing down time for verbose messages to be seen!
+import wget
+
 
 # script compiles scout based on OS from makefile :D
 
@@ -84,7 +86,6 @@ class setup:
 
         # Make and/or reset module requirements!
         try:
-            import wget
             import pipdeptree
         except ModuleNotFoundError:
             print("You do not have the module 'pipdeptree'")
