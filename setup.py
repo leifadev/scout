@@ -180,11 +180,11 @@ class setup:
         print(f'\nYou chose:\n >> {self.debug} << \n')
 
 
-        print("\nVersion: Adds a version file value with your compile arguments\n")
-
-        self.appVersion = str(input("Press enter for no version value, type your desired custom version (e.g. v1.1.1, v.2.1-beta): "))
-
-        print(f'\nYou chose:\n >> {self.appVersion} << \n')
+        # print("\nVersion: Adds a version file value with your compile arguments\n")
+        #
+        # self.appVersion = str(input("Press enter for no version value, type your desired custom version (e.g. v1.1.1, v.2.1-beta): "))
+        #
+        # print(f'\nYou chose:\n >> {self.appVersion} << \n')
 
 
         print(f'\nFound these image files in images direcotry\nDetected Possible Icons:')
