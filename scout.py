@@ -466,7 +466,7 @@ class App:
         if self.OS != "Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
-                self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Install it through http://ffmpeg.org. If it is installed, make sure that the folder of the ffmpeg executable is on the PATH.\n')
+                self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Download through http://ffmpeg.org. Install here: https://github.com/leifadev/scout/wiki/Install-FFmpeg#windows.\n')
                 self.ffmpeg = False
                 self.logfield["state"] = "disabled"
                 print("You don't have FFmpeg installed! You can't use custom file types.")
