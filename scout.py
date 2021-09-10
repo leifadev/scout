@@ -901,13 +901,13 @@ class App:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.path = data[0]['Options']['defaultDir'] # Fetch any set default directories specificed in settings pane
             self.changedDefaultDir = data[0]['Options']['changedDefaultDir']
-            
+
         # First we load the data of the defaultDir value, regardless if we need it for the a selected default directory in settings by the user
         if self.changedDefaultDir:
-            askdirectory(initialdir=self.path) # If the default directory feature was used witha custom path, we will use it from the YML settings file
+            askdirectory(initialdir=self.path) # If the default directory feature was used with a custom path, we will use it from the YML settings file
         else:
             print("* Not using a default custom directory!")
-            self.path = askdirectory(initialdir='/Users/' + self.getUser + '/Desktop/') # Else if the boolean was false, we simply override the fetched self.path to another askdirectory call, redefining self.path!
+            self.path = askdirectory(initialdir=self.path) # Else if the boolean was false, we simply override the fetched self.path with the default desktop directory!
         print(self.path)
 
     # This includes changes boolean status for video/audio inclusion as well as handling the UI elements for them
