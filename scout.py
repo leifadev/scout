@@ -674,7 +674,7 @@ class App:
                     self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n') # This and below show in the log what actually stream object they downloaded with there video. Helpful for debugging!
                     self.videoFetch(self.yt, self.query) # Fetching post-log video info, function up top this download function
                 else:
-                    print(f'\n\nYESY{self.path}\n\n')
+                    print(f'\n\n{self.path}\n\n')
                     videoDown.download(self.path, filename_prefix=self.filePrefix)
                     self.logfield.insert(END, f'\nINFO: The {videoDown}, codec/itag was used.\n')
                     self.videoFetch(self.yt, self.query)
@@ -901,7 +901,7 @@ class App:
             data = yaml.load(yml, Loader=yaml.Loader)
             self.path = data[0]['Options']['defaultDir'] # Fetch any set default directories specificed in settings pane
             self.changedDefaultDir = data[0]['Options']['changedDefaultDir']
-            
+
         # First we load the data of the defaultDir value, regardless if we need it for the a selected default directory in settings by the user
         if self.changedDefaultDir:
             askdirectory(initialdir=self.path) # If the default directory feature was used witha custom path, we will use it from the YML settings file

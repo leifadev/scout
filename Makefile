@@ -21,12 +21,12 @@ help:
 	@echo "\nCoded by leifadev\nhttps://github.com/leifadev/scout\n"
 
 setup:
-	@echo "Setting up project"
-	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
-	@${PIP} install -r requirements.txt
-	@echo "Pulling from git"
-	@git pull
-	@echo "Launching scout, new files will be generated."
+	@echo "Setup function currently disabled.\nUse build to install all required modules."
+#	@echo "Modify your '{PIP}' variable in your Makefile to match your current one"
+#	@${PIP} install -r requirements.txt
+#	@echo "Pulling from git"
+#	@git pull
+#	@echo "Launching scout, new files will be generated."
 
 clean:
 	@echo "Cleaning project\n\n--------------------------\n"
