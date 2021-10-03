@@ -136,7 +136,7 @@ class App:
         ####################################################
 
         # Summary of this block: This generates the YML from scratch if its outdated or doesnt exist, and ignores otherwise.
-        # Uses sample yml "cache.yml" to compare it being the newest yml to a potentially old one. (Not ennough or different settings).
+        # Uses sample yml "cache.yml" to compare it being the newest yml to a potentially old one. (Not enough or different settings).
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -659,7 +659,7 @@ class App:
                     os.chdir(self.fileLoc)
                     # From below we mod the downloaded file for perms to be used with, UNIX system only apply
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
+                    filtered = self.yt.title.translate({ord(i): None for i in '=|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
 
@@ -740,7 +740,7 @@ class App:
                 os.chdir(self.fileLoc)
                 print("\n\n"+os.getcwd()+"\n\n")
                 self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
+                filtered = self.yt.title.translate({ord(i): None for i in '=|;:/,.?*^%$#\'"'})
                 subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                 self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedaf.get()}\n')
                 subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedaf.get()}\"', shell=True)
@@ -814,7 +814,7 @@ class App:
                     silent_audioDown.download(self.fileLoc, filename_prefix=self.filePrefix)
                     os.chdir(self.fileLoc)
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
-                    filtered = self.yt.title.translate({ord(i): None for i in '|;:/,.?*^%$#\'"'})
+                    filtered = self.yt.title.translate({ord(i): None for i in '=|;:/,.?*^%$#\'"'})
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
                     subprocess.run(f'{self.ffmpegDir} -hide_banner -loglevel error -y -i \"{self.fileLoc}{filtered}.mp4\" \"{self.path}{self.path_slash}{filtered}.{self.clickedvf.get()}\"', shell=True)
