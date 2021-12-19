@@ -471,7 +471,7 @@ class App:
         # else:
         #     print("LOLOLOL")
 
-        if self.OS != "Darwin":
+        if self.OS != "Darwin" or "Windows":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Download through http://ffmpeg.org. Install here: https://github.com/leifadev/scout/wiki/Install-FFmpeg#windows.\n')
@@ -487,6 +487,7 @@ class App:
             else:
                 self.ffmpeg = True
                 print("\nYou have FFmpeg installed! You can use custom file types.\n")
+
         else:
             self.logfield["state"] = "normal"
             if not os.path.isfile(self.fileLoc + "ffmpeg"):
@@ -507,8 +508,9 @@ class App:
                     zip.extractall()
                 print("\nFile extracted...\n")
 
-                subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
-                print("\nFFmpeg binary is now executable! :)\n")
+                if self.OS in "darwin": # run for perms for UNIX bs
+                    subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
+                    print("\nFFmpeg binary is now executable! :)\n")
 
                 os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
                 print("\nPurged inital zip file\n")
@@ -529,6 +531,7 @@ class App:
                 self.audioformat["state"] = "disabled"
                 self.ffmpeg = False
             self.logfield["state"] = "disabled"
+
 
 
     ######################################################################################
