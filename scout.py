@@ -64,6 +64,7 @@ class App:
             pass
 
 
+
         # Sets various variables for each OS being used.
         # Fonts, directories, special boolean values, etc.
         if self.OS not in "Windows Darwin":
@@ -86,7 +87,7 @@ class App:
                 "logSize": 9,
                 "verSize": 7
             }
-
+            
         elif self.OS in "Darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
             self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
@@ -907,10 +908,11 @@ class App:
 
         # First we load the data of the defaultDir value, regardless if we need it for the a selected default directory in settings by the user
         if self.changedDefaultDir:
-            askdirectory(initialdir=self.path) # If the default directory feature was used witha custom path, we will use it from the YML settings file
+            askdirectory(initialdir=self.path) # If the default directory feature was used with a custom path, we will use it from the YML settings file
         else:
             print("* Not using a default custom directory!")
-            self.path = askdirectory(initialdir='/Users/' + self.getUser + '/Desktop/') # Else if the boolean was false, we simply override the fetched self.path to another askdirectory call, redefining self.path!
+            self.path = askdirectory(initialdir=self.path) # Else if the boolean was false, we simply override the fetched self.path with the default desktop directory!
+            self.path = self.dirDefaultSetting
         print(self.path)
 
     # This includes changes boolean status for video/audio inclusion as well as handling the UI elements for them

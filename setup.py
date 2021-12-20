@@ -90,6 +90,8 @@ class setup:
         except ModuleNotFoundError:
             print("You do not have the module 'pipdeptree'")
             subprocess.run(f'{self.which} install pipdeptree wget', shell=True)
+            import wget as wget
+            import pipdeptree as pipdeptree
 
         if self.which in ("pip","pip3"):
             time.sleep(0.5)
@@ -120,30 +122,36 @@ class setup:
             print("\n**Installing**")
             print(self.manReq)
             time.sleep(1.5)
-            if self.manReq:
-                print(f"Installing pre-made modules")
-                time.sleep(1)
-                if os.path.isfile("manReq.txt"):
-                    print("No manReq.txt! Making fresh one")
-                    os.remove("manReq.txt")
-                try:
-                    wget.download("https://raw.githubusercontent.com/leifadev/scout/main/manReq.txt", "manReq.txt")
-                    print("manReq.txt not present! Generating new one")
-                except urllib.error.HTTPError as err:
-                    print("ERROR: Request for new manReq.txt from github url not found/invalid!")
+            try:
+                import tkinter
+                if self.manReq:
+                    print(f"Installing pre-made modules")
+                    time.sleep(1)
+                    if os.path.isfile("manReq.txt"):
+                        print("No manReq.txt! Making fresh one")
+                        os.remove("manReq.txt")
+                    import wget as wget
+                    try:
+                        wget.download("https://raw.githubusercontent.com/leifadev/scout/main/manReq.txt", "manReq.txt")
+                        print("manReq.txt not present! Generating new one")
+                    except urllib.error.HTTPError as err:
+                        print("ERROR: Request for new manReq.txt from github url not wasn't found/invalid!")
 
 
-            # subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent
-                subprocess.run(self.which + f" install -r manReq.txt", shell=True)
-                print(f"\n\n **MANREQ INDTALING**\n\n")
+                # subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent')
+                    subprocess.run(self.which + f" install -r manReq.txt", shell=True)
+                    print(f"\n\n **MANREQ DONE**\n\n")
 
-            elif self.manReq == False:
-                print(f"Installing just now genrated modules...")
-                print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
-                time.sleep(1)
-                open('requirements.txt', "w+").close()
-                subprocess.run(f"{self.version} -m pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
-                subprocess.run(self.which + f" install -r requirements.txt", shell=True)
+                elif self.manReq == False:
+                    print(f"Installing just now genrated modules...")
+                    print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
+                    time.sleep(1)
+                    open('requirements.txt', "w+").close()
+                    subprocess.run(f"{self.version} -m pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
+                    subprocess.run(self.which + f" install -r requirements.txt", shell=True)
+            except ModuleNotFoundError as e:
+                print(f'\n----------------------------------------------\nYou do not have tkinter installed with python!\nTkinter is required for the GUI to work.\n----------------------------------------------\n')
+                pass
         else:
             print("Not a valid option! Use pip or pip3\nIf you use another version like pip3.9, try pip3, if that doesn't work contact the developer.")
             return
