@@ -57,7 +57,6 @@ class App:
         ####################################################
 
 
-
         if "Windows" in platform.platform():
             self.OS = "Windows"
         else:
@@ -87,7 +86,7 @@ class App:
                 "logSize": 9,
                 "verSize": 7
             }
-            
+
         elif self.OS in "Darwin":
             self.fileLoc = "/Users/" + self.getUser + "/Library/Application Support/Scout/"
             self.dirDefaultSetting = "/Users/" + self.getUser + "/Desktop"
@@ -472,7 +471,7 @@ class App:
         # else:
         #     print("LOLOLOL")
 
-        if self.OS != "Darwin" or "Windows":
+        if self.OS not in "Windows Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
                 self.logfield.insert(END, f'\nWARNING: You do not have FFmpeg installed, and you cannot choose custom file types!\n |\n └ MacOS: Install homebrew and download it, "brew install ffmpeg". Install brew from \nhttps://brew.sh\n | \n └ Linux: Install it with your package manager, e.g. apt install ffmpeg.\n | \n └ Windows: Download through http://ffmpeg.org. Install here: https://github.com/leifadev/scout/wiki/Install-FFmpeg#windows.\n')
@@ -485,6 +484,7 @@ class App:
                 self.videoformat["state"] = "disabled"
                 self.audioformat["state"] = "disabled"
                 print("\nFFmpeg isn't installed, read console for instructions!\n")
+                print("Operating system is LINUX")
             else:
                 self.ffmpeg = True
                 print("\nYou have FFmpeg installed! You can use custom file types.\n")
@@ -531,6 +531,7 @@ class App:
                 self.videoformat["state"] = "disabled"
                 self.audioformat["state"] = "disabled"
                 self.ffmpeg = False
+                print("")
             self.logfield["state"] = "disabled"
 
 
