@@ -19,7 +19,7 @@ import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
 from zipfile import ZipFile
 import urllib.error
-
+import ssl
 
 
 class App:
@@ -47,7 +47,8 @@ class App:
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
         self.audiof = "" # audio format example: wav
-        # DEVS DONT INCLUDE "."s ^^^BEFORE EXTENSIONS^^^
+
+        ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
 
         ####################################################
@@ -496,14 +497,17 @@ class App:
 
                 self.logfield["state"] = "normal"
 
-                self.logfield.insert(END, f'\nINFO: If don\'t have an internet connection to isntall FFmpeg, you can for now use file formatting features.\n\nJust relaunch scout when you have internet and you are good to go.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
+                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
 
                 print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
 
-                os.chdir(self.fileLoc)
-                wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
-
                 print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
+
+                os.chdir(self.fileLoc)
+                self.logfield.insert(END, f'\nINFO: If don\'t h')
+
+                time.sleep(1)
+                wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
 
                 with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
                     zip.extractall()
