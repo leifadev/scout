@@ -19,7 +19,7 @@ import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
 from zipfile import ZipFile
 import urllib.error
-
+import ssl
 
 
 class App:
@@ -49,6 +49,7 @@ class App:
         self.audiof = "" # audio format example: wav
         # DEVS DONT INCLUDE "."s ^^^BEFORE EXTENSIONS^^^
 
+        ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
         ####################################################
         #                                                  #

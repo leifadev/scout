@@ -7,14 +7,14 @@ No bloated javascript fishy redirect ad websites anymore!
 <img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="300" width="690"/>
 
 ## Why Scout?
-|              Features             	|      Websites      	|        Scout       	|
-|:---------------------------------:	|:------------------:	|:------------------:	|
-| Download videos                   	| :white_check_mark: 	| :white_check_mark: 	|
-| Only  video  or audio             	|          ➖        	| :white_check_mark: 	|
-| No Ads                            	|          ❌         	| :white_check_mark: 	|
-| No fishy redirect links            	|          ❌         	| :white_check_mark: 	|
-|       Application stability       	|          ❌         	| :white_check_mark: 	|
-| Multiple file formats                  	|          ❌     	| :white_check_mark: 	|
+|              Features             	|      Websites      	|        Scout       |
+|:---------------------------------:	|:------------------:	|:------------------:|
+| Download videos                   	| :white_check_mark: 	| :white_check_mark: |
+| Only  video  or audio             	|          ➖        	| :white_check_mark:|
+| No Ads                            	|          ❌         	| :white_check_mark:|
+| No fishy redirect links            	|          ❌         	| :white_check_mark:|
+|       Application stability       	|          ❌         	| :white_check_mark:|
+| Multiple file formats               |          ❌     	    | :white_check_mark:|
 |         Dark Mode       	          |         ➖   	      | :white_check_mark:|
 |       Download Thumbnails         	|         ➖         	| :white_check_mark:|
 
