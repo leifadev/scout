@@ -23,6 +23,9 @@ import urllib.error
 import ssl
 
 
+# -*- coding: utf-8 -*-
+# Above allows more charcters to mentioned IN THE CODE
+
 class App:
     def __init__(self, parent):
 
@@ -48,7 +51,7 @@ class App:
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
         self.audiof = "" # audio format example: wav
-        
+
 
         ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
@@ -502,8 +505,6 @@ class App:
                 print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
 
                 os.chdir(self.fileLoc)
-                self.logfield.insert(END, f'\nINFO: If don\'t h')
-
                 time.sleep(1)
 
                 if self.OS in "Darwin":
@@ -513,6 +514,7 @@ class App:
                         print("\nFile extracted...\n")
 
                 elif self.OS in "Windows":
+                    self.logfield.insert(END, f'\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
                     wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
                 try:
                     if self.OS in "Darwin": # run for perms for UNIX bs
@@ -674,7 +676,9 @@ class App:
                     os.chdir(self.fileLoc)
                     # From below we mod the downloaded file for perms to be used with, UNIX system only apply
                     self.logfield.insert(END, f'\n---------------------------------------------------------------------\nINFO: Modding file permissions...\n')
+
                     filtered = self.yt.title.translate({ord(i): None for i in '=|;:/"\',.?*^%$#'}) # filter fetched yt title and remove all special chars, as pytube removes them when it downloads the first one we need to mod
+
                     subprocess.run(f"chmod 755 \"{filtered}.mp4\"", shell=True) # give perms for file with ffmpeg
                     self.logfield.insert(END, f'\nINFO: Converting inital file to .{self.clickedvf.get()}\n')
 
