@@ -17,6 +17,7 @@ No bloated javascript fishy redirect ad websites anymore!
 | Multiple file formats               |          ❌     	    | :white_check_mark:|
 |         Dark Mode       	          |         ➖   	      | :white_check_mark:|
 |       Download Thumbnails         	|         ➖         	| :white_check_mark:|
+|   Download Age-restriced vidoes 	|         ❌         	| :white_check_mark:|
 
 
 ## Native Build Details
