@@ -546,7 +546,6 @@ class App:
             self.logfield["state"] = "disabled"
 
 
-
     ######################################################################################
 
 
@@ -603,15 +602,14 @@ class App:
             self.query = self.urlfield.get() # gets entry input
             self.yt = YouTube(self.query)
 
-
         except RegexMatchError as e:
             print("Regex match error! Invalid...\n" + str(e) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
-            self.logfield.insert(END, f'\nERROR: There was a regex match error. Invalid link or entry!\n')
+            self.logfield.insert(END, f'\nERROR: Regex could not parse URL field!\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
         except urllib.error.HTTPError as err:
-            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            print("\n\nThere was a (maybe) 404 Not Found error!\n" + str(err) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
             self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
@@ -874,7 +872,7 @@ class App:
                 self.logfield["state"] = "normal" # disable log after any erros are detected
 
             elif self.enablePrompts: # hasnt selected video nor audio
-                self.logfield.insert(END, f'\nERROR: You can\'t download a video with video or audio!\n')
+                self.logfield.insert(END, f'\nERROR: You can\'t download a video without video or audio!\n')
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
