@@ -47,7 +47,7 @@ class App:
         self.audioq = "" # audio quality example: 128kbs
         self.videof = "" # vid format example: mp4
         self.audiof = "" # audio format example: wav
-        # DEVS DONT INCLUDE "."s ^^^BEFORE EXTENSIONS^^^
+        
 
         ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
