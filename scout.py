@@ -139,6 +139,7 @@ class App:
         # Summary of this block: This generates the YML from scratch if its outdated or doesnt exist, and ignores otherwise.
         # Uses sample yml "cache.yml" to compare it being the newest yml to a potentially old one. (Not enough or different settings).
 
+
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
             {
@@ -467,11 +468,6 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        # if self.OS != "Darwin":
-        #     print("BS")
-        # else:
-        #     print("LOLOLOL")
-
         if self.OS not in "Windows Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
@@ -492,7 +488,8 @@ class App:
 
         else:
             self.logfield["state"] = "normal"
-            if not os.path.isfile(self.fileLoc + "ffmpeg"):
+            ext = "ffmpeg" if self.OS in "Darwin" else "ffmpeg.exe" # nice inline statement ;)
+            if not os.path.isfile(self.fileLoc + ext):
                 messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
@@ -510,36 +507,32 @@ class App:
 
                 if self.OS in "Darwin":
                     wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
+                    with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
+                        zip.extractall()
+                        print("\nFile extracted...\n")
+
                 elif self.OS in "Windows":
-                    wget.download("https://objects.githubusercontent.com/github-production-release-asset-2e65be/306803927/a4aff49c-00d5-45c2-84e2-a6c957fd306d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20211230%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20211230T005150Z&X-Amz-Expires=300&X-Amz-Signature=6c150991cd2d350b9df2571451a382642918647b4af601419038474a66723b50&X-Amz-SignedHeaders=host&actor_id=49649192&key_id=0&repo_id=306803927&response-content-disposition=attachment%3B%20filename%3Dffmpeg-2021-12-27-git-617452ce2c-essentials_build.zip&response-content-type=application%2Foctet-stream", self.fileLoc + "ffmpeg.zip")
+                    wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
+                try:
+                    if self.OS in "Darwin": # run for perms for UNIX bs
+                        subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
+                        print("\nFFmpeg binary is now executable! :)\n")
+                    else:
+                        pass
 
-                with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
-                    zip.extractall()
-                print("\nFile extracted...\n")
-
-                if self.OS in "Windows":
-                    os.chdir(self.fileLoc) # get into config folder
-                    f = shutil.move(f"{self.fileLoc}\\ffmpeg\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg", self.fileLoc + "ffmpeg")
-                    f()
-                    print(f)
-
-                else:
-                    print("Didn't need to extract ffmpeg binary out of multiple directories.")
-
-                if self.OS in "darwin": # run for perms for UNIX bs
-                    subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
-                    print("\nFFmpeg binary is now executable! :)\n")
-                else:
-                    pass
-
-                os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
-                print("\nPurged inital zip file\n")
+                    os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
+                    print("\nPurged inital zip file\n")
+                except:
+                    print("Skipped macOS actions...")
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
                 messagebox.showinfo("Success!", "FFmpeg was installed! Continue.")
 
             if os.path.isfile(self.fileLoc + "ffmpeg"): # chevck again if it is now installed
+                print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
+                self.ffmpeg = True
+            elif os.path.isfile(self.fileLoc + "ffmpeg.exe"): # chevck again if it is now installed
                 print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
                 self.ffmpeg = True
             else: # If the binary file still isnt present after the first if block which downloads/installs it
@@ -550,7 +543,6 @@ class App:
                 self.videoformat["state"] = "disabled"
                 self.audioformat["state"] = "disabled"
                 self.ffmpeg = False
-                print("")
             self.logfield["state"] = "disabled"
 
 
