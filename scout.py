@@ -470,6 +470,9 @@ class App:
     # These coinside with the log field element itself
 
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
+
+    def checkFFmpeg(self, quitBool):
+
         self.ffmpeg = bool
 
         if self.OS not in "Windows Darwin":
@@ -494,31 +497,33 @@ class App:
             self.logfield["state"] = "normal"
             ext = "ffmpeg" if self.OS in "Darwin" else "ffmpeg.exe" # nice inline statement ;)
             if not os.path.isfile(self.fileLoc + ext):
-                messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
 
-                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
+                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\nPlease go to the help button and to seek guidance on the wiki and more.')
 
                 print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
 
                 print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
 
+                messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
+
                 os.chdir(self.fileLoc)
                 time.sleep(1)
 
                 if self.OS in "Darwin":
+                    self.logfield.insert(END, f'\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
                     wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
                     with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
                         zip.extractall()
                         print("\nFile extracted...\n")
 
                 elif self.OS in "Windows":
-                    self.logfield.insert(END, f'\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
+                    self.logfield.insert(END, f'\n\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
                     wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
                 try:
                     if self.OS in "Darwin": # run for perms for UNIX bs
-                        subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
+                        subprocess.run(f"chmod +x \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
                         print("\nFFmpeg binary is now executable! :)\n")
                     else:
                         pass
@@ -530,8 +535,12 @@ class App:
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
-                messagebox.showinfo("Success!", "FFmpeg was installed! Restart.")
-                quit()
+                if quitBool:
+                    messagebox.showinfo("Success!", "FFmpeg was installed! Restart.")
+                    quit()
+                else:
+                    messagebox.showinfo("Success!", "FFmpeg was installed! Resuming download...")
+
 
             if os.path.isfile(self.fileLoc + "ffmpeg"): # chevck again if it is now installed
                 print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
@@ -549,6 +558,7 @@ class App:
                 self.ffmpeg = False
             self.logfield["state"] = "disabled"
 
+        return self.checkFFmpeg
 
     ######################################################################################
 
@@ -599,6 +609,8 @@ class App:
         'HTMLParseError': "\nERROR: HTML parsing or extraction has failed",
         'VideoUnavailable': "\nERROR: This video is unavalilable, may possibly be payed material or region-locked\n"}
 
+        # check if ffmpeg binary is present if not for whatever reason...?
+        self.checkFFmpeg(False)
 
         try:
             self.logfield["state"] = "normal"
