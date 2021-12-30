@@ -120,7 +120,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
-            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
+            self.ffmpegDir = self.fileLoc + "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -507,15 +507,30 @@ class App:
                 self.logfield.insert(END, f'\nINFO: If don\'t h')
 
                 time.sleep(1)
-                wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
+
+                if self.OS in "Darwin":
+                    wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
+                elif self.OS in "Windows":
+                    wget.download("https://objects.githubusercontent.com/github-production-release-asset-2e65be/306803927/a4aff49c-00d5-45c2-84e2-a6c957fd306d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20211230%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20211230T005150Z&X-Amz-Expires=300&X-Amz-Signature=6c150991cd2d350b9df2571451a382642918647b4af601419038474a66723b50&X-Amz-SignedHeaders=host&actor_id=49649192&key_id=0&repo_id=306803927&response-content-disposition=attachment%3B%20filename%3Dffmpeg-2021-12-27-git-617452ce2c-essentials_build.zip&response-content-type=application%2Foctet-stream", self.fileLoc + "ffmpeg.zip")
 
                 with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
                     zip.extractall()
                 print("\nFile extracted...\n")
 
+                if self.OS in "Windows":
+                    os.chdir(self.fileLoc) # get into config folder
+                    f = shutil.move(f"{self.fileLoc}\\ffmpeg\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg", self.fileLoc + "ffmpeg")
+                    f()
+                    print(f)
+
+                else:
+                    print("Didn't need to extract ffmpeg binary out of multiple directories.")
+
                 if self.OS in "darwin": # run for perms for UNIX bs
                     subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
                     print("\nFFmpeg binary is now executable! :)\n")
+                else:
+                    pass
 
                 os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
                 print("\nPurged inital zip file\n")
