@@ -530,7 +530,8 @@ class App:
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
-                messagebox.showinfo("Success!", "FFmpeg was installed! Continue.")
+                messagebox.showinfo("Success!", "FFmpeg was installed! Restart.")
+                quit()
 
             if os.path.isfile(self.fileLoc + "ffmpeg"): # chevck again if it is now installed
                 print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
