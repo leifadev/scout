@@ -50,6 +50,7 @@ class App:
 
         ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
+        ssl._create_default_https_context = ssl._create_unverified_context # fixed windows SSL cert issue
 
         ####################################################
         #                                                  #
