@@ -14,6 +14,7 @@ import os
 import wget
 import distro
 import platform
+import time
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
@@ -120,7 +121,7 @@ class App:
                 print("You don't have a selected path! Defaulting your desktop.\nFor more help use the help button to our github.")
             self.restartMsgY = None
             self.path_slash = "\\"
-            self.ffmpegDir = "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
+            self.ffmpegDir = self.fileLoc + "ffmpeg" # change this if you are downloading a seperate ffmpeg binary to config like macOS
             self.UIAttributes = { # pre-made attributes to be place holders for multiple tkinter parames later on
                 "Font": "Courier",
                 "charSize": 8,
@@ -138,6 +139,7 @@ class App:
 
         # Summary of this block: This generates the YML from scratch if its outdated or doesnt exist, and ignores otherwise.
         # Uses sample yml "cache.yml" to compare it being the newest yml to a potentially old one. (Not enough or different settings).
+
 
         # Pre-made Database (pre-made yml structure for intial generation)
         self.payload = [
@@ -467,11 +469,6 @@ class App:
     # FFmpeg warning: For formatting one must install ffmpeg for video formatting
         self.ffmpeg = bool
 
-        # if self.OS != "Darwin":
-        #     print("BS")
-        # else:
-        #     print("LOLOLOL")
-
         if self.OS not in "Windows Darwin":
             if shutil.which('ffmpeg') is None:
                 self.logfield["state"] = "normal"
@@ -492,36 +489,51 @@ class App:
 
         else:
             self.logfield["state"] = "normal"
-            if not os.path.isfile(self.fileLoc + "ffmpeg"):
+            ext = "ffmpeg" if self.OS in "Darwin" else "ffmpeg.exe" # nice inline statement ;)
+            if not os.path.isfile(self.fileLoc + ext):
                 messagebox.showwarning("Warning", "You do not have FFmpeg library installed, please wait several seconds for it to install.\n\nInternet is required!")
 
                 self.logfield["state"] = "normal"
 
-                self.logfield.insert(END, f'\nINFO: If don\'t have an internet connection to isntall FFmpeg, you can for now use file formatting features.\n\nJust relaunch scout when you have internet and you are good to go.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
+                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\n\nPlease go to the help button and to seek guidance on the wiki and more.')
 
                 print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
 
-                os.chdir(self.fileLoc)
-                wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
-
                 print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
 
-                with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
-                    zip.extractall()
-                print("\nFile extracted...\n")
+                os.chdir(self.fileLoc)
+                self.logfield.insert(END, f'\nINFO: If don\'t h')
 
-                if self.OS in "darwin": # run for perms for UNIX bs
-                    subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
-                    print("\nFFmpeg binary is now executable! :)\n")
+                time.sleep(1)
 
-                os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
-                print("\nPurged inital zip file\n")
+                if self.OS in "Darwin":
+                    wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
+                    with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
+                        zip.extractall()
+                        print("\nFile extracted...\n")
+
+                elif self.OS in "Windows":
+                    wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
+                try:
+                    if self.OS in "Darwin": # run for perms for UNIX bs
+                        subprocess.run(f"chmod 755 \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
+                        print("\nFFmpeg binary is now executable! :)\n")
+                    else:
+                        pass
+
+                    os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
+                    print("\nPurged inital zip file\n")
+                except:
+                    print("Skipped macOS actions...")
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
                 messagebox.showinfo("Success!", "FFmpeg was installed! Continue.")
 
             if os.path.isfile(self.fileLoc + "ffmpeg"): # chevck again if it is now installed
+                print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
+                self.ffmpeg = True
+            elif os.path.isfile(self.fileLoc + "ffmpeg.exe"): # chevck again if it is now installed
                 print("\nFFmpeg is present in your config folder!\n(" + self.fileLoc + ")\n")
                 self.ffmpeg = True
             else: # If the binary file still isnt present after the first if block which downloads/installs it
@@ -532,9 +544,7 @@ class App:
                 self.videoformat["state"] = "disabled"
                 self.audioformat["state"] = "disabled"
                 self.ffmpeg = False
-                print("")
             self.logfield["state"] = "disabled"
-
 
 
     ######################################################################################
@@ -593,15 +603,14 @@ class App:
             self.query = self.urlfield.get() # gets entry input
             self.yt = YouTube(self.query)
 
-
         except RegexMatchError as e:
             print("Regex match error! Invalid...\n" + str(e) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
-            self.logfield.insert(END, f'\nERROR: There was a regex match error. Invalid link or entry!\n')
+            self.logfield.insert(END, f'\nERROR: Regex could not parse URL field!\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
 
         except urllib.error.HTTPError as err:
-            print("\n\nThere was a 404 Not Found error!\n" + str(err) + "\n")
+            print("\n\nThere was a (maybe) 404 Not Found error!\n" + str(err) + "\n")
             self.logfield["state"] = "normal" # disable log after any erros are detected
             self.logfield.insert(END, f'\nERROR: There was a 404 Not Found error. Internet down?\nOtherwise may be a (temporary) bug on the backend.\n\nBring this to the github.\n')
             self.logfield["state"] = "disabled" # disable log after any erros are detected
@@ -864,7 +873,7 @@ class App:
                 self.logfield["state"] = "normal" # disable log after any erros are detected
 
             elif self.enablePrompts: # hasnt selected video nor audio
-                self.logfield.insert(END, f'\nERROR: You can\'t download a video with video or audio!\n')
+                self.logfield.insert(END, f'\nERROR: You can\'t download a video without video or audio!\n')
 
             self.logfield["state"] = "disabled" # disabled the entirity again
 
