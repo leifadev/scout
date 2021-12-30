@@ -14,6 +14,7 @@ import os
 import wget
 import distro
 import platform
+import time
 import subprocess # used for ffmpeg (file formatting)
 import shutil # mainly used for detecting ffmpeg installation
 from datetime import datetime
