@@ -500,6 +500,8 @@ class App:
 
                 self.logfield["state"] = "normal"
 
+                self.logfield.insert(END, f'\nINFO: WAIT! Please wait up to a minute (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.\n\n')
+
                 self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\nPlease go to the help button and to seek guidance on the wiki and more.')
 
                 print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
@@ -512,14 +514,12 @@ class App:
                 time.sleep(1)
 
                 if self.OS in "Darwin":
-                    self.logfield.insert(END, f'\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
                     wget.download("https://evermeet.cx/ffmpeg/getrelease/zip", self.fileLoc + "ffmpeg.zip")
                     with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
                         zip.extractall()
                         print("\nFile extracted...\n")
 
                 elif self.OS in "Windows":
-                    self.logfield.insert(END, f'\n\nINFO: WAIT! Please wait 1 to a couple minutes (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.')
                     wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
                 try:
                     if self.OS in "Darwin": # run for perms for UNIX bs
