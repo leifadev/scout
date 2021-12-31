@@ -521,17 +521,19 @@ class App:
 
                 elif self.OS in "Windows":
                     wget.download("https://github.com/leifadev/scout/blob/main/dependencies/ffmpeg.exe?raw=true")
-                try:
-                    if self.OS in "Darwin": # run for perms for UNIX bs
+
+                if self.OS in "Darwin": # run for perms for UNIX bs
+                    try:
                         subprocess.run(f"chmod +x \"ffmpeg\"", shell=True) # gives perms for the file to be an executable like all binaries should be
                         print("\nFFmpeg binary is now executable! :)\n")
-                    else:
-                        pass
+                    except:
+                        print("Skipped macOS actions...")
+                else:
+                    pass
 
-                    os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
-                    print("\nPurged inital zip file\n")
-                except:
-                    print("Skipped macOS actions...")
+                os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
+                print("\nPurged inital zip file\n")
+
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
