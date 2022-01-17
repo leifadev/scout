@@ -531,9 +531,11 @@ class App:
                 else:
                     pass
 
-                os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
-                print("\nPurged inital zip file\n")
-
+                try:
+                    os.remove("ffmpeg.zip") # remove zipped file for clean dir and less space
+                    print("\nPurged inital zip file\n")
+                except:
+                    print("Zip file not present, already deleted by the OS?")
 
                 print("\nFFmpeg was sucessfully automatically installed to your config directory!\n")
 
