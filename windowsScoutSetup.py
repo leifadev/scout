@@ -16,7 +16,8 @@ NOTE: Make an options available local path and system-wide path
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import *
-import webbrowser, getpass, wget, os, time, zipfile
+import webbrowser, getpass, wget, os, time
+from zipfile import ZipFile
 
 
 class Window:
@@ -24,6 +25,7 @@ class Window:
 
         self.localPath = ""
         self.systemPath = ""
+        self.permDir = "C:\\Users\\{getpass.getuser()}\\AppData\\Roaming\\" # add \\FFmpeg folder later!
         self.tempDir = f"C:\\Users\\{getpass.getuser()}\\AppData\\Local\\Temp\\" # ADD TEMP DIR FROM WINDOWS
         self.icon = ""
         self.version = "v0.1"
@@ -80,7 +82,8 @@ class Window:
         self.cancelB.grid(row=0, column=0, padx=(100, 10))
 
 
-    # Functions!
+
+    ## Functions! ##
 
     def install(self, type: str):
         os.chdir(self.tempDir)
@@ -88,11 +91,22 @@ class Window:
 
         print("\nDownloading latest stable version of ffmpeg, may take several seconds!\n")
 
+        try:
+            os.mkdir("C:\\Users\\Leif\\AppData\\Roaming\\FFmpeg\\")
+        except:
+            print("FFmpeg folder is already there, by this script?")
+        print("Made FFmpeg directory for unzipping...")
+
         self.logfield.insert("Extracting ffmpeg zip...")
         with ZipFile("ffmpeg.zip", 'r') as zip: # extracts downloaded zip from ffmpegs download API for latest release
-            zip.extractall()
-        self.logfield.insert("File extracted!")
+            zip.extractall(self.permDir) # permanent spot for ffmpeg binary as said in line 27
+        self.logfield.insert(f"File extracted to {self.permDir}!")
         print("\nFile extracted...\n")
+
+
+        # change sys path!
+
+
 
 
     # cancels program and "saves"
