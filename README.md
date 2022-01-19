@@ -2,7 +2,7 @@
 
 A simple but powerful python-based __cross-platform__ youtube video/audio downloader.
 
-No bloated javascript fishy redirect ad websites anymore!
+**No bloated __javascript__ and __fishy__ redirect ad websites anymore!**
 
 <img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="300" width="690"/>
 
