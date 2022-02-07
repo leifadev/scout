@@ -51,7 +51,7 @@ class setup:
             for x in self.version:
                 if x not in self.python:
                     print("Your pip version may be outdated or your entry is invalid.")
-                    return
+                    continue
             if "3" in self.moveOn:
                 print("Ok, you seem to be using a python version of python to python3.9!")
             else:
@@ -75,7 +75,7 @@ class setup:
             for x in self.which:
                 if x not in self.pip:
                     print("\nYour pip version may be outdated or your entry is invalid.")
-                    return
+                    continue
             if "3" in self.which:
                 print("\nOk, you seem to be using a pip version of pip3 or pip3.9!")
         else:
@@ -87,11 +87,14 @@ class setup:
         try:
             import wget
             import pipdeptree
-        except ModuleNotFoundError:
+            import pyperclip
+        except ModuleNotFoundError as e:
             print("You do not have the module 'pipdeptree'")
-            subprocess.run(f'{self.which} install pipdeptree wget', shell=True)
+            print(e)
+            subprocess.run(f'{self.which} install pipdeptree wget pyperclip', shell=True)
             import wget as wget
             import pipdeptree as pipdeptree
+            import pyperclip
 
         if self.which in ("pip","pip3"):
             time.sleep(0.5)
@@ -171,7 +174,7 @@ class setup:
             self.targetFile = "scout.py"
         else:
             if ".py" not in self.targetFile:
-                print("ERROR: You did not include .py in your file. Please use e.g. main.py, scout.py, app.py.")
+#                print("ERROR: You did not include .py in your file. Please use e.g. main.py, scout.py, app.py.")
                 return
 
         print(f'\nYou chose:\n >> {self.targetFile} << \n')
@@ -288,9 +291,20 @@ class setup:
             return
 
 
-        time.sleep(2)
+        print(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file="{self.appVersion}" -n={self.name} {self.targetFile}')
 
-        print(f'\nCommand:\n{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file="{self.appVersion}" -n={self.name} {self.targetFile}\n')
+
+        time.sleep(2)
+        
+        
+        import pyperclip
+        clipBool = input("Do you want to copy the compile terminal command to your clipboard just in case? Y/n: ")
+        if clipBool in "yY":
+            pyperclip.copy(f'{self.version} -m PyInstaller --onefile {self.debug} --icon={self.icon} --osx-bundle-identifier={self.bundleId} --version-file="{self.appVersion}" -n={self.name} {self.targetFile}')
+        elif clipBool in "nN":
+            return
+        else:
+            return
 
         time.sleep(1)
 

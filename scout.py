@@ -23,7 +23,7 @@ import urllib.error
 import ssl
 
 
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 # Above allows more charcters to mentioned IN THE CODE
 
 class App:
