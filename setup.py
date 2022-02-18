@@ -84,6 +84,7 @@ class setup:
         print(f"\nYour using: {self.which}")
 
         # Make and/or reset module requirements!
+        subprocess.run(f'{self.which} install pip-upgrader', shell=True)
         try:
             import wget
             import pipdeptree
@@ -95,7 +96,6 @@ class setup:
             import wget as wget
             import pipdeptree as pipdeptree
             import pyperclip
-            subprocess.run(f'{self.which} install pip-upgrader', shell=True)
 
         if self.which in ("pip", "pip3"):
             time.sleep(0.5)
@@ -141,8 +141,8 @@ class setup:
                     except urllib.error.HTTPError as err:
                         print(f"ERROR: Request for new manReq.txt from github url not wasn't found/invalid!\n{err}")
 
-                    subprocess.run(f"pip-upgrade --skip-package-installation") # upgrade manreq.txt
-                    subprocess.run(f"{self.which} install -r -U manReq.txt", shell=True)
+                    subprocess.run(f"pip-upgrade --skip-package-installation manReq.txt", shell=True) # upgrade manreq.txt
+                    subprocess.run(f"{self.which} install -r manReq.txt", shell=True)
                     print(f"Upgraded modules from repo!")
 
 
@@ -297,8 +297,8 @@ class setup:
 
 
         time.sleep(2)
-        
-        
+
+
         import pyperclip
         clipBool = input("Do you want to copy the compile terminal command to your clipboard just in case? Y/n: ")
         if clipBool in "yY":
