@@ -88,10 +88,9 @@ class setup:
             import wget
             import pyperclip
         except ModuleNotFoundError as e:
-            print("You do not have the module 'pipdeptree'")
-            print(e)
+            print(f"Require modules for the script were not found! {e}")
             subprocess.run(f'{self.which} install wget pyperclip', shell=True)
-            import wget as wget
+            import wget
             import pyperclip
 
         if self.which in ("pip", "pip3"):
