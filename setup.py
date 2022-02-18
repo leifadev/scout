@@ -95,8 +95,9 @@ class setup:
             import wget as wget
             import pipdeptree as pipdeptree
             import pyperclip
+            subprocess.run(f'{self.which} install pip-upgrader', shell=True)
 
-        if self.which in ("pip","pip3"):
+        if self.which in ("pip", "pip3"):
             time.sleep(0.5)
             try:
                 os.remove("requirements.txt")
@@ -138,12 +139,12 @@ class setup:
                         wget.download("https://raw.githubusercontent.com/leifadev/scout/main/manReq.txt", "manReq.txt")
                         print("manReq.txt not present! Generating new one")
                     except urllib.error.HTTPError as err:
-                        print("ERROR: Request for new manReq.txt from github url not wasn't found/invalid!")
+                        print(f"ERROR: Request for new manReq.txt from github url not wasn't found/invalid!\n{err}")
 
+                    subprocess.run(f"pip-upgrade --skip-package-installation") # upgrade manreq.txt
+                    subprocess.run(f"{self.which} install -r -U manReq.txt", shell=True)
+                    print(f"Upgraded modules from repo!")
 
-                # subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent')
-                    subprocess.run(self.which + f" install -r manReq.txt", shell=True)
-                    print(f"\n\n **MANREQ DONE**\n\n")
 
                 elif self.manReq == False:
                     print(f"Installing just now genrated modules...")
@@ -152,7 +153,8 @@ class setup:
                     open('requirements.txt', "w+").close()
                     subprocess.run(f"{self.version} -m pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
                     subprocess.run(self.which + f" install -r requirements.txt", shell=True)
-            except ModuleNotFoundError as e:
+
+            except ModuleNotFoundError:
                 print(f'\n----------------------------------------------\nYou do not have tkinter installed with python!\nTkinter is required for the GUI to work.\n----------------------------------------------\n')
                 pass
         else:
