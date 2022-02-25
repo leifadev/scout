@@ -62,7 +62,6 @@ class setup:
         self.version = self.moveOn
         print(f"\nYour using: {self.version}")
 
-
         time.sleep(0.5)
         print("\nBeginning!\n")
 
@@ -84,47 +83,42 @@ class setup:
         print(f"\nYour using: {self.which}")
 
         # Make and/or reset module requirements!
+        subprocess.run(f'{self.which} install pip-upgrader', shell=True)
         try:
             import wget
-            import pipdeptree
             import pyperclip
         except ModuleNotFoundError as e:
-            print("You do not have the module 'pipdeptree'")
-            print(e)
-            subprocess.run(f'{self.which} install pipdeptree wget pyperclip', shell=True)
-            import wget as wget
-            import pipdeptree as pipdeptree
+            print(f"Require modules for the script were not found! {e}")
+            subprocess.run(f'{self.which} install wget pyperclip', shell=True)
+            import wget
             import pyperclip
 
-        if self.which in ("pip","pip3"):
+        if self.which in ("pip", "pip3"):
             time.sleep(0.5)
             try:
                 os.remove("requirements.txt")
             except FileNotFoundError:
                 print(f'requirements.txt is not present as acting for freezing modules. Maybe you have a file for this under a different name?')
 
-            self.manReq = str(input("\n*Premade option reccomended!*\nEnter for default version modules, anything for generated: "))
+            self.manReq = str(input("\nEnter for default version modules: "))
+            """
+            DEV NOTE: As of Feb. 18 2022, the automatic requirements.txt pipdeptree option is deprecated and REMOVED
+            The reason why you are seeing self.manReq still being used, and being True everytime is just for the sake of simplicity in removing
+            the feature from the setup.py script. The above input() prompt essentially now is just a confirmation prompt, it's easier for me to
+            just set too true regardless and keep some structure in case I need to use the option again at all, probably not thought ;)
+            """
+            
             if self.manReq == "":
                 self.manReq = True
             else:
-                self.manReq = False
-                time.sleep(0.5)
-                if self.manReq != None:
-                    print("\nIf you are ON WINDOWS, genrated modules will NOT work, for UNIX only.")
-                    self.manReqConfirm = str(input("Press enter to start over, other UNIX systems go ahead enter anything: "))
-                    if self.manReqConfirm is "":
-                        exit()
-                    else:
-                        pass
-                else:
-                    pass
+                self.manReq = True
             print(f"\nRemoving requirements.txt in current folder directory...\n")
             time.sleep(1)
             print(os.getcwd() + ", is the current executing path. \nIf this isn't, maybe look into the code, and/or submit an issue at the github")
             time.sleep(2)
             print("\n**Installing**")
             print(self.manReq)
-            time.sleep(1.5)
+            time.sleep(1)
             try:
                 import tkinter
                 if self.manReq:
@@ -133,26 +127,22 @@ class setup:
                     if os.path.isfile("manReq.txt"):
                         print("No manReq.txt! Making fresh one")
                         os.remove("manReq.txt")
-                    import wget as wget
+                    
+                    # Download custom name requirements.txt
                     try:
                         wget.download("https://raw.githubusercontent.com/leifadev/scout/main/manReq.txt", "manReq.txt")
                         print("manReq.txt not present! Generating new one")
                     except urllib.error.HTTPError as err:
-                        print("ERROR: Request for new manReq.txt from github url not wasn't found/invalid!")
+                        print(f"ERROR: Request for new manReq.txt from github url not wasn't found/invalid!\n{err}")
 
-
-                # subprocess.run("cat manReq.txt >> requirements.txt", shell=True) #fetch promade module list relavent')
-                    subprocess.run(self.which + f" install -r manReq.txt", shell=True)
-                    print(f"\n\n **MANREQ DONE**\n\n")
+                    subprocess.run(f"pip-upgrade --skip-package-installation manReq.txt", shell=True) # upgrade manreq.txt
+                    subprocess.run(f"{self.which} install -r manReq.txt", shell=True)
+                    print(f"Upgraded modules from repo!")
 
                 elif self.manReq == False:
-                    print(f"Installing just now genrated modules...")
-                    print("\nFeezing, NOTE that the file for your freezed modules is coded to use 'requirements.txt'\nModify setup.py code if desired.")
-                    time.sleep(1)
-                    open('requirements.txt', "w+").close()
-                    subprocess.run(f"{self.version} -m pipdeptree --warn silence | grep -E '^\w+' >> requirements.txt", shell=True) # using pipdeptree instead of pip's freezing: for
-                    subprocess.run(self.which + f" install -r requirements.txt", shell=True)
-            except ModuleNotFoundError as e:
+                    pass # Use this if needed a second option/method to auto upgrade all modules
+
+            except ModuleNotFoundError:
                 print(f'\n----------------------------------------------\nYou do not have tkinter installed with python!\nTkinter is required for the GUI to work.\n----------------------------------------------\n')
                 pass
         else:
@@ -295,8 +285,8 @@ class setup:
 
 
         time.sleep(2)
-        
-        
+
+
         import pyperclip
         clipBool = input("Do you want to copy the compile terminal command to your clipboard just in case? Y/n: ")
         if clipBool in "yY":

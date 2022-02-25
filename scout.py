@@ -502,7 +502,7 @@ class App:
 
                 self.logfield.insert(END, f'\nINFO: WAIT! Please wait up to a minute (depending on your internet connection)\nfor scout to download video and audio conversion! This will only happen once.\n\n')
 
-                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\nPlease go to the help button and to seek guidance on the wiki and more.')
+                self.logfield.insert(END, f'\nINFO: If you don\'t have an internet connection to install FFmpeg, wait until you do. Then relaunch scout when you have one.\nPlease go to the help button and to seek guidance on the wiki and more.\n')
 
                 print("\nYou don\'t have FFmpeg installed! DONT WORRY, it will be installed automatically for you now!\n")
 
