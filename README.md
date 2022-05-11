@@ -69,8 +69,9 @@ In the makefile, or just using the setup.py you can easily configure and build y
 - ~~Add extra video file console logging~~
 - ~~Add thumbnail downloading  support~~
 - **Add playlist support with video selection**
-- **Add custom theme integration (TkkThemes)**
-- **Add segmented video download support**
+- **Add custom theme integration (TtkThemes)**
+- **Built-in update manager**
+
 
 # Help
 
