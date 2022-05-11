@@ -259,24 +259,6 @@ class App:
         parent.geometry(alignstr)
         parent.resizable(width=False, height=False)
 
-        # DEPRECATED \/\/\/
-        ## area where clicks are detected ##
-
-#        frame = Frame(parent, width=100, height=30)
-#        frame.bind("<Button-1>", leftclick)
-#        frame.place(x=170,y=300,width=35)
-#        if self.darkMode:
-#            frame["bg"] = '#464646'
-#        else:
-#            frame['bg'] = "#ececec"
-
-
-#        canvas = Canvas(frame, width=845, height=350)
-#        canvas.pack()
-#
-#        test = PhotoImage(file="test.png")
-#        canvas.create_image(350,50,image=test)apply
-
 
         ## Menu items ##
 
