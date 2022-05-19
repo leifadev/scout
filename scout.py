@@ -24,7 +24,7 @@ import ssl
 
 
 # -*- mode: python ; coding: utf-8 -*-
-# Above allows more charcters to mentioned IN THE CODE
+# Above allows more charcters to mentioned IN THE Code
 
 class App:
     def __init__(self, parent):
