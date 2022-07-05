@@ -4,7 +4,7 @@ A simple but powerful python-based __cross-platform__ youtube video/audio downlo
 
 **No bloated __javascript__ and __fishy__ redirect ad websites anymore!**
 
-<img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="300" width="690"/>
+<img src="https://github.com/leifadev/scout/blob/main/doc/images/DEMO.png" alt="Demo" height="300" width="670"/>
 
 ## Why Scout?
 |              Features             	|      Websites      	|        Scout       |
